@@ -20,7 +20,7 @@
         "Ruff check passes: `uv run ruff check .`"
       ],
       "priority": 1,
-      "passes": false,
+      "passes": true,
       "notes": "Use UV for package management. Python 3.11+. Read port from config for dynamic allocation."
     },
     {
