@@ -23,7 +23,7 @@
         "Run `bun run lint` passes"
       ],
       "priority": 1,
-      "passes": false,
+      "passes": true,
       "notes": "Use Bun for package management. TypeScript strict mode enabled by default in Vite template."
     },
     {
@@ -45,7 +45,7 @@
         "Lint passes"
       ],
       "priority": 2,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {
@@ -64,7 +64,7 @@
         "Lint passes"
       ],
       "priority": 3,
-      "passes": false,
+      "passes": true,
       "notes": "Passphrase will be read from auth store created in FE-004. For now, interceptor can be a placeholder."
     },
     {
@@ -85,7 +85,7 @@
         "Lint passes"
       ],
       "priority": 4,
-      "passes": false,
+      "passes": true,
       "notes": "Multiple inventories can be remembered simultaneously."
     },
     {
@@ -108,7 +108,7 @@
         "Lint passes"
       ],
       "priority": 5,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {
@@ -131,7 +131,7 @@
         "Lint passes"
       ],
       "priority": 6,
-      "passes": false,
+      "passes": true,
       "notes": "The Inventory page will be fully built in Phase 2, but should handle auth flow now."
     }
   ]
