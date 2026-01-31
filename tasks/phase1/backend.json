@@ -20,7 +20,7 @@
         "Ruff check passes: `uv run ruff check .`"
       ],
       "priority": 1,
-      "passes": false,
+      "passes": true,
       "notes": "Use UV for package management. Python 3.11+. Read port from config for dynamic allocation."
     },
     {
@@ -40,7 +40,7 @@
         "Ruff check passes"
       ],
       "priority": 2,
-      "passes": false,
+      "passes": true,
       "notes": "Use aiosqlite for async SQLite. Database file at data/dnd_inventory.db."
     },
     {
@@ -62,7 +62,7 @@
         "Ruff check passes"
       ],
       "priority": 3,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {
@@ -81,7 +81,7 @@
         "Ruff check passes"
       ],
       "priority": 4,
-      "passes": false,
+      "passes": true,
       "notes": ""
     },
     {
@@ -103,7 +103,7 @@
         "Ruff check passes"
       ],
       "priority": 5,
-      "passes": false,
+      "passes": true,
       "notes": "Use secrets.token_hex(2) for random suffix generation."
     },
     {
@@ -126,7 +126,7 @@
         "Ruff check passes"
       ],
       "priority": 6,
-      "passes": false,
+      "passes": true,
       "notes": ""
     }
   ]
