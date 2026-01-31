@@ -1,10 +1,10 @@
 {
   "project": "D&D Party Inventory Manager",
-  "branchName": "ralph/phase-1-backend-core",
+  "branchName": "ralph/backend-phase-1",
   "description": "Phase 1: Backend foundation - FastAPI app with SQLite database and core inventory/auth endpoints",
   "userStories": [
     {
-      "id": "US-001",
+      "id": "BE-001",
       "title": "Backend project scaffolding",
       "description": "Set up the Python backend with FastAPI, UV, and project structure",
       "acceptanceCriteria": [
@@ -21,7 +21,7 @@
       "notes": "Use UV for package management. Python 3.11+"
     },
     {
-      "id": "US-002",
+      "id": "BE-002",
       "title": "SQLAlchemy database setup",
       "description": "Configure async SQLite database with SQLAlchemy",
       "acceptanceCriteria": [
@@ -36,7 +36,7 @@
       "notes": "Use aiosqlite for async SQLite support"
     },
     {
-      "id": "US-003",
+      "id": "BE-003",
       "title": "Inventory ORM model",
       "description": "Create SQLAlchemy model for party inventories",
       "acceptanceCriteria": [
@@ -51,7 +51,7 @@
       "notes": ""
     },
     {
-      "id": "US-004",
+      "id": "BE-004",
       "title": "Inventory Pydantic schemas",
       "description": "Create Pydantic models for inventory API request/response",
       "acceptanceCriteria": [
@@ -67,7 +67,7 @@
       "notes": ""
     },
     {
-      "id": "US-005",
+      "id": "BE-005",
       "title": "Create inventory endpoint",
       "description": "API endpoint to create a new party inventory",
       "acceptanceCriteria": [
@@ -85,7 +85,7 @@
       "notes": "Slug format: lowercase, hyphens, alphanumeric only"
     },
     {
-      "id": "US-006",
+      "id": "BE-006",
       "title": "Auth and get inventory endpoints",
       "description": "Endpoints for passphrase auth and fetching inventory",
       "acceptanceCriteria": [

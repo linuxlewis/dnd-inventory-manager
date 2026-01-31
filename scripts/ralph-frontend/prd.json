@@ -1,0 +1,107 @@
+{
+  "project": "D&D Party Inventory Manager",
+  "branchName": "ralph/frontend-phase-1",
+  "description": "Phase 1: Frontend foundation - React app with routing, auth flow, and inventory creation",
+  "userStories": [
+    {
+      "id": "FE-001",
+      "title": "Frontend project scaffolding",
+      "description": "Set up the React frontend with Vite, Bun, and core dependencies",
+      "acceptanceCriteria": [
+        "Create frontend/ directory with Vite React TypeScript template",
+        "Install dependencies: react-router-dom, @tanstack/react-query, zustand, axios, tailwindcss, lucide-react",
+        "Configure Tailwind CSS with mobile-first breakpoints",
+        "Create basic App.tsx with React Router setup",
+        "Add scripts to package.json: dev, build, typecheck, lint",
+        "Run `bun install` and `bun run dev` successfully"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Use Bun for package management. TypeScript strict mode."
+    },
+    {
+      "id": "FE-002",
+      "title": "App layout and routing",
+      "description": "Create the base layout shell and route structure",
+      "acceptanceCriteria": [
+        "Create src/components/layout/AppLayout.tsx with header and main content area",
+        "Create src/pages/Home.tsx placeholder",
+        "Create src/pages/Inventory.tsx placeholder",
+        "Create src/pages/NotFound.tsx",
+        "Set up routes: / (home), /:slug (inventory), /* (404)",
+        "Mobile-responsive header with app title",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "FE-003",
+      "title": "API client setup",
+      "description": "Configure Axios client and TanStack Query provider",
+      "acceptanceCriteria": [
+        "Create src/api/client.ts with Axios instance",
+        "Base URL configurable via env var (VITE_API_URL)",
+        "Request interceptor to add X-Passphrase header from store",
+        "Response interceptor for 401 handling",
+        "Wrap App in QueryClientProvider",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "FE-004",
+      "title": "Auth store with Zustand",
+      "description": "Create client-side auth state management",
+      "acceptanceCriteria": [
+        "Create src/stores/authStore.ts with Zustand",
+        "State: sessions Map of slug → passphrase (for multi-inventory support)",
+        "Actions: setSession(slug, passphrase), clearSession(slug), getPassphrase(slug)",
+        "Persist to localStorage",
+        "Create src/hooks/useAuth.ts hook for easy access",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "FE-005",
+      "title": "Home page with create inventory form",
+      "description": "Build the landing page where users create new inventories",
+      "acceptanceCriteria": [
+        "Hero section with app title and brief description",
+        "Create Inventory form: party name, passphrase (with confirm), optional description",
+        "Form validation (name required, passphrase min 6 chars, passwords match)",
+        "Submit button calls API (mock for now if backend not ready)",
+        "On success, redirect to /:slug",
+        "Mobile-friendly form layout",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": "Add mock API response if backend not deployed yet"
+    },
+    {
+      "id": "FE-006",
+      "title": "Inventory access with passphrase",
+      "description": "Handle accessing existing inventory via slug + passphrase",
+      "acceptanceCriteria": [
+        "Section on Home page: 'Access Existing Inventory'",
+        "Input for slug (or parse from URL if navigating directly)",
+        "Passphrase input with show/hide toggle",
+        "Submit validates against API (mock if needed)",
+        "On success: store session, redirect to /:slug",
+        "On failure: show error message",
+        "If already have session for slug, skip auth and load directly",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}
