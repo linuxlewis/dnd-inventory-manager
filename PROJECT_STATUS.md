@@ -1,20 +1,20 @@
 # Project Status — D&D Party Inventory Manager
 
-*Last updated: 2026-01-31 16:45 CST*
+*Last updated: 2026-01-31 17:08 CST*
 
 ## Worktrees
 
 | Worktree | Location | Current Branch | Assigned PRD | Status |
 |----------|----------|----------------|--------------|--------|
-| wt-1 | `../dnd-helper-wt-1` | feat/backend-phase-1 | Backend Phase 1 | 🔀 PR #1 open |
-| wt-2 | `../dnd-helper-wt-2` | feat/frontend-phase-1 | Frontend Phase 1 | 🔀 PR #2 open |
-| wt-3 | `../dnd-helper-wt-3` | wt-3 | — | 🔲 Available |
+| wt-1 | `../dnd-helper-wt-1` | — | — | 🔲 Available |
+| wt-2 | `../dnd-helper-wt-2` | — | — | 🔲 Available |
+| wt-3 | `../dnd-helper-wt-3` | — | — | 🔲 Available |
 
 ---
 
-## Phase 1: Foundation
+## Phase 1: Foundation ✅
 
-### Backend (`tasks/phase1/backend.json`) — PR #1
+### Backend (`tasks/phase1/backend.json`) — Merged
 | ID | Story | Status |
 |----|-------|--------|
 | BE-001 | Backend project scaffolding | ✅ |
@@ -24,7 +24,7 @@
 | BE-005 | Create inventory endpoint | ✅ |
 | BE-006 | Auth and get inventory endpoints | ✅ |
 
-### Frontend (`tasks/phase1/frontend.json`) — PR #2
+### Frontend (`tasks/phase1/frontend.json`) — Merged
 | ID | Story | Status |
 |----|-------|--------|
 | FE-001 | Frontend project scaffolding | ✅ |
@@ -33,6 +33,41 @@
 | FE-004 | Auth store with session persistence | ✅ |
 | FE-005 | Home page with create inventory form | ✅ |
 | FE-006 | Home page access existing inventory | ✅ |
+
+---
+
+## Infra Phase (Current)
+
+### API Tests (`tasks/infra/api-tests.json`)
+| ID | Story | Status |
+|----|-------|--------|
+| TEST-001 | Pytest project setup | 🔲 |
+| TEST-002 | Test fixtures for database and client | 🔲 |
+| TEST-003 | Health endpoint test | 🔲 |
+| TEST-004 | Create inventory endpoint tests | 🔲 |
+| TEST-005 | Auth and get inventory endpoint tests | 🔲 |
+
+### Dev Tooling (`tasks/infra/dev-tooling.json`)
+| ID | Story | Status |
+|----|-------|--------|
+| DEV-001 | Port discovery script | 🔲 |
+| DEV-002 | Local environment setup script | 🔲 |
+| DEV-003 | Unified dev runner | 🔲 |
+| DEV-004 | CLAUDE.md documentation update | 🔲 |
+
+### Docker Deployment (`tasks/infra/docker-local.json`)
+| ID | Story | Status |
+|----|-------|--------|
+| DOCKER-001 | Backend Dockerfile | 🔲 |
+| DOCKER-002 | Frontend Dockerfile | 🔲 |
+| DOCKER-003 | Docker Compose configuration | 🔲 |
+| DOCKER-004 | Tailnet access documentation | 🔲 |
+| DOCKER-005 | Environment configuration for Docker | 🔲 |
+| DOCKER-006 | Production start/stop scripts | 🔲 |
+
+---
+
+## Backlog
 
 ### SRD Data (`tasks/phase1/srd.json`)
 | ID | Story | Status |
@@ -43,14 +78,21 @@
 | SRD-004 | Adventuring gear database | 🔲 |
 | SRD-005 | Combined SRD index | 🔲 |
 
+### Phase 2: Items Management
+*Stories to be detailed after Infra phase. See IMPLEMENTATION.md.*
+
 ---
 
-## Open PRs
+## Port Configuration
 
-| PR | Branch | Stories | Status |
-|----|--------|---------|--------|
-| [#1](https://github.com/linuxlewis/dnd-helper/pull/1) | feat/backend-phase-1 | BE-001 → BE-006 | 🔀 Awaiting review |
-| [#2](https://github.com/linuxlewis/dnd-helper/pull/2) | feat/frontend-phase-1 | FE-001 → FE-006 | 🔀 Awaiting review |
+**Development (dynamic):** Ports assigned by `scripts/dev-setup.sh`
+- Backend: 8000-8099 range
+- Frontend: 5173-5199 range
+
+**Production (Docker):**
+- Backend: 9000
+- Frontend: 9080
+- Access via Tailscale IP: `http://<tailscale-ip>:9080`
 
 ---
 
@@ -66,7 +108,7 @@
 
 ## Next Steps
 
-1. Review and merge PR #1 (Backend Phase 1)
-2. Review and merge PR #2 (Frontend Phase 1)
-3. Optionally kick off SRD data (wt-3 available)
-4. Plan Phase 2: Items Management
+1. Kick off API tests (wt-1)
+2. Kick off Dev tooling (wt-2)
+3. Kick off Docker deployment (wt-3)
+4. All three can run in parallel
