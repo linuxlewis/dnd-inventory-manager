@@ -1,0 +1,104 @@
+{
+  "project": "D&D Party Inventory Manager",
+  "branchName": "ralph/phase-1-backend-core",
+  "description": "Phase 1: Backend foundation - FastAPI app with SQLite database and core inventory/auth endpoints",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Backend project scaffolding",
+      "description": "Set up the Python backend with FastAPI, UV, and project structure",
+      "acceptanceCriteria": [
+        "Create backend/pyproject.toml with dependencies: fastapi, uvicorn[standard], sqlalchemy, pydantic, pydantic-settings, bcrypt, aiosqlite",
+        "Add dev dependencies: ruff, pytest, pytest-asyncio",
+        "Create backend/app/__init__.py",
+        "Create backend/app/main.py with basic FastAPI app and /health endpoint",
+        "Create backend/app/config.py with Pydantic Settings (database_url, encryption_key, cors_origins)",
+        "Run `cd backend && uv sync` successfully",
+        "Server starts with `uv run uvicorn app.main:app --reload`"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Use UV for package management. Python 3.11+"
+    },
+    {
+      "id": "US-002",
+      "title": "SQLAlchemy database setup",
+      "description": "Configure async SQLite database with SQLAlchemy",
+      "acceptanceCriteria": [
+        "Create backend/app/database.py with async engine and session factory",
+        "Enable WAL mode and foreign keys via event listener",
+        "Create backend/app/db/__init__.py and backend/app/db/base.py with declarative base",
+        "Add get_db dependency for FastAPI",
+        "Database file created at data/dnd_inventory.db on startup"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": "Use aiosqlite for async SQLite support"
+    },
+    {
+      "id": "US-003",
+      "title": "Inventory ORM model",
+      "description": "Create SQLAlchemy model for party inventories",
+      "acceptanceCriteria": [
+        "Create backend/app/db/inventory.py with Inventory model",
+        "Fields: id (UUID), slug (unique), passphrase_hash, name, description",
+        "Currency fields: copper, silver, gold, platinum (all integer, default 0)",
+        "Timestamps: created_at, updated_at",
+        "Add model to database initialization"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Inventory Pydantic schemas",
+      "description": "Create Pydantic models for inventory API request/response",
+      "acceptanceCriteria": [
+        "Create backend/app/models/__init__.py",
+        "Create backend/app/models/inventory.py",
+        "InventoryCreate schema: name, passphrase, description (optional), slug (optional)",
+        "InventoryResponse schema: id, slug, name, description, currency fields, timestamps",
+        "InventoryAuth schema: passphrase",
+        "All models use Pydantic v2 syntax"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Create inventory endpoint",
+      "description": "API endpoint to create a new party inventory",
+      "acceptanceCriteria": [
+        "Create backend/app/routers/__init__.py",
+        "Create backend/app/routers/inventories.py with APIRouter",
+        "POST /api/inventories creates new inventory",
+        "Generate slug from name (slugify), append random suffix if collision",
+        "Hash passphrase with bcrypt before storing",
+        "Return created inventory (without passphrase_hash)",
+        "Register router in main.py",
+        "Ruff check passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": "Slug format: lowercase, hyphens, alphanumeric only"
+    },
+    {
+      "id": "US-006",
+      "title": "Auth and get inventory endpoints",
+      "description": "Endpoints for passphrase auth and fetching inventory",
+      "acceptanceCriteria": [
+        "POST /api/inventories/{slug}/auth validates passphrase, returns success boolean",
+        "GET /api/inventories/{slug} requires X-Passphrase header",
+        "Return 401 if passphrase missing or invalid",
+        "Return 404 if inventory not found",
+        "Create backend/app/core/__init__.py and backend/app/core/auth.py for auth helpers",
+        "Ruff check passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}
