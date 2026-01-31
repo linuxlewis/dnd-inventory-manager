@@ -5,7 +5,10 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.database import engine
-from app.db.base import Base
+from app.db import (
+    Base,  # noqa: F401 - import models to register with metadata
+    Inventory,  # noqa: F401
+)
 
 
 @asynccontextmanager
