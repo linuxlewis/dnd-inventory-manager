@@ -1,0 +1,80 @@
+{
+  "project": "D&D Party Inventory Manager",
+  "branchName": "feat/dev-tooling",
+  "description": "Developer tooling for dynamic port assignment and isolated worktree environments",
+  "userStories": [
+    {
+      "id": "DEV-001",
+      "title": "Port discovery script",
+      "description": "As a developer, I need a script that finds available ports so multiple dev environments don't conflict.",
+      "acceptanceCriteria": [
+        "Create scripts/dev-ports.sh",
+        "Script finds 2 available ports: one in 8000-8099 range (backend), one in 5173-5199 range (frontend)",
+        "Uses lsof to check if port is in use",
+        "Outputs shell-sourceable format: BACKEND_PORT=XXXX and FRONTEND_PORT=XXXX",
+        "Exits with error if no ports available in range",
+        "Works on macOS",
+        "Script is executable (chmod +x)"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "DEV-002",
+      "title": "Local environment setup script",
+      "description": "As a developer, I need a script that configures my local environment with available ports.",
+      "acceptanceCriteria": [
+        "Create scripts/dev-setup.sh",
+        "Calls dev-ports.sh to get available ports",
+        "Creates backend/.env.local with PORT=<backend_port>",
+        "Creates frontend/.env.local with VITE_PORT=<frontend_port> and VITE_API_URL=http://localhost:<backend_port>",
+        "Verify backend/.env.local is in backend/.gitignore (add if missing)",
+        "Verify frontend/.env.local is in frontend/.gitignore (add if missing)",
+        "Prints assigned ports to stdout with clear formatting",
+        "Idempotent: re-running updates the files with new ports",
+        "Script is executable"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "DEV-003",
+      "title": "Unified dev runner",
+      "description": "As a developer, I want a single command to start the full dev stack.",
+      "acceptanceCriteria": [
+        "Create scripts/dev.sh",
+        "Runs dev-setup.sh if backend/.env.local or frontend/.env.local missing",
+        "Sources port config from .env.local files",
+        "Starts backend with: cd backend && uv run uvicorn app.main:app --reload --port $PORT",
+        "Starts frontend with: cd frontend && bun run dev --port $VITE_PORT",
+        "Backend runs in background, frontend in foreground",
+        "Ctrl+C kills both processes (trap EXIT)",
+        "Prints URLs for both services on startup",
+        "Script is executable"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": "Consider using trap to ensure cleanup on exit"
+    },
+    {
+      "id": "DEV-004",
+      "title": "CLAUDE.md documentation update",
+      "description": "As a developer, I need updated docs explaining the new dev workflow.",
+      "acceptanceCriteria": [
+        "Update CLAUDE.md Development section",
+        "Document new workflow: ./scripts/dev-setup.sh for first time setup",
+        "Document ./scripts/dev.sh for running full stack",
+        "Document manual workflow: run backend/frontend separately after setup",
+        "Remove or update hardcoded worktree port table (now dynamic)",
+        "Add note that .env.local files are gitignored and auto-generated",
+        "Document that ports are dynamically assigned to avoid conflicts",
+        "Add troubleshooting: what to do if ports seem stuck (delete .env.local, re-run setup)"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

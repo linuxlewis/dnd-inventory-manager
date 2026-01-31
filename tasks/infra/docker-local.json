@@ -1,7 +1,7 @@
 {
   "project": "D&D Party Inventory Manager",
   "branchName": "feat/docker-local",
-  "description": "Docker Compose setup for local development and LAN testing (accessible from phone)",
+  "description": "Docker Compose setup for production deployment with Tailscale access (accessible from phone via tailnet)",
   "userStories": [
     {
       "id": "DOCKER-001",
@@ -19,11 +19,11 @@
         "Expose port 8000",
         "Set CMD to run uvicorn on 0.0.0.0:8000",
         "Build succeeds: `docker build -t dnd-backend ./backend`",
-        "Container runs: `docker run -p 8000:8000 dnd-backend` and /health responds"
+        "Container runs: `docker run -p 9000:8000 dnd-backend` and /health responds on port 9000"
       ],
       "priority": 1,
       "passes": false,
-      "notes": "Use 0.0.0.0 to bind to all interfaces for LAN access"
+      "notes": "Use 0.0.0.0 to bind to all interfaces. Production port 9000 to avoid dev conflicts."
     },
     {
       "id": "DOCKER-002",
@@ -49,42 +49,40 @@
     {
       "id": "DOCKER-003",
       "title": "Docker Compose configuration",
-      "description": "As a developer, I want a single command to run the full stack locally.",
+      "description": "As a developer, I want a single command to run the full production stack.",
       "acceptanceCriteria": [
         "Create docker-compose.yml in project root",
         "Define backend service building from ./backend",
-        "Backend exposes port 8000:8000",
+        "Backend exposes port 9000:8000 (production port)",
         "Backend mounts ./data:/app/data volume for persistent SQLite",
         "Define frontend service building from ./frontend",
-        "Frontend exposes port 3000:80",
+        "Frontend exposes port 9080:80 (production port)",
         "Frontend depends_on backend",
-        "Add .env.example with VITE_API_URL=http://localhost:8000",
-        "Create .dockerignore files in backend/ and frontend/ excluding node_modules, __pycache__, .venv, etc.",
+        "Create .dockerignore files in backend/ and frontend/ excluding node_modules, __pycache__, .venv, .env.local, etc.",
         "Running `docker-compose up --build` starts both services",
-        "Frontend accessible at http://localhost:3000",
-        "API accessible at http://localhost:8000/health"
+        "Frontend accessible at http://localhost:9080",
+        "API accessible at http://localhost:9000/health"
       ],
       "priority": 3,
       "passes": false,
-      "notes": ""
+      "notes": "Production ports 9000/9080 to avoid conflicts with dev ports (8000-8099, 5173-5199)"
     },
     {
       "id": "DOCKER-004",
-      "title": "LAN access documentation",
-      "description": "As a user, I want instructions to access the app from my phone on the local network.",
+      "title": "Tailnet access documentation",
+      "description": "As a user, I want instructions to access the app from my phone via Tailscale.",
       "acceptanceCriteria": [
-        "Create docs/LOCAL_NETWORK.md",
-        "Document how to find local IP: `ipconfig getifaddr en0` (Mac)",
-        "Document starting with LAN access: bind to 0.0.0.0 (already configured)",
-        "Document accessing from phone: http://<local-ip>:3000",
-        "Document that phone must be on same WiFi network",
-        "Add troubleshooting section: firewall, network isolation",
-        "Add quick start section to main README.md for Docker",
-        "Update docker-compose.yml if needed to ensure 0.0.0.0 binding"
+        "Create docs/TAILNET_ACCESS.md",
+        "Document getting Tailscale IP: `tailscale ip -4`",
+        "Document accessing from phone: http://<tailscale-ip>:9080",
+        "Note that phone must have Tailscale installed and connected to same tailnet",
+        "Add troubleshooting section: Tailscale not connected, MagicDNS alternative",
+        "Document MagicDNS access if enabled: http://<machine-name>:9080",
+        "Add quick start section to main README.md for Docker + Tailscale"
       ],
       "priority": 4,
       "passes": false,
-      "notes": "No Tailscale needed - just local network access"
+      "notes": "Direct Tailscale IP access - no Tailscale Serve needed (avoids OpenClaw config conflicts)"
     },
     {
       "id": "DOCKER-005",
@@ -92,16 +90,32 @@
       "description": "As a developer, I need proper environment variable handling in Docker.",
       "acceptanceCriteria": [
         "Update frontend Dockerfile to accept VITE_API_URL as build arg",
-        "Frontend nginx.conf should proxy to backend service name (http://backend:8000)",
+        "Frontend nginx.conf should proxy /api/* to backend service name (http://backend:8000)",
         "Backend reads DATABASE_URL from environment with fallback to SQLite file",
-        "Create .env.docker with production-like settings",
+        "Create .env.docker with production settings",
         "docker-compose.yml uses env_file for configuration",
-        "Document environment variables in docs/LOCAL_NETWORK.md",
-        "App works end-to-end: create inventory from phone, access it"
+        "Document environment variables in docs/TAILNET_ACCESS.md",
+        "App works end-to-end: create inventory from phone via Tailscale, access it"
       ],
       "priority": 5,
       "passes": false,
       "notes": "Frontend API calls go through nginx proxy to avoid CORS issues"
+    },
+    {
+      "id": "DOCKER-006",
+      "title": "Production start/stop scripts",
+      "description": "As a developer, I want simple commands to manage the production stack.",
+      "acceptanceCriteria": [
+        "Create scripts/prod-up.sh that runs docker-compose up -d --build",
+        "Create scripts/prod-down.sh that runs docker-compose down",
+        "Create scripts/prod-logs.sh that runs docker-compose logs -f",
+        "Scripts print Tailscale IP and access URL on startup",
+        "Add to CLAUDE.md: production workflow documentation",
+        "Document difference between dev (scripts/dev.sh) and prod (scripts/prod-up.sh)"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
     }
   ]
 }
