@@ -9,6 +9,7 @@ from app.db import (
     Base,  # noqa: F401 - import models to register with metadata
     Inventory,  # noqa: F401
 )
+from app.routers import inventories_router
 
 
 @asynccontextmanager
@@ -29,6 +30,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# Register routers
+app.include_router(inventories_router)
 
 
 @app.get("/health")
