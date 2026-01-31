@@ -75,6 +75,48 @@ bun run dev --port 5174
 | wt-1 | 8001 | 5174 |
 | wt-2 | 8002 | 5175 |
 | wt-3 | 8003 | 5176 |
+| **Production** | **9000** | **9080** |
+
+## Production Deployment (Docker)
+
+### Quick Start
+```bash
+./scripts/prod-up.sh    # Build & start containers
+./scripts/prod-down.sh  # Stop containers
+./scripts/prod-logs.sh  # View logs
+```
+
+### Access URLs
+- **Local:** http://localhost:9080
+- **Tailscale:** http://<tailscale-ip>:9080 (from phone/other devices)
+
+### Architecture
+```
+Phone/Device (Tailscale) → Frontend (nginx:9080) → Backend (uvicorn:9000)
+                                    ↓
+                           /api/* proxy to backend
+```
+
+### Key Files
+- `docker-compose.yml` — Service definitions
+- `backend/Dockerfile` — Python 3.12 + UV
+- `frontend/Dockerfile` — Bun build → nginx:alpine
+- `frontend/nginx.conf` — SPA routing + API proxy
+- `.env.docker` — Production environment variables
+- `docs/TAILNET_ACCESS.md` — Full Tailscale setup guide
+
+### Development vs Production
+
+| Aspect | Development | Production |
+|--------|-------------|------------|
+| Command | `./scripts/dev.sh` | `./scripts/prod-up.sh` |
+| Backend | uvicorn with --reload | Docker container |
+| Frontend | Vite dev server | nginx serving built files |
+| Ports | 8000-8099, 5173-5199 | 9000, 9080 |
+| Hot reload | Yes | No (rebuild required) |
+
+### Data Persistence
+SQLite database is stored in `./data/` and mounted as a Docker volume. Data persists across container restarts.
 
 ## Code Conventions
 

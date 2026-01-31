@@ -22,6 +22,23 @@ A web application for managing shared party inventory in Dungeons & Dragons 5th 
 | Images | OpenAI DALL-E 3 |
 | Deployment | Docker + Tailscale Funnel |
 
+## Quick Start (Docker + Tailscale)
+
+Run the app in production mode, accessible from your phone via Tailscale:
+
+```bash
+# Start production stack
+./scripts/prod-up.sh
+
+# Access from phone: http://<tailscale-ip>:9080
+# Get your Tailscale IP: tailscale ip -4
+
+# Stop when done
+./scripts/prod-down.sh
+```
+
+See [docs/TAILNET_ACCESS.md](docs/TAILNET_ACCESS.md) for detailed setup.
+
 ## Development
 
 ### Prerequisites

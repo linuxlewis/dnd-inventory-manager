@@ -1,0 +1,49 @@
+# D&D Party Inventory Manager - Docker Compose
+# Production deployment with persistent SQLite storage
+#
+# Usage:
+#   docker-compose up --build        # Start services
+#   docker-compose down              # Stop services
+#   docker-compose logs -f           # View logs
+#
+# Access:
+#   Frontend: http://localhost:9080
+#   Backend:  http://localhost:9000
+#   Via Tailscale: http://<tailscale-ip>:9080
+
+services:
+  backend:
+    build: ./backend
+    container_name: dnd-backend
+    ports:
+      - "9000:8000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///./data/dnd_inventory.db
+      - CORS_ORIGINS=["http://localhost:9080","http://localhost:5173"]
+    env_file:
+      - .env.docker
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: dnd-frontend
+    ports:
+      - "9080:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
