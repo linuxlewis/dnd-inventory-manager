@@ -1,0 +1,107 @@
+{
+  "project": "D&D Party Inventory Manager",
+  "branchName": "feat/docker-local",
+  "description": "Docker Compose setup for local development and LAN testing (accessible from phone)",
+  "userStories": [
+    {
+      "id": "DOCKER-001",
+      "title": "Backend Dockerfile",
+      "description": "As a developer, I need a Dockerfile to containerize the FastAPI backend.",
+      "acceptanceCriteria": [
+        "Create backend/Dockerfile",
+        "Use python:3.12-slim as base image",
+        "Install UV using official installation method (COPY --from=ghcr.io/astral-sh/uv:latest)",
+        "Set WORKDIR to /app",
+        "Copy pyproject.toml and uv.lock first for layer caching",
+        "Run uv sync --frozen --no-dev to install dependencies",
+        "Copy app/ directory",
+        "Create /app/data directory for SQLite database",
+        "Expose port 8000",
+        "Set CMD to run uvicorn on 0.0.0.0:8000",
+        "Build succeeds: `docker build -t dnd-backend ./backend`",
+        "Container runs: `docker run -p 8000:8000 dnd-backend` and /health responds"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Use 0.0.0.0 to bind to all interfaces for LAN access"
+    },
+    {
+      "id": "DOCKER-002",
+      "title": "Frontend Dockerfile",
+      "description": "As a developer, I need a Dockerfile to build and serve the React frontend.",
+      "acceptanceCriteria": [
+        "Create frontend/Dockerfile",
+        "Use oven/bun:1 as builder stage",
+        "Copy package.json and bun.lockb for layer caching",
+        "Run bun install --frozen-lockfile",
+        "Copy source files and run bun run build",
+        "Use nginx:alpine as production stage",
+        "Copy built files from /app/dist to /usr/share/nginx/html",
+        "Create frontend/nginx.conf with SPA routing (try_files $uri /index.html)",
+        "Configure nginx to proxy /api/* requests to backend service",
+        "Expose port 80",
+        "Build succeeds: `docker build -t dnd-frontend ./frontend`"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "DOCKER-003",
+      "title": "Docker Compose configuration",
+      "description": "As a developer, I want a single command to run the full stack locally.",
+      "acceptanceCriteria": [
+        "Create docker-compose.yml in project root",
+        "Define backend service building from ./backend",
+        "Backend exposes port 8000:8000",
+        "Backend mounts ./data:/app/data volume for persistent SQLite",
+        "Define frontend service building from ./frontend",
+        "Frontend exposes port 3000:80",
+        "Frontend depends_on backend",
+        "Add .env.example with VITE_API_URL=http://localhost:8000",
+        "Create .dockerignore files in backend/ and frontend/ excluding node_modules, __pycache__, .venv, etc.",
+        "Running `docker-compose up --build` starts both services",
+        "Frontend accessible at http://localhost:3000",
+        "API accessible at http://localhost:8000/health"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "DOCKER-004",
+      "title": "LAN access documentation",
+      "description": "As a user, I want instructions to access the app from my phone on the local network.",
+      "acceptanceCriteria": [
+        "Create docs/LOCAL_NETWORK.md",
+        "Document how to find local IP: `ipconfig getifaddr en0` (Mac)",
+        "Document starting with LAN access: bind to 0.0.0.0 (already configured)",
+        "Document accessing from phone: http://<local-ip>:3000",
+        "Document that phone must be on same WiFi network",
+        "Add troubleshooting section: firewall, network isolation",
+        "Add quick start section to main README.md for Docker",
+        "Update docker-compose.yml if needed to ensure 0.0.0.0 binding"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": "No Tailscale needed - just local network access"
+    },
+    {
+      "id": "DOCKER-005",
+      "title": "Environment configuration for Docker",
+      "description": "As a developer, I need proper environment variable handling in Docker.",
+      "acceptanceCriteria": [
+        "Update frontend Dockerfile to accept VITE_API_URL as build arg",
+        "Frontend nginx.conf should proxy to backend service name (http://backend:8000)",
+        "Backend reads DATABASE_URL from environment with fallback to SQLite file",
+        "Create .env.docker with production-like settings",
+        "docker-compose.yml uses env_file for configuration",
+        "Document environment variables in docs/LOCAL_NETWORK.md",
+        "App works end-to-end: create inventory from phone, access it"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": "Frontend API calls go through nginx proxy to avoid CORS issues"
+    }
+  ]
+}

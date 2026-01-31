@@ -1,0 +1,97 @@
+{
+  "project": "D&D Party Inventory Manager",
+  "branchName": "feat/api-tests",
+  "description": "Add pytest test suite for backend API endpoints with fixtures and CI-ready setup",
+  "userStories": [
+    {
+      "id": "TEST-001",
+      "title": "Pytest project setup",
+      "description": "As a developer, I need pytest configured so I can run automated tests.",
+      "acceptanceCriteria": [
+        "Ensure pytest and pytest-asyncio are in pyproject.toml dev dependencies",
+        "Add httpx to dev dependencies for async test client",
+        "Create backend/tests/__init__.py",
+        "Create backend/tests/conftest.py with pytest configuration",
+        "Add pytest.ini or pyproject.toml [tool.pytest.ini_options] with asyncio_mode = 'auto'",
+        "Add test script to pyproject.toml: `uv run pytest`",
+        "Running `cd backend && uv run pytest` executes without errors (0 tests collected is OK)",
+        "Ruff check passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "TEST-002",
+      "title": "Test fixtures for database and client",
+      "description": "As a developer, I need reusable fixtures for testing API endpoints.",
+      "acceptanceCriteria": [
+        "Create fixture `test_db` that creates an in-memory SQLite database for each test",
+        "Test database uses 'sqlite+aiosqlite:///:memory:' URL",
+        "Create fixture `client` that returns httpx.AsyncClient configured with app and test DB",
+        "Client fixture overrides the get_db dependency to use test_db",
+        "Create fixture `test_inventory` that creates a sample inventory and returns (inventory, passphrase)",
+        "Fixtures properly clean up after each test (async context managers)",
+        "Ruff check passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": "Use pytest-asyncio for async fixtures"
+    },
+    {
+      "id": "TEST-003",
+      "title": "Health endpoint test",
+      "description": "As a developer, I want a simple test to verify the test setup works.",
+      "acceptanceCriteria": [
+        "Create backend/tests/test_health.py",
+        "Test that GET /health returns 200 status",
+        "Test that response body is {\"status\": \"ok\"}",
+        "Test passes: `uv run pytest tests/test_health.py -v`",
+        "Ruff check passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "TEST-004",
+      "title": "Create inventory endpoint tests",
+      "description": "As a developer, I want tests for the inventory creation endpoint.",
+      "acceptanceCriteria": [
+        "Create backend/tests/test_inventories.py",
+        "Test POST /api/inventories with valid data returns 200 and inventory response",
+        "Test response includes id, slug, name, currency fields (all 0), timestamps",
+        "Test response does NOT include passphrase_hash",
+        "Test slug is generated from name (lowercase, hyphens)",
+        "Test creating inventory with same name twice produces different slugs",
+        "Test validation: missing name returns 422",
+        "Test validation: passphrase less than 6 chars returns 422",
+        "All tests pass",
+        "Ruff check passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "TEST-005",
+      "title": "Auth and get inventory endpoint tests",
+      "description": "As a developer, I want tests for authentication and inventory retrieval.",
+      "acceptanceCriteria": [
+        "Add tests to backend/tests/test_inventories.py",
+        "Test POST /api/inventories/{slug}/auth with correct passphrase returns {\"success\": true}",
+        "Test POST /api/inventories/{slug}/auth with wrong passphrase returns {\"success\": false}",
+        "Test POST /api/inventories/{slug}/auth with unknown slug returns 404",
+        "Test GET /api/inventories/{slug} with valid X-Passphrase header returns inventory",
+        "Test GET /api/inventories/{slug} without header returns 401",
+        "Test GET /api/inventories/{slug} with wrong passphrase returns 401",
+        "Test GET /api/inventories/{slug} with unknown slug returns 404",
+        "All tests pass",
+        "Ruff check passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}
