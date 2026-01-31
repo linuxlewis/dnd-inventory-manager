@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useCreateInventory } from '../api/inventories'
+import { Eye, EyeOff } from 'lucide-react'
+import { useCreateInventory, useAuthenticateInventory } from '../api/inventories'
 import { useAuth } from '../hooks/useAuth'
+import { AxiosError } from 'axios'
 
 interface FormErrors {
   name?: string
@@ -10,16 +12,30 @@ interface FormErrors {
   general?: string
 }
 
+interface AccessErrors {
+  slug?: string
+  passphrase?: string
+  general?: string
+}
+
 export function Home() {
   const navigate = useNavigate()
   const { setSession } = useAuth()
   const createInventory = useCreateInventory()
+  const authenticateInventory = useAuthenticateInventory()
 
+  // Create form state
   const [name, setName] = useState('')
   const [passphrase, setPassphrase] = useState('')
   const [confirmPassphrase, setConfirmPassphrase] = useState('')
   const [description, setDescription] = useState('')
   const [errors, setErrors] = useState<FormErrors>({})
+
+  // Access form state
+  const [accessSlug, setAccessSlug] = useState('')
+  const [accessPassphrase, setAccessPassphrase] = useState('')
+  const [showAccessPassphrase, setShowAccessPassphrase] = useState(false)
+  const [accessErrors, setAccessErrors] = useState<AccessErrors>({})
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {}
@@ -42,7 +58,7 @@ export function Home() {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!validateForm()) {
@@ -66,6 +82,57 @@ export function Home() {
     }
   }
 
+  const validateAccessForm = (): boolean => {
+    const newErrors: AccessErrors = {}
+
+    if (!accessSlug.trim()) {
+      newErrors.slug = 'Inventory slug is required'
+    }
+
+    if (!accessPassphrase) {
+      newErrors.passphrase = 'Passphrase is required'
+    }
+
+    setAccessErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const handleAccessSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!validateAccessForm()) {
+      return
+    }
+
+    const slug = accessSlug.trim().toLowerCase()
+
+    try {
+      const result = await authenticateInventory.mutateAsync({
+        slug,
+        passphrase: accessPassphrase,
+      })
+
+      if (result.success) {
+        setSession(slug, accessPassphrase)
+        navigate(`/${slug}`)
+      } else {
+        setAccessErrors({
+          general: 'Invalid passphrase',
+        })
+      }
+    } catch (error) {
+      if (error instanceof AxiosError && error.response?.status === 404) {
+        setAccessErrors({
+          general: 'Inventory not found',
+        })
+      } else {
+        setAccessErrors({
+          general: 'Failed to access inventory. Please try again.',
+        })
+      }
+    }
+  }
+
   return (
     <div className="max-w-2xl mx-auto">
       {/* Hero Section */}
@@ -85,7 +152,7 @@ export function Home() {
           Create New Inventory
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleCreateSubmit} className="space-y-4">
           {errors.general && (
             <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded">
               {errors.general}
@@ -183,6 +250,87 @@ export function Home() {
             className="w-full py-3 px-4 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {createInventory.isPending ? 'Creating...' : 'Create Inventory'}
+          </button>
+        </form>
+      </section>
+
+      {/* Access Existing Inventory Section */}
+      <section className="bg-white rounded-lg shadow-md p-6">
+        <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+          Access Existing Inventory
+        </h2>
+
+        <form onSubmit={handleAccessSubmit} className="space-y-4">
+          {accessErrors.general && (
+            <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+              {accessErrors.general}
+            </div>
+          )}
+
+          <div>
+            <label
+              htmlFor="accessSlug"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Inventory Slug <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="accessSlug"
+              value={accessSlug}
+              onChange={(e) => setAccessSlug(e.target.value)}
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                accessErrors.slug ? 'border-red-500' : 'border-gray-300'
+              }`}
+              placeholder="the-mighty-nein"
+            />
+            {accessErrors.slug && (
+              <p className="mt-1 text-sm text-red-500">{accessErrors.slug}</p>
+            )}
+          </div>
+
+          <div>
+            <label
+              htmlFor="accessPassphrase"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Passphrase <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <input
+                type={showAccessPassphrase ? 'text' : 'password'}
+                id="accessPassphrase"
+                value={accessPassphrase}
+                onChange={(e) => setAccessPassphrase(e.target.value)}
+                className={`w-full px-3 py-2 pr-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                  accessErrors.passphrase ? 'border-red-500' : 'border-gray-300'
+                }`}
+                placeholder="Enter passphrase"
+              />
+              <button
+                type="button"
+                onClick={() => setShowAccessPassphrase(!showAccessPassphrase)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-700 focus:outline-none"
+                aria-label={showAccessPassphrase ? 'Hide passphrase' : 'Show passphrase'}
+              >
+                {showAccessPassphrase ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
+            </div>
+            {accessErrors.passphrase && (
+              <p className="mt-1 text-sm text-red-500">{accessErrors.passphrase}</p>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            disabled={authenticateInventory.isPending}
+            className="w-full py-3 px-4 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {authenticateInventory.isPending ? 'Accessing...' : 'Access Inventory'}
           </button>
         </form>
       </section>
