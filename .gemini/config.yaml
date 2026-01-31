@@ -1,0 +1,30 @@
+# Gemini Code Assist Configuration
+# https://developers.google.com/gemini-code-assist/docs/customize-gemini-behavior-github
+
+have_fun: false
+
+code_review:
+  disable: false
+  comment_severity_threshold: MEDIUM  # LOW, MEDIUM, HIGH, CRITICAL
+  max_review_comments: -1  # -1 for unlimited
+  pull_request_opened:
+    help: false
+    summary: true
+    code_review: true
+    include_drafts: false  # Don't review drafts
+
+# Files to ignore during review
+ignore_patterns:
+  - "*.lock"
+  - "*.lockb"
+  - "bun.lockb"
+  - "uv.lock"
+  - "package-lock.json"
+  - "*.min.js"
+  - "*.min.css"
+  - "dist/**"
+  - "build/**"
+  - "node_modules/**"
+  - "__pycache__/**"
+  - "*.pyc"
+  - "backend/app/data/*.json"  # SRD data files are large
