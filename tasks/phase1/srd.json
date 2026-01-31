@@ -1,0 +1,37 @@
+{
+  "project": "D&D Party Inventory Manager",
+  "branchName": "feat/srd-data",
+  "description": "SRD Data: 5e item databases from Open5e",
+  "userStories": [
+    {
+      "id": "SRD-001",
+      "title": "Weapons Database",
+      "priority": 1,
+      "passes": false
+    },
+    {
+      "id": "SRD-002",
+      "title": "Armor Database",
+      "priority": 2,
+      "passes": false
+    },
+    {
+      "id": "SRD-003",
+      "title": "Potions Database",
+      "priority": 3,
+      "passes": false
+    },
+    {
+      "id": "SRD-004",
+      "title": "Adventuring Gear",
+      "priority": 4,
+      "passes": false
+    },
+    {
+      "id": "SRD-005",
+      "title": "Combined Index",
+      "priority": 5,
+      "passes": false
+    }
+  ]
+}

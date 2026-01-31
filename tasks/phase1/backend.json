@@ -1,0 +1,43 @@
+{
+  "project": "D&D Party Inventory Manager",
+  "branchName": "feat/backend-phase-1",
+  "description": "Phase 1 Backend: FastAPI app with SQLite, inventory CRUD, and authentication",
+  "userStories": [
+    {
+      "id": "BE-001",
+      "title": "Project Scaffolding",
+      "priority": 1,
+      "passes": false
+    },
+    {
+      "id": "BE-002",
+      "title": "Database Setup",
+      "priority": 2,
+      "passes": false
+    },
+    {
+      "id": "BE-003",
+      "title": "Inventory Model",
+      "priority": 3,
+      "passes": false
+    },
+    {
+      "id": "BE-004",
+      "title": "Inventory Schemas",
+      "priority": 4,
+      "passes": false
+    },
+    {
+      "id": "BE-005",
+      "title": "Create Inventory Endpoint",
+      "priority": 5,
+      "passes": false
+    },
+    {
+      "id": "BE-006",
+      "title": "Auth & Get Inventory",
+      "priority": 6,
+      "passes": false
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "project": "D&D Party Inventory Manager",
+  "branchName": "feat/frontend-phase-1",
+  "description": "Phase 1 Frontend: React app with routing, auth flow, and inventory creation",
+  "userStories": [
+    {
+      "id": "FE-001",
+      "title": "Project Scaffolding",
+      "priority": 1,
+      "passes": false
+    },
+    {
+      "id": "FE-002",
+      "title": "Layout & Routing",
+      "priority": 2,
+      "passes": false
+    },
+    {
+      "id": "FE-003",
+      "title": "API Client",
+      "priority": 3,
+      "passes": false
+    },
+    {
+      "id": "FE-004",
+      "title": "Auth Store",
+      "priority": 4,
+      "passes": false
+    },
+    {
+      "id": "FE-005",
+      "title": "Home Page - Create Inventory",
+      "priority": 5,
+      "passes": false
+    },
+    {
+      "id": "FE-006",
+      "title": "Home Page - Access Inventory",
+      "priority": 6,
+      "passes": false
+    }
+  ]
+}
