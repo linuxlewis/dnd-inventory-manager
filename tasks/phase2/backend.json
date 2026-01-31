@@ -1,0 +1,124 @@
+{
+  "project": "D&D Party Inventory Manager",
+  "branchName": "feat/items-backend",
+  "description": "Backend API for inventory item CRUD with SRD integration",
+  "userStories": [
+    {
+      "id": "BE-007",
+      "title": "Item ORM Model",
+      "description": "As a developer, I need a SQLAlchemy model for inventory items with flexible properties storage.",
+      "acceptanceCriteria": [
+        "Create backend/app/db/item.py with Item model",
+        "Fields: id (UUID PK), inventory_id (FK), name, type (enum), category, rarity (enum)",
+        "Fields: description, notes, quantity (default 1), weight, estimated_value",
+        "Fields: thumbnail_url, is_standard_item, standard_item_id, properties (JSON)",
+        "Fields: created_at, updated_at (timestamps)",
+        "Add relationship to Inventory model (one-to-many)",
+        "Update table creation in app lifespan",
+        "Model imports without error",
+        "Ruff check passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Use JSON field for properties to store type-specific data (damage_dice, ac_bonus, etc.)"
+    },
+    {
+      "id": "BE-008",
+      "title": "Item Pydantic Schemas",
+      "description": "As a developer, I need Pydantic v2 models for item API request/response.",
+      "acceptanceCriteria": [
+        "Create backend/app/models/item.py",
+        "Define ItemType enum: equipment, potion, scroll, consumable, misc",
+        "Define ItemRarity enum: common, uncommon, rare, very_rare, legendary, artifact",
+        "ItemBase: name, type, category, rarity, description, quantity, weight, estimated_value",
+        "ItemCreate: ItemBase + notes, properties dict",
+        "ItemUpdate: all fields optional (partial update)",
+        "ItemResponse: full item with id, timestamps, thumbnail_url, etc.",
+        "ItemListResponse: list of items with total count",
+        "Enums serialize to strings in JSON",
+        "Ruff check passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "BE-009",
+      "title": "Create Item Endpoint",
+      "description": "As a user, I want to add items to my inventory.",
+      "acceptanceCriteria": [
+        "Create backend/app/routers/items.py",
+        "POST /api/inventories/{slug}/items creates item",
+        "Requires X-Passphrase header (auth)",
+        "Returns 401 without valid passphrase",
+        "Returns 404 for unknown inventory slug",
+        "Returns 422 for invalid item data",
+        "Returns ItemResponse with generated ID",
+        "Register router in main.py",
+        "Ruff check passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "BE-010",
+      "title": "List Items Endpoint",
+      "description": "As a user, I want to view and filter items in my inventory.",
+      "acceptanceCriteria": [
+        "GET /api/inventories/{slug}/items lists items",
+        "Query params: type, category, rarity for filtering",
+        "Query param: search for name substring (case-insensitive)",
+        "Query params: limit, offset for pagination",
+        "Requires auth (X-Passphrase header)",
+        "Returns ItemListResponse with items array and count",
+        "Returns 401 without auth",
+        "Returns 404 for unknown inventory",
+        "Ruff check passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "BE-011",
+      "title": "Get/Update/Delete Item Endpoints",
+      "description": "As a user, I want to view, edit, and remove individual items.",
+      "acceptanceCriteria": [
+        "GET /api/inventories/{slug}/items/{item_id} returns single item",
+        "PATCH /api/inventories/{slug}/items/{item_id} updates item (partial)",
+        "DELETE /api/inventories/{slug}/items/{item_id} removes item",
+        "All require auth",
+        "Get/Update return ItemResponse",
+        "Delete returns 204 No Content",
+        "All return 404 for unknown item or inventory",
+        "All return 401 without auth",
+        "Ruff check passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "BE-012",
+      "title": "SRD Search Endpoint",
+      "description": "As a user, I want to search the SRD database to quickly add standard items.",
+      "acceptanceCriteria": [
+        "Create backend/app/services/srd.py",
+        "Load SRD index (srd_index.json) on startup, cache in memory",
+        "search_srd(query, type?, category?, limit=10) function",
+        "Returns matching items with full data from source files",
+        "Create backend/app/routers/srd.py",
+        "GET /api/srd/search?q=<query>&type=<type>&limit=<n>",
+        "No auth required (SRD is public data)",
+        "Case-insensitive search",
+        "Returns empty list for no matches",
+        "Register router in main.py",
+        "Ruff check passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": "Depends on SRD-005 (combined index). Can stub until SRD data is ready."
+    }
+  ]
+}
