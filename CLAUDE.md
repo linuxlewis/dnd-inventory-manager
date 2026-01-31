@@ -4,6 +4,13 @@
 
 Web app for D&D 5e party inventory management. Slug + passphrase access (no user accounts). Real-time sync via SSE.
 
+## Key Documents
+
+- **Full Spec:** `tasks/prd-inventory-manager.md` — Complete product specification
+- **Implementation:** `IMPLEMENTATION.md` — Ordered user stories with acceptance criteria
+- **Status:** `PROJECT_STATUS.md` — Current progress across all workstreams
+- **PRDs:** `tasks/phase1/*.json` — Machine-readable story lists for Ralph
+
 ## Tech Stack
 
 - **Frontend:** React 18 + Vite + Bun + Tailwind + TanStack Query + Zustand
@@ -14,7 +21,7 @@ Web app for D&D 5e party inventory management. Slug + passphrase access (no user
 ## Project Structure
 
 ```
-dnd-helper/
+dnd-helper/                    # Main repo (on main branch)
 ├── backend/
 │   └── app/
 │       ├── main.py           # FastAPI app
@@ -34,9 +41,39 @@ dnd-helper/
 │       ├── pages/            # Route pages
 │       ├── stores/           # Zustand stores
 │       └── types/            # TypeScript types
-├── tasks/                    # PRD and specs
-└── scripts/ralph/            # Ralph agent loop
+├── tasks/                    # PRDs and specs
+│   ├── prd-inventory-manager.md
+│   └── phase1/               # Phase 1 story lists
+└── scripts/
+    └── ralph.sh              # Agent loop script
+
+# Worktrees (sibling directories)
+dnd-helper-backend/           # feat/backend-phase-1 branch
+dnd-helper-frontend/          # feat/frontend-phase-1 branch  
+dnd-helper-srd/               # feat/srd-data branch
 ```
+
+## Port Configuration
+
+To avoid conflicts when running multiple worktrees:
+
+**Backend:** Set `PORT` env var (default 8000)
+```bash
+PORT=8001 uv run uvicorn app.main:app --port $PORT
+```
+
+**Frontend:** Set `VITE_PORT` in `.env.local` or use --port
+```bash
+VITE_PORT=5174 bun run dev
+# or
+bun run dev --port 5174
+```
+
+| Worktree | Backend Port | Frontend Port |
+|----------|--------------|---------------|
+| dnd-helper-backend | 8001 | — |
+| dnd-helper-frontend | 8002 | 5174 |
+| dnd-helper-srd | — | — |
 
 ## Code Conventions
 
