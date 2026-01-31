@@ -23,7 +23,7 @@
         "Run `bun run lint` passes"
       ],
       "priority": 1,
-      "passes": false,
+      "passes": true,
       "notes": "Use Bun for package management. TypeScript strict mode enabled by default in Vite template."
     },
     {

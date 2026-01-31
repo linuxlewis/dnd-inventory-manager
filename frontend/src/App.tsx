@@ -1,8 +1,20 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { AppLayout } from './components/layout/AppLayout'
+import { Home } from './pages/Home'
+import { Inventory } from './pages/Inventory'
+import { NotFound } from './pages/NotFound'
+
 function App() {
   return (
-    <div className="min-h-screen bg-gray-100">
-      <h1 className="text-3xl font-bold text-center py-8">D&D Inventory</h1>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/:slug" element={<Inventory />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   )
 }
 
