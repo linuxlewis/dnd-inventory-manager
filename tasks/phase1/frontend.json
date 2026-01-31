@@ -131,7 +131,7 @@
         "Lint passes"
       ],
       "priority": 6,
-      "passes": false,
+      "passes": true,
       "notes": "The Inventory page will be fully built in Phase 2, but should handle auth flow now."
     }
   ]
