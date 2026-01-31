@@ -1,43 +1,138 @@
 {
   "project": "D&D Party Inventory Manager",
   "branchName": "feat/frontend-phase-1",
-  "description": "Phase 1 Frontend: React app with routing, auth flow, and inventory creation",
+  "description": "Phase 1 Frontend: React app with Vite/Bun, routing, auth flow, and inventory creation/access",
   "userStories": [
     {
       "id": "FE-001",
-      "title": "Project Scaffolding",
+      "title": "Frontend project scaffolding",
+      "description": "As a developer, I need the React frontend initialized with Vite and Bun so I can build the UI.",
+      "acceptanceCriteria": [
+        "Create frontend/ directory using `bun create vite frontend --template react-ts`",
+        "Install dependencies with bun: react-router-dom, @tanstack/react-query, zustand, axios, lucide-react",
+        "Install and configure Tailwind CSS: tailwindcss, postcss, autoprefixer",
+        "Create tailwind.config.js with content paths for src/**/*.{ts,tsx}",
+        "Update src/index.css with Tailwind directives (@tailwind base, components, utilities)",
+        "Create frontend/.env.example with VITE_API_URL=http://localhost:8000 and VITE_PORT=5173",
+        "Update vite.config.ts to read port from process.env.VITE_PORT with fallback to 5173",
+        "Add scripts to package.json: typecheck (tsc --noEmit), lint (eslint src --ext ts,tsx)",
+        "Clean up default Vite boilerplate (remove App.css contents, simplify App.tsx)",
+        "Run `bun install` successfully",
+        "Run `bun run dev` starts server on configured port",
+        "Run `bun run typecheck` passes",
+        "Run `bun run lint` passes"
+      ],
       "priority": 1,
-      "passes": false
+      "passes": false,
+      "notes": "Use Bun for package management. TypeScript strict mode enabled by default in Vite template."
     },
     {
       "id": "FE-002",
-      "title": "Layout & Routing",
+      "title": "App layout and routing",
+      "description": "As a user, I want to navigate between pages with a consistent layout.",
+      "acceptanceCriteria": [
+        "Create src/components/layout/AppLayout.tsx component",
+        "AppLayout includes header with app title 'D&D Inventory' and main content area",
+        "Header is responsive: full title on desktop, can abbreviate on mobile",
+        "Create src/pages/Home.tsx with placeholder content",
+        "Create src/pages/Inventory.tsx with placeholder content",
+        "Create src/pages/NotFound.tsx with '404 - Page Not Found' message and link to home",
+        "Set up React Router in App.tsx with BrowserRouter",
+        "Configure routes: / -> Home, /:slug -> Inventory, * -> NotFound",
+        "AppLayout wraps all routes via Outlet",
+        "Navigation between pages works correctly",
+        "Typecheck passes",
+        "Lint passes"
+      ],
       "priority": 2,
-      "passes": false
+      "passes": false,
+      "notes": ""
     },
     {
       "id": "FE-003",
-      "title": "API Client",
+      "title": "API client setup",
+      "description": "As a developer, I need an HTTP client configured to communicate with the backend.",
+      "acceptanceCriteria": [
+        "Create src/api/client.ts with Axios instance",
+        "Set baseURL from import.meta.env.VITE_API_URL with fallback to http://localhost:8000",
+        "Add request interceptor that reads passphrase from auth store and sets X-Passphrase header if present",
+        "Add response interceptor that handles 401 errors (can log for now, full handling in FE-004)",
+        "Create src/api/types.ts with TypeScript interfaces matching backend schemas: InventoryCreate, InventoryResponse, InventoryAuth, AuthResponse",
+        "Wrap App in QueryClientProvider in main.tsx",
+        "Create QueryClient with sensible defaults (staleTime: 5 minutes)",
+        "Typecheck passes",
+        "Lint passes"
+      ],
       "priority": 3,
-      "passes": false
+      "passes": false,
+      "notes": "Passphrase will be read from auth store created in FE-004. For now, interceptor can be a placeholder."
     },
     {
       "id": "FE-004",
-      "title": "Auth Store",
+      "title": "Auth store with session persistence",
+      "description": "As a user, I want my inventory sessions remembered so I don't re-enter my passphrase every visit.",
+      "acceptanceCriteria": [
+        "Create src/stores/authStore.ts using Zustand",
+        "Store state: sessions as Record<string, string> mapping slug to passphrase",
+        "Store actions: setSession(slug, passphrase), clearSession(slug), getPassphrase(slug), hasSession(slug)",
+        "Persist sessions to localStorage using zustand/middleware persist",
+        "LocalStorage key: 'dnd-inventory-sessions'",
+        "Create src/hooks/useAuth.ts that exports hook wrapping the store for convenient access",
+        "Hook provides: sessions, setSession, clearSession, getPassphrase, hasSession",
+        "Update API client request interceptor to use getPassphrase for current slug (slug can be passed or read from URL)",
+        "Sessions survive page reload",
+        "Typecheck passes",
+        "Lint passes"
+      ],
       "priority": 4,
-      "passes": false
+      "passes": false,
+      "notes": "Multiple inventories can be remembered simultaneously."
     },
     {
       "id": "FE-005",
-      "title": "Home Page - Create Inventory",
+      "title": "Home page with create inventory form",
+      "description": "As a user, I want to create a new party inventory from the home page.",
+      "acceptanceCriteria": [
+        "Update src/pages/Home.tsx with full layout",
+        "Add hero section with title 'D&D Party Inventory Manager' and brief description",
+        "Add 'Create New Inventory' section with form",
+        "Form fields: Party Name (required, text), Passphrase (required, password, min 6 chars), Confirm Passphrase (required, password), Description (optional, textarea)",
+        "Form validation: name required, passphrase min 6 chars, passwords must match",
+        "Show inline validation errors below fields",
+        "Create src/api/inventories.ts with createInventory function using TanStack Query useMutation",
+        "Submit button shows loading state during API call",
+        "On success: save session to auth store, navigate to /:slug",
+        "On API error: show error message (e.g., toast or inline)",
+        "Form is mobile-friendly (single column, full-width inputs on small screens)",
+        "Typecheck passes",
+        "Lint passes"
+      ],
       "priority": 5,
-      "passes": false
+      "passes": false,
+      "notes": ""
     },
     {
       "id": "FE-006",
-      "title": "Home Page - Access Inventory",
+      "title": "Home page access existing inventory",
+      "description": "As a user, I want to access an existing inventory by entering its slug and passphrase.",
+      "acceptanceCriteria": [
+        "Add 'Access Existing Inventory' section to Home.tsx below create form",
+        "Section has inputs: Inventory Slug (text), Passphrase (password with show/hide toggle)",
+        "Add show/hide toggle button (eye icon) for passphrase field",
+        "Add src/api/inventories.ts authenticateInventory function using useMutation",
+        "Submit calls POST /api/inventories/{slug}/auth",
+        "On success (success: true): save session to auth store, navigate to /:slug",
+        "On failure (success: false): show error 'Invalid passphrase'",
+        "On 404: show error 'Inventory not found'",
+        "Update Inventory.tsx to check if session exists for slug on mount",
+        "If session exists, fetch inventory data (can show loading state for now)",
+        "If no session, redirect to home or show passphrase prompt",
+        "Typecheck passes",
+        "Lint passes"
+      ],
       "priority": 6,
-      "passes": false
+      "passes": false,
+      "notes": "The Inventory page will be fully built in Phase 2, but should handle auth flow now."
     }
   ]
 }

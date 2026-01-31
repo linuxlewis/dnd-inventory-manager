@@ -1,43 +1,133 @@
 {
   "project": "D&D Party Inventory Manager",
   "branchName": "feat/backend-phase-1",
-  "description": "Phase 1 Backend: FastAPI app with SQLite, inventory CRUD, and authentication",
+  "description": "Phase 1 Backend: FastAPI app with SQLite database, inventory CRUD, and passphrase authentication",
   "userStories": [
     {
       "id": "BE-001",
-      "title": "Project Scaffolding",
+      "title": "Backend project scaffolding",
+      "description": "As a developer, I need the Python backend initialized with FastAPI and UV so I can start building the API.",
+      "acceptanceCriteria": [
+        "Create backend/pyproject.toml with dependencies: fastapi, uvicorn[standard], sqlalchemy, pydantic, pydantic-settings, bcrypt, aiosqlite, python-multipart",
+        "Add dev dependencies: ruff, pytest, pytest-asyncio",
+        "Create backend/app/__init__.py",
+        "Create backend/app/main.py with FastAPI app instance",
+        "Add CORS middleware configured from settings",
+        "Add /health endpoint that returns {\"status\": \"ok\"}",
+        "Create backend/app/config.py with Pydantic Settings class containing: database_url (default sqlite+aiosqlite:///./data/dnd_inventory.db), port (default 8000), cors_origins (list)",
+        "Run `cd backend && uv sync` successfully",
+        "Server starts with `uv run uvicorn app.main:app --port 8000`",
+        "Ruff check passes: `uv run ruff check .`"
+      ],
       "priority": 1,
-      "passes": false
+      "passes": false,
+      "notes": "Use UV for package management. Python 3.11+. Read port from config for dynamic allocation."
     },
     {
       "id": "BE-002",
-      "title": "Database Setup",
+      "title": "SQLAlchemy async database setup",
+      "description": "As a developer, I need async SQLite database connectivity so the API can persist data.",
+      "acceptanceCriteria": [
+        "Create backend/app/database.py with create_async_engine using config.database_url",
+        "Create async_sessionmaker with AsyncSession class",
+        "Add event listener on sync_engine connect to set PRAGMA journal_mode=WAL",
+        "Add event listener to set PRAGMA foreign_keys=ON",
+        "Create get_db async dependency function that yields sessions",
+        "Create backend/app/db/__init__.py",
+        "Create backend/app/db/base.py with DeclarativeBase class",
+        "Create backend/data/.gitkeep directory for database files",
+        "Add lifespan context manager to main.py that creates tables on startup",
+        "Ruff check passes"
+      ],
       "priority": 2,
-      "passes": false
+      "passes": false,
+      "notes": "Use aiosqlite for async SQLite. Database file at data/dnd_inventory.db."
     },
     {
       "id": "BE-003",
-      "title": "Inventory Model",
+      "title": "Inventory SQLAlchemy model",
+      "description": "As a developer, I need a database model to store party inventory metadata and currency.",
+      "acceptanceCriteria": [
+        "Create backend/app/db/inventory.py with Inventory model class",
+        "Add id field: UUID primary key with default uuid4",
+        "Add slug field: String, unique, indexed",
+        "Add passphrase_hash field: String, not null",
+        "Add name field: String, not null",
+        "Add description field: String, nullable",
+        "Add currency fields: copper, silver, gold, platinum as Integer with default 0",
+        "Add created_at field: DateTime with default func.now()",
+        "Add updated_at field: DateTime with default func.now(), onupdate func.now()",
+        "Import model in db/__init__.py and base.py metadata",
+        "Table creates successfully on app startup",
+        "Ruff check passes"
+      ],
       "priority": 3,
-      "passes": false
+      "passes": false,
+      "notes": ""
     },
     {
       "id": "BE-004",
-      "title": "Inventory Schemas",
+      "title": "Inventory Pydantic schemas",
+      "description": "As a developer, I need request/response schemas for the inventory API endpoints.",
+      "acceptanceCriteria": [
+        "Create backend/app/models/__init__.py",
+        "Create backend/app/models/inventory.py",
+        "Create InventoryCreate schema with fields: name (str, min 1 char), passphrase (str, min 6 chars), description (str, optional), slug (str, optional)",
+        "Create InventoryResponse schema with fields: id (UUID), slug, name, description, copper, silver, gold, platinum, created_at, updated_at",
+        "InventoryResponse has model_config with from_attributes=True",
+        "Create InventoryAuth schema with field: passphrase (str)",
+        "Create AuthResponse schema with fields: success (bool), message (str, optional)",
+        "All schemas use Pydantic v2 syntax (no Config class)",
+        "Ruff check passes"
+      ],
       "priority": 4,
-      "passes": false
+      "passes": false,
+      "notes": ""
     },
     {
       "id": "BE-005",
-      "title": "Create Inventory Endpoint",
+      "title": "Create inventory endpoint",
+      "description": "As a user, I want to create a new party inventory so my group can track items.",
+      "acceptanceCriteria": [
+        "Create backend/app/routers/__init__.py",
+        "Create backend/app/routers/inventories.py with APIRouter prefix /api/inventories",
+        "Implement POST / endpoint that accepts InventoryCreate body",
+        "Generate slug from name: lowercase, replace spaces/special chars with hyphens, strip non-alphanumeric except hyphens",
+        "If slug already exists in database, append random 4-character alphanumeric suffix",
+        "Hash passphrase using bcrypt before storing",
+        "Create Inventory record in database",
+        "Return InventoryResponse (excludes passphrase_hash)",
+        "Register router in main.py",
+        "Test: POST /api/inventories with valid data returns 200 and created inventory",
+        "Test: Creating two inventories with same name produces different slugs",
+        "Ruff check passes"
+      ],
       "priority": 5,
-      "passes": false
+      "passes": false,
+      "notes": "Use secrets.token_hex(2) for random suffix generation."
     },
     {
       "id": "BE-006",
-      "title": "Auth & Get Inventory",
+      "title": "Auth and get inventory endpoints",
+      "description": "As a user, I want to authenticate with my passphrase and retrieve my inventory data.",
+      "acceptanceCriteria": [
+        "Create backend/app/core/__init__.py",
+        "Create backend/app/core/auth.py with verify_passphrase(plain: str, hashed: str) -> bool function using bcrypt",
+        "Implement POST /api/inventories/{slug}/auth endpoint",
+        "Auth endpoint accepts InventoryAuth body, returns AuthResponse",
+        "Auth endpoint returns {\"success\": true} if passphrase matches, {\"success\": false, \"message\": \"Invalid passphrase\"} otherwise",
+        "Auth endpoint returns 404 if slug not found",
+        "Implement GET /api/inventories/{slug} endpoint",
+        "Get endpoint reads X-Passphrase header",
+        "Get endpoint returns 401 {\"detail\": \"Passphrase required\"} if header missing",
+        "Get endpoint returns 401 {\"detail\": \"Invalid passphrase\"} if passphrase wrong",
+        "Get endpoint returns 404 if slug not found",
+        "Get endpoint returns InventoryResponse on success",
+        "Ruff check passes"
+      ],
       "priority": 6,
-      "passes": false
+      "passes": false,
+      "notes": ""
     }
   ]
 }

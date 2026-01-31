@@ -1,46 +1,58 @@
 # Project Status — D&D Party Inventory Manager
 
-*Last updated: 2026-01-31 16:00 CST*
+*Last updated: 2026-01-31 16:20 CST*
 
-## Active Workstreams
+## Worktrees
 
-| Worktree | Branch | Assignee | Current Story | Status |
-|----------|--------|----------|---------------|--------|
-| `main` | main | — | — | Base repo |
-| `wt-backend` | feat/backend-phase-1 | TBD | BE-001 | 🔲 Not started |
-| `wt-frontend` | feat/frontend-phase-1 | TBD | FE-001 | 🔲 Not started |
-| `wt-srd` | feat/srd-data | TBD | SRD-001 | 🔲 Not started |
+Generic worker worktrees that can be assigned to any task:
 
-## Phase 1 Progress
+| Worktree | Location | Current Branch | Assigned PRD | Status |
+|----------|----------|----------------|--------------|--------|
+| wt-1 | `../dnd-helper-wt-1` | wt-1 | — | 🔲 Available |
+| wt-2 | `../dnd-helper-wt-2` | wt-2 | — | 🔲 Available |
+| wt-3 | `../dnd-helper-wt-3` | wt-3 | — | 🔲 Available |
 
-### Backend (6 stories)
-| ID | Story | Status | PR |
-|----|-------|--------|-----|
-| BE-001 | Project Scaffolding | 🔲 | — |
-| BE-002 | Database Setup | 🔲 | — |
-| BE-003 | Inventory Model | 🔲 | — |
-| BE-004 | Inventory Schemas | 🔲 | — |
-| BE-005 | Create Inventory Endpoint | 🔲 | — |
-| BE-006 | Auth & Get Inventory | 🔲 | — |
+### Port Assignments
+| Worktree | Backend Port | Frontend Port |
+|----------|--------------|---------------|
+| wt-1 | 8001 | 5174 |
+| wt-2 | 8002 | 5175 |
+| wt-3 | 8003 | 5176 |
 
-### Frontend (6 stories)
-| ID | Story | Status | PR |
-|----|-------|--------|-----|
-| FE-001 | Project Scaffolding | 🔲 | — |
-| FE-002 | Layout & Routing | 🔲 | — |
-| FE-003 | API Client | 🔲 | — |
-| FE-004 | Auth Store | 🔲 | — |
-| FE-005 | Home Page - Create | 🔲 | — |
-| FE-006 | Home Page - Access | 🔲 | — |
+---
 
-### SRD Data (5 stories)
-| ID | Story | Status | PR |
-|----|-------|--------|-----|
-| SRD-001 | Weapons Database | 🔲 | — |
-| SRD-002 | Armor Database | 🔲 | — |
-| SRD-003 | Potions Database | 🔲 | — |
-| SRD-004 | Adventuring Gear | 🔲 | — |
-| SRD-005 | Combined Index | 🔲 | — |
+## Phase 1: Foundation
+
+### Backend (`tasks/phase1/backend.json`)
+| ID | Story | Worktree | Status | PR |
+|----|-------|----------|--------|-----|
+| BE-001 | Backend project scaffolding | — | 🔲 | — |
+| BE-002 | SQLAlchemy async database setup | — | 🔲 | — |
+| BE-003 | Inventory SQLAlchemy model | — | 🔲 | — |
+| BE-004 | Inventory Pydantic schemas | — | 🔲 | — |
+| BE-005 | Create inventory endpoint | — | 🔲 | — |
+| BE-006 | Auth and get inventory endpoints | — | 🔲 | — |
+
+### Frontend (`tasks/phase1/frontend.json`)
+| ID | Story | Worktree | Status | PR |
+|----|-------|----------|--------|-----|
+| FE-001 | Frontend project scaffolding | — | 🔲 | — |
+| FE-002 | App layout and routing | — | 🔲 | — |
+| FE-003 | API client setup | — | 🔲 | — |
+| FE-004 | Auth store with session persistence | — | 🔲 | — |
+| FE-005 | Home page with create inventory form | — | 🔲 | — |
+| FE-006 | Home page access existing inventory | — | 🔲 | — |
+
+### SRD Data (`tasks/phase1/srd.json`)
+| ID | Story | Worktree | Status | PR |
+|----|-------|----------|--------|-----|
+| SRD-001 | Weapons database | — | 🔲 | — |
+| SRD-002 | Armor database | — | 🔲 | — |
+| SRD-003 | Potions database | — | 🔲 | — |
+| SRD-004 | Adventuring gear database | — | 🔲 | — |
+| SRD-005 | Combined SRD index | — | 🔲 | — |
+
+---
 
 ## Legend
 
@@ -50,23 +62,30 @@
 - 🔀 PR open
 - ⏸️ Blocked
 
-## Worktree Ports
+---
 
-| Worktree | Backend Port | Frontend Port |
-|----------|--------------|---------------|
-| wt-backend | 8001 | — |
-| wt-frontend | 8002 | 5174 |
-| wt-srd | — | — |
+## Dispatched Work Log
 
-## Notes
+*Track who/what is working on each task*
 
-*Add coordination notes, blockers, and decisions here.*
+| Time | Worktree | PRD | Stories | Agent | Notes |
+|------|----------|-----|---------|-------|-------|
+| — | — | — | — | — | — |
 
 ---
 
-## Session Log
+## Coordination Notes
 
-### 2026-01-31
-- Initial project setup
-- Created implementation spec
-- Set up parallel worktree structure
+*Blockers, decisions, and cross-cutting concerns*
+
+- Phase 1 Backend and Frontend can run in parallel
+- SRD data can run independently
+- Frontend FE-005/006 can use mocked API if backend not ready
+
+---
+
+## Completed PRs
+
+| PR | Branch | Stories | Merged | Notes |
+|----|--------|---------|--------|-------|
+| — | — | — | — | — |

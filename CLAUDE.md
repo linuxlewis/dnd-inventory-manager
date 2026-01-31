@@ -47,33 +47,34 @@ dnd-helper/                    # Main repo (on main branch)
 └── scripts/
     └── ralph.sh              # Agent loop script
 
-# Worktrees (sibling directories)
-dnd-helper-backend/           # feat/backend-phase-1 branch
-dnd-helper-frontend/          # feat/frontend-phase-1 branch  
-dnd-helper-srd/               # feat/srd-data branch
+# Worktrees (sibling directories) - generic workers
+dnd-helper-wt-1/              # Can work on any branch/PRD
+dnd-helper-wt-2/              # Can work on any branch/PRD
+dnd-helper-wt-3/              # Can work on any branch/PRD
 ```
 
 ## Port Configuration
 
-To avoid conflicts when running multiple worktrees:
+To avoid conflicts when running multiple worktrees simultaneously:
 
-**Backend:** Set `PORT` env var (default 8000)
+**Backend:** Set `PORT` env var
 ```bash
 PORT=8001 uv run uvicorn app.main:app --port $PORT
 ```
 
-**Frontend:** Set `VITE_PORT` in `.env.local` or use --port
+**Frontend:** Set `VITE_PORT` in `.env.local` or pass --port
 ```bash
 VITE_PORT=5174 bun run dev
 # or
 bun run dev --port 5174
 ```
 
+**Assigned Ports:**
 | Worktree | Backend Port | Frontend Port |
 |----------|--------------|---------------|
-| dnd-helper-backend | 8001 | — |
-| dnd-helper-frontend | 8002 | 5174 |
-| dnd-helper-srd | — | — |
+| wt-1 | 8001 | 5174 |
+| wt-2 | 8002 | 5175 |
+| wt-3 | 8003 | 5176 |
 
 ## Code Conventions
 

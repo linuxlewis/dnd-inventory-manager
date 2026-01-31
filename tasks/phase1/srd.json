@@ -1,37 +1,100 @@
 {
   "project": "D&D Party Inventory Manager",
   "branchName": "feat/srd-data",
-  "description": "SRD Data: 5e item databases from Open5e",
+  "description": "SRD Data: Compile 5e SRD items from Open5e API into structured JSON databases",
   "userStories": [
     {
       "id": "SRD-001",
-      "title": "Weapons Database",
+      "title": "Weapons database",
+      "description": "As a user, I want standard 5e weapons available for quick lookup when adding items to my inventory.",
+      "acceptanceCriteria": [
+        "Create backend/app/data/ directory if it doesn't exist",
+        "Create backend/app/data/weapons.json",
+        "Fetch weapon data from Open5e API (https://api.open5e.com/v1/weapons/) or use SRD reference",
+        "Include all simple melee weapons: club, dagger, greatclub, handaxe, javelin, light hammer, mace, quarterstaff, sickle, spear",
+        "Include all simple ranged weapons: light crossbow, dart, shortbow, sling",
+        "Include all martial melee weapons: battleaxe, flail, glaive, greataxe, greatsword, halberd, lance, longsword, maul, morningstar, pike, rapier, scimitar, shortsword, trident, war pick, warhammer, whip",
+        "Include all martial ranged weapons: blowgun, hand crossbow, heavy crossbow, longbow, net",
+        "Each weapon object has: id (kebab-case), name, type ('equipment'), category ('weapon'), subcategory ('simple melee'|'simple ranged'|'martial melee'|'martial ranged'), damage_dice, damage_type, weight (number in lbs), value_gp (number), properties (array of strings like 'finesse', 'versatile', 'thrown', etc.)",
+        "For versatile weapons, include versatile_dice field",
+        "For thrown/ranged weapons, include range field as string '20/60' format",
+        "JSON is valid (parseable by jq)",
+        "JSON is formatted with 2-space indentation"
+      ],
       "priority": 1,
-      "passes": false
+      "passes": false,
+      "notes": "Source: https://api.open5e.com/v1/weapons/ or PHB SRD. Ensure all values match official SRD."
     },
     {
       "id": "SRD-002",
-      "title": "Armor Database",
+      "title": "Armor database",
+      "description": "As a user, I want standard 5e armor available for quick lookup when adding items to my inventory.",
+      "acceptanceCriteria": [
+        "Create backend/app/data/armor.json",
+        "Include light armor: padded (AC 11), leather (AC 11), studded leather (AC 12)",
+        "Include medium armor: hide (AC 12), chain shirt (AC 13), scale mail (AC 14), breastplate (AC 14), half plate (AC 15)",
+        "Include heavy armor: ring mail (AC 14), chain mail (AC 16), splint (AC 17), plate (AC 18)",
+        "Include shield (AC +2)",
+        "Each armor object has: id (kebab-case), name, type ('equipment'), category ('armor'), armor_type ('light'|'medium'|'heavy'|'shield'), ac_base (number), ac_max_dex_bonus (number or null for no limit), stealth_disadvantage (boolean), strength_requirement (number or null), weight (number in lbs), value_gp (number)",
+        "For shields: ac_bonus field instead of ac_base",
+        "JSON is valid and formatted with 2-space indentation"
+      ],
       "priority": 2,
-      "passes": false
+      "passes": false,
+      "notes": ""
     },
     {
       "id": "SRD-003",
-      "title": "Potions Database",
+      "title": "Potions database",
+      "description": "As a user, I want standard 5e potions available with their effects pre-filled.",
+      "acceptanceCriteria": [
+        "Create backend/app/data/potions.json",
+        "Include all healing potions: Potion of Healing (2d4+2, common, 50gp), Potion of Greater Healing (4d4+4, uncommon, 150gp), Potion of Superior Healing (8d4+8, rare, 500gp), Potion of Supreme Healing (10d4+20, very rare, 1350gp)",
+        "Include common/uncommon potions: Potion of Climbing, Potion of Fire Breath, Potion of Growth, Potion of Heroism, Potion of Invisibility, Potion of Mind Reading, Potion of Poison, Potion of Resistance, Potion of Speed, Potion of Water Breathing",
+        "Include Giant Strength potions: Hill (STR 21), Frost/Stone (STR 23), Fire (STR 25), Cloud (STR 27), Storm (STR 29)",
+        "Include Potion of Flying",
+        "Each potion object has: id (kebab-case), name, type ('potion'), rarity ('common'|'uncommon'|'rare'|'very_rare'|'legendary'), effect_description (string describing effect), value_gp (number)",
+        "For healing potions: add healing_dice field (e.g., '2d4+2')",
+        "For buff potions: add duration field (e.g., '1 hour', '10 minutes')",
+        "For potions that set stats: add stat_bonus object (e.g., {\"stat\": \"strength\", \"value\": 21})",
+        "JSON is valid and formatted with 2-space indentation"
+      ],
       "priority": 3,
-      "passes": false
+      "passes": false,
+      "notes": "Values from DMG. Prices are approximate market values."
     },
     {
       "id": "SRD-004",
-      "title": "Adventuring Gear",
+      "title": "Adventuring gear database",
+      "description": "As a user, I want common adventuring gear available for quick addition to my inventory.",
+      "acceptanceCriteria": [
+        "Create backend/app/data/gear.json",
+        "Include essential adventuring gear: backpack, bedroll, blanket, candle, chain (10 ft), chalk, climber's kit, clothes (common/fine/traveler's), component pouch, crowbar, flask, grappling hook, hammer, healer's kit, holy symbol, hourglass, hunting trap, ink, ink pen, ladder, lamp, lantern (bullseye/hooded), lock, magnifying glass, manacles, map/scroll case, mess kit, mirror, oil, paper, parchment, perfume, pick (miner's), piton, pole (10 ft), pot (iron), pouch, quiver, rations, rope (hemp/silk), sack, scale (merchant's), sealing wax, shovel, signal whistle, signet ring, soap, spellbook, spikes (iron), spyglass, tent, thieves' tools, tinderbox, torch, vial, waterskin, whetstone",
+        "Each item has: id (kebab-case), name, type ('gear'), category (string like 'container', 'tool', 'supply', 'clothing'), description (brief string), weight (number in lbs, can be 0), value_gp (number, can be decimal like 0.5)",
+        "Include at least 30 common items",
+        "JSON is valid and formatted with 2-space indentation"
+      ],
       "priority": 4,
-      "passes": false
+      "passes": false,
+      "notes": "Focus on commonly used items. Can expand later."
     },
     {
       "id": "SRD-005",
-      "title": "Combined Index",
+      "title": "Combined SRD index",
+      "description": "As a developer, I need a combined index of all items for quick search/autocomplete.",
+      "acceptanceCriteria": [
+        "Create backend/app/data/srd_index.json",
+        "Load all items from weapons.json, armor.json, potions.json, gear.json",
+        "Create combined array of all items",
+        "Each index entry has: id, name, type, category, source_file (e.g., 'weapons.json')",
+        "Sort array alphabetically by name",
+        "Add metadata object at top level with total_count and last_updated (ISO date string)",
+        "Structure: { \"metadata\": { \"total_count\": N, \"last_updated\": \"2026-01-31\" }, \"items\": [...] }",
+        "JSON is valid and formatted with 2-space indentation"
+      ],
       "priority": 5,
-      "passes": false
+      "passes": false,
+      "notes": "This index enables fast autocomplete without loading full item data."
     }
   ]
 }
