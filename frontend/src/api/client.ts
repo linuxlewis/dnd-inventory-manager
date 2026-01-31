@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { useAuthStore } from '../stores/authStore'
 
 const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
@@ -10,21 +11,17 @@ export const apiClient = axios.create({
 })
 
 // Request interceptor to add passphrase header
-// Note: getPassphrase will be properly implemented in FE-004
-let getPassphraseForSlug: ((slug: string) => string | null) | null = null
-
-export function setPassphraseGetter(getter: (slug: string) => string | null) {
-  getPassphraseForSlug = getter
-}
-
 apiClient.interceptors.request.use((config) => {
   // Extract slug from URL if present (e.g., /api/inventories/{slug})
   const urlMatch = config.url?.match(/\/api\/inventories\/([^/]+)/)
-  if (urlMatch && getPassphraseForSlug) {
+  if (urlMatch) {
     const slug = urlMatch[1]
-    const passphrase = getPassphraseForSlug(slug)
-    if (passphrase) {
-      config.headers['X-Passphrase'] = passphrase
+    // Skip auth header for the auth endpoint itself
+    if (!config.url?.endsWith('/auth')) {
+      const passphrase = useAuthStore.getState().getPassphrase(slug)
+      if (passphrase) {
+        config.headers['X-Passphrase'] = passphrase
+      }
     }
   }
   return config
@@ -36,7 +33,12 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       console.warn('Unauthorized - invalid or missing passphrase')
-      // Full handling will be implemented in FE-004
+      // Could clear the session here if desired
+      const urlMatch = error.config?.url?.match(/\/api\/inventories\/([^/]+)/)
+      if (urlMatch) {
+        const slug = urlMatch[1]
+        useAuthStore.getState().clearSession(slug)
+      }
     }
     return Promise.reject(error)
   }

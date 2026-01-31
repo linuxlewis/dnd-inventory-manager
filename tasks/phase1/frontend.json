@@ -64,7 +64,7 @@
         "Lint passes"
       ],
       "priority": 3,
-      "passes": false,
+      "passes": true,
       "notes": "Passphrase will be read from auth store created in FE-004. For now, interceptor can be a placeholder."
     },
     {
