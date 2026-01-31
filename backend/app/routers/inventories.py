@@ -2,13 +2,19 @@ import re
 import secrets
 
 import bcrypt
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Header, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.auth import verify_passphrase
 from app.database import get_db
 from app.db.inventory import Inventory
-from app.models.inventory import InventoryCreate, InventoryResponse
+from app.models.inventory import (
+    AuthResponse,
+    InventoryAuth,
+    InventoryCreate,
+    InventoryResponse,
+)
 
 router = APIRouter(prefix="/api/inventories", tags=["inventories"])
 
@@ -54,5 +60,46 @@ async def create_inventory(
     db.add(inventory)
     await db.commit()
     await db.refresh(inventory)
+
+    return inventory
+
+
+@router.post("/{slug}/auth", response_model=AuthResponse)
+async def authenticate_inventory(
+    slug: str,
+    data: InventoryAuth,
+    db: AsyncSession = Depends(get_db),
+) -> AuthResponse:
+    """Authenticate with a party inventory."""
+    result = await db.execute(select(Inventory).where(Inventory.slug == slug))
+    inventory = result.scalar_one_or_none()
+
+    if inventory is None:
+        raise HTTPException(status_code=404, detail="Inventory not found")
+
+    if verify_passphrase(data.passphrase, inventory.passphrase_hash):
+        return AuthResponse(success=True)
+
+    return AuthResponse(success=False, message="Invalid passphrase")
+
+
+@router.get("/{slug}", response_model=InventoryResponse)
+async def get_inventory(
+    slug: str,
+    db: AsyncSession = Depends(get_db),
+    x_passphrase: str | None = Header(default=None),
+) -> Inventory:
+    """Get a party inventory (requires authentication via X-Passphrase header)."""
+    if x_passphrase is None:
+        raise HTTPException(status_code=401, detail="Passphrase required")
+
+    result = await db.execute(select(Inventory).where(Inventory.slug == slug))
+    inventory = result.scalar_one_or_none()
+
+    if inventory is None:
+        raise HTTPException(status_code=404, detail="Inventory not found")
+
+    if not verify_passphrase(x_passphrase, inventory.passphrase_hash):
+        raise HTTPException(status_code=401, detail="Invalid passphrase")
 
     return inventory
