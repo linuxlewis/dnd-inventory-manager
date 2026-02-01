@@ -7,6 +7,16 @@ from app.models.inventory import (
     InventoryRead,
     InventoryUpdate,
 )
+from app.models.item import (
+    Item,
+    ItemCreate,
+    ItemListResponse,
+    ItemRarity,
+    ItemRead,
+    ItemType,
+    ItemUpdate,
+)
+from app.models.srd import SrdItemRead
 
 __all__ = [
     "Inventory",
@@ -15,4 +25,12 @@ __all__ = [
     "InventoryUpdate",
     "InventoryAuth",
     "AuthResponse",
+    "Item",
+    "ItemCreate",
+    "ItemRead",
+    "ItemUpdate",
+    "ItemListResponse",
+    "ItemType",
+    "ItemRarity",
+    "SrdItemRead",
 ]

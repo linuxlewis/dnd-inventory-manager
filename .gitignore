@@ -43,3 +43,5 @@ thumbnails/
 
 # Ralph
 scripts/ralph/.last-branch
+backend/data/*.db-shm
+backend/data/*.db-wal
