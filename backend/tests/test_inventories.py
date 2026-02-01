@@ -1,6 +1,11 @@
 """Tests for inventory API endpoints."""
 
+from typing import TYPE_CHECKING
+
 from httpx import AsyncClient
+
+if TYPE_CHECKING:
+    from app.db.inventory import Inventory
 
 
 class TestCreateInventory:
@@ -93,7 +98,7 @@ class TestAuthInventory:
     """Tests for POST /api/inventories/{slug}/auth endpoint."""
 
     async def test_auth_correct_passphrase(
-        self, client: AsyncClient, test_inventory: tuple
+        self, client: AsyncClient, test_inventory: tuple["Inventory", str]
     ) -> None:
         """Test correct passphrase returns {"success": true}."""
         inventory, passphrase = test_inventory
@@ -105,7 +110,7 @@ class TestAuthInventory:
         assert response.json()["success"] is True
 
     async def test_auth_wrong_passphrase(
-        self, client: AsyncClient, test_inventory: tuple
+        self, client: AsyncClient, test_inventory: tuple["Inventory", str]
     ) -> None:
         """Test wrong passphrase returns {"success": false}."""
         inventory, _ = test_inventory
@@ -129,7 +134,7 @@ class TestGetInventory:
     """Tests for GET /api/inventories/{slug} endpoint."""
 
     async def test_get_with_valid_passphrase(
-        self, client: AsyncClient, test_inventory: tuple
+        self, client: AsyncClient, test_inventory: tuple["Inventory", str]
     ) -> None:
         """Test GET with valid X-Passphrase header returns inventory."""
         inventory, passphrase = test_inventory
@@ -143,7 +148,7 @@ class TestGetInventory:
         assert data["name"] == inventory.name
 
     async def test_get_without_header_returns_401(
-        self, client: AsyncClient, test_inventory: tuple
+        self, client: AsyncClient, test_inventory: tuple["Inventory", str]
     ) -> None:
         """Test GET without X-Passphrase header returns 401."""
         inventory, _ = test_inventory
@@ -151,7 +156,7 @@ class TestGetInventory:
         assert response.status_code == 401
 
     async def test_get_with_wrong_passphrase_returns_401(
-        self, client: AsyncClient, test_inventory: tuple
+        self, client: AsyncClient, test_inventory: tuple["Inventory", str]
     ) -> None:
         """Test GET with wrong passphrase returns 401."""
         inventory, _ = test_inventory
@@ -161,13 +166,10 @@ class TestGetInventory:
         )
         assert response.status_code == 401
 
-    async def test_get_unknown_slug_returns_404(
-        self, client: AsyncClient, test_inventory: tuple
-    ) -> None:
+    async def test_get_unknown_slug_returns_404(self, client: AsyncClient) -> None:
         """Test GET with unknown slug returns 404."""
-        _, passphrase = test_inventory
         response = await client.get(
             "/api/inventories/nonexistent-slug",
-            headers={"X-Passphrase": passphrase},
+            headers={"X-Passphrase": "any-passphrase"},
         )
         assert response.status_code == 404

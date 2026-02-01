@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 from app.database import get_db
 from app.db.base import Base
+from app.db.inventory import Inventory
 from app.main import app
 from app.routers.inventories import hash_passphrase
 
@@ -50,9 +51,8 @@ async def client(test_db: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
 
 
 @pytest.fixture
-async def test_inventory(test_db: AsyncSession) -> tuple[object, str]:
+async def test_inventory(test_db: AsyncSession) -> tuple["Inventory", str]:
     """Create a sample inventory and return (inventory, passphrase)."""
-    from app.db.inventory import Inventory
 
     passphrase = "test-passphrase-123"
     inventory = Inventory(
