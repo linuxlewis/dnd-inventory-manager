@@ -215,6 +215,56 @@ Broadcast via `ConnectionManager`. Events: `item_added`, `item_updated`, `item_r
 ### Item Type Handling
 Base `Item` model with `properties: dict` for type-specific fields. Use discriminated unions in Pydantic.
 
+## Testing Guidelines
+
+### Backend Tests
+
+**Assert database persistence for create/update operations:**
+
+Tests should verify that data was actually persisted to the database, not just that the API returned a successful response. This catches issues where the response looks correct but the database transaction failed or wasn't committed.
+
+```python
+async def test_create_item_success(
+    self, client: AsyncClient, test_inventory: tuple[Inventory, str], test_db: AsyncSession
+) -> None:
+    """Test creating an item persists to database."""
+    inventory, passphrase = test_inventory
+    response = await client.post(
+        f"/api/inventories/{inventory.slug}/items",
+        json={"name": "Magic Sword", "type": "equipment"},
+        headers={"X-Passphrase": passphrase},
+    )
+    assert response.status_code == 200
+    
+    # Verify persistence to database
+    data = response.json()
+    from uuid import UUID
+    from sqlmodel import select
+    
+    item_id = UUID(data["id"])
+    result = await test_db.execute(select(Item).where(Item.id == item_id))
+    db_item = result.scalar_one_or_none()
+    assert db_item is not None
+    assert db_item.name == "Magic Sword"
+```
+
+**For update tests, refresh the fixture object:**
+
+```python
+async def test_update_item_success(
+    self, client: AsyncClient, inventory_with_items: tuple, test_db: AsyncSession
+) -> None:
+    inventory, passphrase, items = inventory_with_items
+    item = items[0]
+    response = await client.patch(...)
+    
+    # Refresh and verify database state
+    await test_db.refresh(item)
+    result = await test_db.execute(select(Item).where(Item.id == item.id))
+    db_item = result.scalar_one_or_none()
+    assert db_item.name == "Updated Name"
+```
+
 ## Quality Checks
 
 Before committing, run:

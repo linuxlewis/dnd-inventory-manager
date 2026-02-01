@@ -306,9 +306,12 @@ class TestUpdateItem:
     """Tests for PATCH /api/inventories/{slug}/items/{item_id} endpoint."""
 
     async def test_update_item_success(
-        self, client: AsyncClient, inventory_with_items: tuple[Inventory, str, list[Item]]
+        self,
+        client: AsyncClient,
+        inventory_with_items: tuple[Inventory, str, list[Item]],
+        test_db: AsyncSession,
     ) -> None:
-        """Test updating an item."""
+        """Test updating an item persists changes to database."""
         inventory, passphrase, items = inventory_with_items
         item = items[0]
         response = await client.patch(
@@ -320,6 +323,16 @@ class TestUpdateItem:
         data = response.json()
         assert data["name"] == "Enhanced Longsword"
         assert data["rarity"] == "rare"
+
+        # Verify changes were persisted to the database
+        from sqlmodel import select
+
+        await test_db.refresh(item)  # Refresh to get updated values
+        result = await test_db.execute(select(Item).where(Item.id == item.id))
+        db_item = result.scalar_one_or_none()
+        assert db_item is not None
+        assert db_item.name == "Enhanced Longsword"
+        assert db_item.rarity == ItemRarity.rare
 
     async def test_update_item_partial(
         self, client: AsyncClient, inventory_with_items: tuple[Inventory, str, list[Item]]
