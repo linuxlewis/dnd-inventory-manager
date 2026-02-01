@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, History } from 'lucide-react'
 import { apiClient } from '../api/client'
 import { useAuth } from '../hooks/useAuth'
 import { useAuthenticateInventory } from '../api/inventories'
 import type { InventoryResponse } from '../api/types'
 import { AxiosError } from 'axios'
+import { TreasuryWidget } from '../components/currency/TreasuryWidget'
+import { CurrencyModal } from '../components/currency/CurrencyModal'
+import { ConvertModal } from '../components/currency/ConvertModal'
 
 export function Inventory() {
   const { slug } = useParams<{ slug: string }>()
@@ -17,6 +20,8 @@ export function Inventory() {
   const [passphrase, setPassphrase] = useState('')
   const [showPassphrase, setShowPassphrase] = useState(false)
   const [authError, setAuthError] = useState<string | null>(null)
+  const [showCurrencyModal, setShowCurrencyModal] = useState(false)
+  const [showConvertModal, setShowConvertModal] = useState(false)
 
   const isAuthenticated = slug ? hasSession(slug) : false
 
@@ -179,42 +184,70 @@ export function Inventory() {
   }
 
   // Show inventory content
+  const currency = {
+    copper: inventory?.copper ?? 0,
+    silver: inventory?.silver ?? 0,
+    gold: inventory?.gold ?? 0,
+    platinum: inventory?.platinum ?? 0,
+  }
+
   return (
     <div>
+      {/* Header */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          {inventory?.name}
-        </h1>
-        {inventory?.description && (
-          <p className="text-gray-600">{inventory.description}</p>
-        )}
-      </div>
-
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Treasury</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-amber-100 rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-amber-800">{inventory?.copper ?? 0}</p>
-            <p className="text-sm text-amber-600">Copper</p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+              {inventory?.name}
+            </h1>
+            {inventory?.description && (
+              <p className="text-gray-600">{inventory.description}</p>
+            )}
           </div>
-          <div className="bg-gray-200 rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-gray-700">{inventory?.silver ?? 0}</p>
-            <p className="text-sm text-gray-500">Silver</p>
-          </div>
-          <div className="bg-yellow-100 rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-yellow-700">{inventory?.gold ?? 0}</p>
-            <p className="text-sm text-yellow-600">Gold</p>
-          </div>
-          <div className="bg-slate-200 rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-slate-700">{inventory?.platinum ?? 0}</p>
-            <p className="text-sm text-slate-500">Platinum</p>
-          </div>
+          <Link
+            to={`/${slug}/history`}
+            className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+          >
+            <History className="w-5 h-5" />
+            <span className="hidden sm:inline">History</span>
+          </Link>
         </div>
       </div>
 
-      <p className="mt-6 text-center text-gray-500 text-sm">
-        Inventory items will be added in Phase 2.
-      </p>
+      {/* Treasury Widget */}
+      <TreasuryWidget
+        currency={currency}
+        onAddSpend={() => setShowCurrencyModal(true)}
+        onConvert={() => setShowConvertModal(true)}
+      />
+
+      {/* Items placeholder */}
+      <div className="mt-6 bg-white rounded-lg shadow-md p-6">
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">Items</h2>
+        <p className="text-center text-gray-500 py-8">
+          Inventory items will be added in Phase 2.
+        </p>
+      </div>
+
+      {/* Currency Modal */}
+      {slug && (
+        <CurrencyModal
+          isOpen={showCurrencyModal}
+          onClose={() => setShowCurrencyModal(false)}
+          slug={slug}
+          currentCurrency={currency}
+        />
+      )}
+
+      {/* Convert Modal */}
+      {slug && (
+        <ConvertModal
+          isOpen={showConvertModal}
+          onClose={() => setShowConvertModal(false)}
+          slug={slug}
+          currentCurrency={currency}
+        />
+      )}
     </div>
   )
 }
