@@ -1,0 +1,214 @@
+[
+  {
+    "id": "potion-of-healing",
+    "name": "Potion of Healing",
+    "type": "potion",
+    "rarity": "common",
+    "effect_description": "You regain hit points when you drink this potion. The number of hit points depends on the potion's rarity.",
+    "healing_dice": "2d4+2",
+    "value_gp": 50
+  },
+  {
+    "id": "potion-of-greater-healing",
+    "name": "Potion of Greater Healing",
+    "type": "potion",
+    "rarity": "uncommon",
+    "effect_description": "You regain hit points when you drink this potion.",
+    "healing_dice": "4d4+4",
+    "value_gp": 150
+  },
+  {
+    "id": "potion-of-superior-healing",
+    "name": "Potion of Superior Healing",
+    "type": "potion",
+    "rarity": "rare",
+    "effect_description": "You regain hit points when you drink this potion.",
+    "healing_dice": "8d4+8",
+    "value_gp": 500
+  },
+  {
+    "id": "potion-of-supreme-healing",
+    "name": "Potion of Supreme Healing",
+    "type": "potion",
+    "rarity": "very_rare",
+    "effect_description": "You regain hit points when you drink this potion.",
+    "healing_dice": "10d4+20",
+    "value_gp": 1350
+  },
+  {
+    "id": "potion-of-climbing",
+    "name": "Potion of Climbing",
+    "type": "potion",
+    "rarity": "common",
+    "effect_description": "When you drink this potion, you gain a climbing speed equal to your walking speed for 1 hour. During this time, you have advantage on Strength (Athletics) checks you make to climb.",
+    "duration": "1 hour",
+    "value_gp": 75
+  },
+  {
+    "id": "potion-of-fire-breath",
+    "name": "Potion of Fire Breath",
+    "type": "potion",
+    "rarity": "uncommon",
+    "effect_description": "After drinking this potion, you can use a bonus action to exhale fire at a target within 30 feet. The target must make a DC 13 Dexterity saving throw, taking 4d6 fire damage on a failed save, or half as much on a successful one. The effect ends after you exhale the fire three times or when 1 hour has passed.",
+    "duration": "1 hour",
+    "value_gp": 150
+  },
+  {
+    "id": "potion-of-growth",
+    "name": "Potion of Growth",
+    "type": "potion",
+    "rarity": "uncommon",
+    "effect_description": "When you drink this potion, you gain the 'enlarge' effect of the enlarge/reduce spell for 1d4 hours (no concentration required).",
+    "duration": "1d4 hours",
+    "value_gp": 200
+  },
+  {
+    "id": "potion-of-heroism",
+    "name": "Potion of Heroism",
+    "type": "potion",
+    "rarity": "rare",
+    "effect_description": "For 1 hour after drinking it, you gain 10 temporary hit points that last for 1 hour. For the same duration, you are under the effect of the bless spell (no concentration required).",
+    "duration": "1 hour",
+    "value_gp": 180
+  },
+  {
+    "id": "potion-of-invisibility",
+    "name": "Potion of Invisibility",
+    "type": "potion",
+    "rarity": "very_rare",
+    "effect_description": "This potion's container looks empty but feels as though it holds liquid. When you drink it, you become invisible for 1 hour. Anything you wear or carry is invisible with you. The effect ends early if you attack or cast a spell.",
+    "duration": "1 hour",
+    "value_gp": 5000
+  },
+  {
+    "id": "potion-of-mind-reading",
+    "name": "Potion of Mind Reading",
+    "type": "potion",
+    "rarity": "rare",
+    "effect_description": "When you drink this potion, you gain the effect of the detect thoughts spell (save DC 13). The potion's effect doesn't require concentration.",
+    "duration": "1 minute",
+    "value_gp": 250
+  },
+  {
+    "id": "potion-of-poison",
+    "name": "Potion of Poison",
+    "type": "potion",
+    "rarity": "uncommon",
+    "effect_description": "This concoction looks, smells, and tastes like a potion of healing or other beneficial potion. However, it is actually poison masked by illusion magic. If you drink it, you take 3d6 poison damage, and you must succeed on a DC 13 Constitution saving throw or be poisoned.",
+    "value_gp": 100
+  },
+  {
+    "id": "potion-of-resistance",
+    "name": "Potion of Resistance",
+    "type": "potion",
+    "rarity": "uncommon",
+    "effect_description": "When you drink this potion, you gain resistance to one type of damage for 1 hour. The type depends on the potion variety.",
+    "duration": "1 hour",
+    "value_gp": 300
+  },
+  {
+    "id": "potion-of-speed",
+    "name": "Potion of Speed",
+    "type": "potion",
+    "rarity": "very_rare",
+    "effect_description": "When you drink this potion, you gain the effect of the haste spell for 1 minute (no concentration required).",
+    "duration": "1 minute",
+    "value_gp": 5000
+  },
+  {
+    "id": "potion-of-water-breathing",
+    "name": "Potion of Water Breathing",
+    "type": "potion",
+    "rarity": "uncommon",
+    "effect_description": "You can breathe underwater for 1 hour after drinking this potion. Its cloudy green fluid smells of the sea and has a jellyfish-like bubble floating in it.",
+    "duration": "1 hour",
+    "value_gp": 100
+  },
+  {
+    "id": "potion-of-flying",
+    "name": "Potion of Flying",
+    "type": "potion",
+    "rarity": "very_rare",
+    "effect_description": "When you drink this potion, you gain a flying speed equal to your walking speed for 1 hour and can hover. If you're in the air when the potion wears off, you fall unless you have some other means of staying aloft.",
+    "duration": "1 hour",
+    "value_gp": 5000
+  },
+  {
+    "id": "potion-of-hill-giant-strength",
+    "name": "Potion of Hill Giant Strength",
+    "type": "potion",
+    "rarity": "uncommon",
+    "effect_description": "When you drink this potion, your Strength score changes to 21 for 1 hour. The potion has no effect on you if your Strength is equal to or greater than that score.",
+    "duration": "1 hour",
+    "stat_bonus": {
+      "stat": "strength",
+      "value": 21
+    },
+    "value_gp": 500
+  },
+  {
+    "id": "potion-of-frost-giant-strength",
+    "name": "Potion of Frost Giant Strength",
+    "type": "potion",
+    "rarity": "rare",
+    "effect_description": "When you drink this potion, your Strength score changes to 23 for 1 hour. The potion has no effect on you if your Strength is equal to or greater than that score.",
+    "duration": "1 hour",
+    "stat_bonus": {
+      "stat": "strength",
+      "value": 23
+    },
+    "value_gp": 1500
+  },
+  {
+    "id": "potion-of-stone-giant-strength",
+    "name": "Potion of Stone Giant Strength",
+    "type": "potion",
+    "rarity": "rare",
+    "effect_description": "When you drink this potion, your Strength score changes to 23 for 1 hour. The potion has no effect on you if your Strength is equal to or greater than that score.",
+    "duration": "1 hour",
+    "stat_bonus": {
+      "stat": "strength",
+      "value": 23
+    },
+    "value_gp": 1500
+  },
+  {
+    "id": "potion-of-fire-giant-strength",
+    "name": "Potion of Fire Giant Strength",
+    "type": "potion",
+    "rarity": "rare",
+    "effect_description": "When you drink this potion, your Strength score changes to 25 for 1 hour. The potion has no effect on you if your Strength is equal to or greater than that score.",
+    "duration": "1 hour",
+    "stat_bonus": {
+      "stat": "strength",
+      "value": 25
+    },
+    "value_gp": 2500
+  },
+  {
+    "id": "potion-of-cloud-giant-strength",
+    "name": "Potion of Cloud Giant Strength",
+    "type": "potion",
+    "rarity": "very_rare",
+    "effect_description": "When you drink this potion, your Strength score changes to 27 for 1 hour. The potion has no effect on you if your Strength is equal to or greater than that score.",
+    "duration": "1 hour",
+    "stat_bonus": {
+      "stat": "strength",
+      "value": 27
+    },
+    "value_gp": 5000
+  },
+  {
+    "id": "potion-of-storm-giant-strength",
+    "name": "Potion of Storm Giant Strength",
+    "type": "potion",
+    "rarity": "legendary",
+    "effect_description": "When you drink this potion, your Strength score changes to 29 for 1 hour. The potion has no effect on you if your Strength is equal to or greater than that score.",
+    "duration": "1 hour",
+    "stat_bonus": {
+      "stat": "strength",
+      "value": 29
+    },
+    "value_gp": 25000
+  }
+]
