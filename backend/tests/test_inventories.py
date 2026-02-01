@@ -1,23 +1,30 @@
 """Tests for inventory API endpoints."""
 
-from typing import TYPE_CHECKING
-
 from httpx import AsyncClient
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql import func
 
-if TYPE_CHECKING:
-    from app.db.inventory import Inventory
+from app.models import Inventory
 
 
 class TestCreateInventory:
     """Tests for POST /api/inventories endpoint."""
 
-    async def test_create_inventory_success(self, client: AsyncClient) -> None:
+    async def test_create_inventory_success(
+        self, client: AsyncClient, test_db: AsyncSession
+    ) -> None:
         """Test creating an inventory with valid data returns 200."""
         response = await client.post(
             "/api/inventories/",
             json={"name": "Dragon Slayers", "passphrase": "secret123"},
         )
         assert response.status_code == 200
+
+        # Verify inventory was persisted in database
+        result = await test_db.execute(select(func.count()).select_from(Inventory))
+        count = result.scalar()
+        assert count == 1
 
     async def test_create_inventory_response_fields(self, client: AsyncClient) -> None:
         """Test response includes required fields."""
@@ -98,7 +105,7 @@ class TestAuthInventory:
     """Tests for POST /api/inventories/{slug}/auth endpoint."""
 
     async def test_auth_correct_passphrase(
-        self, client: AsyncClient, test_inventory: tuple["Inventory", str]
+        self, client: AsyncClient, test_inventory: tuple[Inventory, str]
     ) -> None:
         """Test correct passphrase returns {"success": true}."""
         inventory, passphrase = test_inventory
@@ -110,7 +117,7 @@ class TestAuthInventory:
         assert response.json()["success"] is True
 
     async def test_auth_wrong_passphrase(
-        self, client: AsyncClient, test_inventory: tuple["Inventory", str]
+        self, client: AsyncClient, test_inventory: tuple[Inventory, str]
     ) -> None:
         """Test wrong passphrase returns {"success": false}."""
         inventory, _ = test_inventory
@@ -134,7 +141,7 @@ class TestGetInventory:
     """Tests for GET /api/inventories/{slug} endpoint."""
 
     async def test_get_with_valid_passphrase(
-        self, client: AsyncClient, test_inventory: tuple["Inventory", str]
+        self, client: AsyncClient, test_inventory: tuple[Inventory, str]
     ) -> None:
         """Test GET with valid X-Passphrase header returns inventory."""
         inventory, passphrase = test_inventory
@@ -148,7 +155,7 @@ class TestGetInventory:
         assert data["name"] == inventory.name
 
     async def test_get_without_header_returns_401(
-        self, client: AsyncClient, test_inventory: tuple["Inventory", str]
+        self, client: AsyncClient, test_inventory: tuple[Inventory, str]
     ) -> None:
         """Test GET without X-Passphrase header returns 401."""
         inventory, _ = test_inventory
@@ -156,7 +163,7 @@ class TestGetInventory:
         assert response.status_code == 401
 
     async def test_get_with_wrong_passphrase_returns_401(
-        self, client: AsyncClient, test_inventory: tuple["Inventory", str]
+        self, client: AsyncClient, test_inventory: tuple[Inventory, str]
     ) -> None:
         """Test GET with wrong passphrase returns 401."""
         inventory, _ = test_inventory
@@ -173,3 +180,40 @@ class TestGetInventory:
             headers={"X-Passphrase": "any-passphrase"},
         )
         assert response.status_code == 404
+
+
+class TestSQLModelValidation:
+    """Tests verifying SQLModel schema validation works correctly."""
+
+    async def test_sqlmodel_validates_name_min_length(self, client: AsyncClient) -> None:
+        """Test SQLModel validates name has minimum length of 1."""
+        response = await client.post(
+            "/api/inventories/",
+            json={"name": "", "passphrase": "password123"},
+        )
+        assert response.status_code == 422
+
+    async def test_sqlmodel_validates_passphrase_min_length(self, client: AsyncClient) -> None:
+        """Test SQLModel validates passphrase has minimum length of 6."""
+        response = await client.post(
+            "/api/inventories/",
+            json={"name": "Valid Name", "passphrase": "12345"},
+        )
+        assert response.status_code == 422
+
+    async def test_sqlmodel_schema_excludes_sensitive_fields(self, client: AsyncClient) -> None:
+        """Test InventoryRead schema excludes passphrase_hash from response."""
+        # Create inventory
+        response = await client.post(
+            "/api/inventories/",
+            json={"name": "Schema Test", "passphrase": "password123"},
+        )
+        data = response.json()
+
+        # Verify passphrase_hash is not in response
+        assert "passphrase_hash" not in data
+        # Verify expected fields are present
+        assert "id" in data
+        assert "slug" in data
+        assert "name" in data
+        assert data["name"] == "Schema Test"

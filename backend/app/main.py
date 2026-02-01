@@ -4,19 +4,15 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.database import engine
-from app.db import (
-    Base,  # noqa: F401 - import models to register with metadata
-    Inventory,  # noqa: F401
-)
+from app.database import init_db
+from app.models import Inventory  # noqa: F401 - import to register with SQLModel metadata
 from app.routers import inventories_router
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Create database tables on startup."""
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    await init_db()
     yield
 
 

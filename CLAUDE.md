@@ -14,7 +14,7 @@ Web app for D&D 5e party inventory management. Slug + passphrase access (no user
 ## Tech Stack
 
 - **Frontend:** React 18 + Vite + Bun + Tailwind + TanStack Query + Zustand
-- **Backend:** Python 3.11+ + FastAPI + UV + Pydantic v2 + SQLAlchemy
+- **Backend:** Python 3.11+ + FastAPI + UV + SQLModel + Pydantic v2
 - **Database:** SQLite (async via aiosqlite)
 - **Real-time:** Server-Sent Events (SSE)
 
@@ -26,9 +26,9 @@ dnd-helper/                    # Main repo (on main branch)
 │   └── app/
 │       ├── main.py           # FastAPI app
 │       ├── config.py         # Pydantic settings
-│       ├── database.py       # SQLAlchemy setup
-│       ├── models/           # Pydantic models (API schemas)
-│       ├── db/               # SQLAlchemy ORM models
+│       ├── database.py       # SQLModel/SQLAlchemy async setup
+│       ├── models/           # SQLModel models (ORM + schemas)
+│       │   └── inventory.py  # Inventory model + Create/Read/Update schemas
 │       ├── routers/          # API endpoints
 │       ├── services/         # Business logic
 │       ├── core/             # Auth, encryption, SSE manager
@@ -52,6 +52,76 @@ dnd-helper-wt-1/              # Can work on any branch/PRD
 dnd-helper-wt-2/              # Can work on any branch/PRD
 dnd-helper-wt-3/              # Can work on any branch/PRD
 ```
+
+## SQLModel Patterns
+
+SQLModel combines SQLAlchemy ORM and Pydantic validation into a single model. This eliminates the old pattern of separate `db/*.py` (ORM) and `models/*.py` (schemas).
+
+### Creating a New Model
+
+```python
+from datetime import UTC, datetime
+from uuid import UUID, uuid4
+from sqlmodel import Field, SQLModel
+
+# Base schema with shared fields
+class ItemBase(SQLModel):
+    name: str = Field(min_length=1)
+    description: str | None = None
+
+# ORM model (table=True makes it a database table)
+class Item(ItemBase, table=True):
+    __tablename__ = "items"
+    
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+
+# Create schema (for POST requests)
+class ItemCreate(SQLModel):
+    name: str = Field(min_length=1)
+    description: str | None = None
+
+# Read schema (for responses - excludes sensitive fields)
+class ItemRead(ItemBase):
+    id: UUID
+    created_at: datetime
+    model_config = {"from_attributes": True}
+
+# Update schema (all fields optional)
+class ItemUpdate(SQLModel):
+    name: str | None = Field(default=None, min_length=1)
+    description: str | None = None
+```
+
+### Key Points
+
+1. **`table=True`** — Makes the class an ORM model (creates database table)
+2. **Without `table=True`** — Just a Pydantic schema for validation
+3. **`from_attributes=True`** — Allows creating from ORM instances
+4. **Use Read schemas for responses** — Exclude sensitive fields like password hashes
+
+### Query Pattern
+
+```python
+from sqlmodel import select
+
+# Using SQLModel select (works with async sessions)
+result = await db.execute(select(Item).where(Item.slug == slug))
+item = result.scalar_one_or_none()
+```
+
+### When to Use Custom Endpoints vs CRUDRouter
+
+**Custom endpoints** (preferred when):
+- Custom authentication logic (passphrase headers)
+- Slug generation or other preprocessing
+- Non-standard response shapes
+- Complex business logic
+
+**CRUDRouter** (useful when):
+- Simple CRUD with no auth
+- Standard REST patterns
+- Admin/internal APIs
 
 ## Development
 
@@ -168,10 +238,10 @@ SQLite database is stored in `./data/` and mounted as a Docker volume. Data pers
 ## Code Conventions
 
 ### Backend (Python)
-- Use Pydantic v2 for all models (request/response schemas)
+- Use SQLModel for all models (ORM + schemas in one)
 - Async everywhere (async def, await)
 - Type hints on all functions
-- SQLAlchemy 2.0 style (select(), scalars())
+- SQLModel select() for queries
 - UV for package management
 
 ### Frontend (TypeScript/React)
@@ -201,7 +271,8 @@ Before committing, run:
 cd backend
 uv run ruff check .
 uv run ruff format .
-uv run mypy app/
+uv run ty check app/
+uv run pytest -v
 
 # Frontend
 cd frontend
