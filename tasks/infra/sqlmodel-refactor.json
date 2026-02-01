@@ -1,0 +1,110 @@
+{
+  "project": "D&D Party Inventory Manager",
+  "branchName": "feat/sqlmodel-refactor",
+  "description": "Refactor backend to use SQLModel + FastAPI-CRUDRouter to reduce boilerplate before Phase 2",
+  "userStories": [
+    {
+      "id": "REFACTOR-001",
+      "title": "Add SQLModel and CRUDRouter dependencies",
+      "description": "As a developer, I need the new libraries installed.",
+      "acceptanceCriteria": [
+        "Add sqlmodel to pyproject.toml dependencies",
+        "Add fastapi-crudrouter to pyproject.toml dependencies",
+        "Run uv sync to install",
+        "Verify imports work: `from sqlmodel import SQLModel, Field`",
+        "Verify imports work: `from fastapi_crudrouter import SQLAlchemyCRUDRouter`",
+        "Ruff check passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "SQLModel is by the FastAPI creator, designed to work seamlessly"
+    },
+    {
+      "id": "REFACTOR-002",
+      "title": "Convert Inventory to SQLModel",
+      "description": "As a developer, I want a single Inventory model that serves as both ORM and Pydantic schema.",
+      "acceptanceCriteria": [
+        "Create backend/app/models/inventory_model.py with SQLModel-based Inventory",
+        "Inventory class: `class Inventory(SQLModel, table=True):`",
+        "Fields: id (UUID, primary_key), slug (unique, index), passphrase_hash, name, description (optional)",
+        "Fields: copper, silver, gold, platinum (int, default 0)",
+        "Fields: created_at, updated_at (datetime)",
+        "Create InventoryCreate schema (SQLModel without table=True, excludes id/timestamps/hash)",
+        "Create InventoryRead schema (excludes passphrase_hash)",
+        "Create InventoryUpdate schema (all fields optional)",
+        "Remove old app/db/inventory.py and app/models/inventory.py",
+        "Update imports throughout codebase",
+        "Ruff check passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": "SQLModel handles both ORM mapping and Pydantic validation in one class"
+    },
+    {
+      "id": "REFACTOR-003",
+      "title": "Update database setup for SQLModel",
+      "description": "As a developer, I need the database configured for SQLModel.",
+      "acceptanceCriteria": [
+        "Update backend/app/database.py to use SQLModel's create_engine",
+        "Keep async support with aiosqlite",
+        "Update lifespan in main.py to use SQLModel.metadata.create_all",
+        "Verify database tables still create correctly on startup",
+        "Verify existing data migration path (if any test data exists)",
+        "Ruff check passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": "SQLModel wraps SQLAlchemy, so async should still work"
+    },
+    {
+      "id": "REFACTOR-004",
+      "title": "Refactor inventory router with CRUDRouter",
+      "description": "As a developer, I want to use CRUDRouter to auto-generate standard CRUD endpoints.",
+      "acceptanceCriteria": [
+        "Keep custom create endpoint (has slug generation + passphrase hashing logic)",
+        "Keep custom auth endpoint (not standard CRUD)",
+        "Use CRUDRouter for: get_one, get_all (if needed later)",
+        "Or: keep manual endpoints but with cleaner SQLModel queries",
+        "Ensure X-Passphrase auth still works on protected routes",
+        "All existing API behavior unchanged",
+        "Existing tests still pass",
+        "Ruff check passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": "CRUDRouter may not fit perfectly due to passphrase auth - evaluate and use where it makes sense"
+    },
+    {
+      "id": "REFACTOR-005",
+      "title": "Update tests for SQLModel",
+      "description": "As a developer, I need tests updated to work with the new model structure.",
+      "acceptanceCriteria": [
+        "Update conftest.py fixtures for SQLModel",
+        "Update test_inventories.py imports",
+        "All 15+ existing tests pass",
+        "Add a test verifying SQLModel schema validation works",
+        "Ruff check passes",
+        "uv run pytest -v passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "REFACTOR-006",
+      "title": "Document SQLModel patterns in CLAUDE.md",
+      "description": "As a developer, I need documentation on the new patterns for future development.",
+      "acceptanceCriteria": [
+        "Update CLAUDE.md with SQLModel usage patterns",
+        "Document: how to create a new model (table=True for ORM, without for schema)",
+        "Document: Create/Read/Update schema pattern",
+        "Document: when to use CRUDRouter vs custom endpoints",
+        "Remove outdated references to separate db/ and models/ patterns",
+        "Update project structure section"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}
