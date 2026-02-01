@@ -1,9 +1,18 @@
-# Pydantic models package
+# Pydantic/SQLModel schemas package
 from app.models.inventory import (
     AuthResponse,
+    Inventory,
     InventoryAuth,
     InventoryCreate,
-    InventoryResponse,
+    InventoryRead,
+    InventoryUpdate,
 )
 
-__all__ = ["InventoryCreate", "InventoryResponse", "InventoryAuth", "AuthResponse"]
+__all__ = [
+    "Inventory",
+    "InventoryCreate",
+    "InventoryRead",
+    "InventoryUpdate",
+    "InventoryAuth",
+    "AuthResponse",
+]

@@ -1,5 +1,4 @@
 # Database models package
-from app.db.base import Base
-from app.db.inventory import Inventory
+# Note: Inventory model is now in app.models.inventory using SQLModel
 
-__all__ = ["Base", "Inventory"]
+__all__: list[str] = []

@@ -1,10 +1,51 @@
-from datetime import datetime
-from uuid import UUID
+"""SQLModel-based Inventory models.
 
-from pydantic import BaseModel, Field
+This module contains a single Inventory class that serves as both:
+1. ORM model (with table=True) for database operations
+2. Pydantic schema (through SQLModel) for API serialization
+
+Plus Create/Read/Update schemas for API endpoints.
+"""
+
+from datetime import UTC, datetime
+from uuid import UUID, uuid4
+
+from pydantic import field_validator
+from sqlmodel import Field, SQLModel
 
 
-class InventoryCreate(BaseModel):
+class InventoryBase(SQLModel):
+    """Base fields shared across all Inventory schemas."""
+
+    name: str = Field(min_length=1, description="Party name")
+    description: str | None = Field(default=None, description="Optional description")
+
+
+class Inventory(InventoryBase, table=True):
+    """Party inventory model - serves as both ORM and Pydantic schema.
+
+    This is the core model stored in the database. It includes all fields
+    including sensitive data like passphrase_hash.
+    """
+
+    __tablename__ = "inventories"
+
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    slug: str = Field(index=True, unique=True, max_length=255)
+    passphrase_hash: str = Field(max_length=255)
+
+    # Currency fields
+    copper: int = Field(default=0)
+    silver: int = Field(default=0)
+    gold: int = Field(default=0)
+    platinum: int = Field(default=0)
+
+    # Timestamps
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+
+
+class InventoryCreate(SQLModel):
     """Schema for creating a new inventory."""
 
     name: str = Field(min_length=1, description="Party name")
@@ -13,13 +54,11 @@ class InventoryCreate(BaseModel):
     slug: str | None = Field(default=None, description="Optional custom slug")
 
 
-class InventoryResponse(BaseModel):
-    """Schema for inventory response."""
+class InventoryRead(InventoryBase):
+    """Schema for inventory response (excludes passphrase_hash)."""
 
     id: UUID
     slug: str
-    name: str
-    description: str | None
     copper: int
     silver: int
     gold: int
@@ -30,13 +69,32 @@ class InventoryResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
-class InventoryAuth(BaseModel):
+class InventoryUpdate(SQLModel):
+    """Schema for updating an inventory (all fields optional)."""
+
+    name: str | None = Field(default=None, min_length=1)
+    description: str | None = None
+    copper: int | None = None
+    silver: int | None = None
+    gold: int | None = None
+    platinum: int | None = None
+
+    @field_validator("copper", "silver", "gold", "platinum", mode="before")
+    @classmethod
+    def validate_currency(cls, v):
+        """Ensure currency values are non-negative."""
+        if v is not None and v < 0:
+            raise ValueError("Currency cannot be negative")
+        return v
+
+
+class InventoryAuth(SQLModel):
     """Schema for inventory authentication."""
 
     passphrase: str
 
 
-class AuthResponse(BaseModel):
+class AuthResponse(SQLModel):
     """Schema for authentication response."""
 
     success: bool

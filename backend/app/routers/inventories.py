@@ -1,19 +1,21 @@
+"""Inventory API endpoints using SQLModel."""
+
 import re
 import secrets
 
 import bcrypt
 from fastapi import APIRouter, Depends, Header, HTTPException
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlmodel import select
 
 from app.core.auth import verify_passphrase
 from app.database import get_db
-from app.db.inventory import Inventory
-from app.models.inventory import (
+from app.models import (
     AuthResponse,
+    Inventory,
     InventoryAuth,
     InventoryCreate,
-    InventoryResponse,
+    InventoryRead,
 )
 
 router = APIRouter(prefix="/api/inventories", tags=["inventories"])
@@ -34,7 +36,7 @@ def hash_passphrase(passphrase: str) -> str:
     return bcrypt.hashpw(passphrase.encode(), bcrypt.gensalt()).decode()
 
 
-@router.post("/", response_model=InventoryResponse)
+@router.post("/", response_model=InventoryRead)
 async def create_inventory(
     data: InventoryCreate,
     db: AsyncSession = Depends(get_db),
@@ -49,7 +51,7 @@ async def create_inventory(
     if result.scalar_one_or_none() is not None:
         slug = f"{base_slug}-{secrets.token_hex(2)}"
 
-    # Create inventory
+    # Create inventory using SQLModel
     inventory = Inventory(
         slug=slug,
         name=data.name,
@@ -83,7 +85,7 @@ async def authenticate_inventory(
     return AuthResponse(success=False, message="Invalid passphrase")
 
 
-@router.get("/{slug}", response_model=InventoryResponse)
+@router.get("/{slug}", response_model=InventoryRead)
 async def get_inventory(
     slug: str,
     db: AsyncSession = Depends(get_db),
