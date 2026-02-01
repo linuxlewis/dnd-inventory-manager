@@ -1,0 +1,256 @@
+import { useState } from 'react'
+import { X } from 'lucide-react'
+import { useUpdateItem } from '../../api/items'
+import type { Item, ItemType, ItemRarity, ItemUpdate } from '../../api/types'
+import { ITEM_TYPES, ITEM_RARITIES, TYPE_LABELS, RARITY_LABELS } from './utils'
+
+interface EditItemModalProps {
+  item: Item
+  slug: string
+  isOpen: boolean
+  onClose: () => void
+}
+
+export function EditItemModal({ item, slug, isOpen, onClose }: EditItemModalProps) {
+  // Use key on the form content to reset state when item changes
+  if (!isOpen) return null
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-y-auto">
+      <div className="flex min-h-full items-center justify-center p-4">
+        {/* Backdrop */}
+        <div className="fixed inset-0 bg-black/50" onClick={onClose} />
+
+        {/* Modal - key prop ensures form resets when item changes */}
+        <EditItemForm key={item.id} item={item} slug={slug} onClose={onClose} />
+      </div>
+    </div>
+  )
+}
+
+interface EditItemFormProps {
+  item: Item
+  slug: string
+  onClose: () => void
+}
+
+function EditItemForm({ item, slug, onClose }: EditItemFormProps) {
+  const updateItem = useUpdateItem(slug, item.id)
+
+  const [formError, setFormError] = useState<string | null>(null)
+  const [name, setName] = useState(item.name)
+  const [type, setType] = useState<ItemType>(item.type)
+  const [category, setCategory] = useState(item.category)
+  const [rarity, setRarity] = useState<ItemRarity>(item.rarity)
+  const [description, setDescription] = useState(item.description || '')
+  const [notes, setNotes] = useState(item.notes || '')
+  const [quantity, setQuantity] = useState(item.quantity)
+  const [weight, setWeight] = useState<number | ''>(item.weight ?? '')
+  const [estimatedValue, setEstimatedValue] = useState<number | ''>(item.estimated_value ?? '')
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setFormError(null)
+
+    if (!name.trim()) {
+      setFormError('Name is required')
+      return
+    }
+
+    const itemData: ItemUpdate = {
+      name: name.trim(),
+      type,
+      category: category || type,
+      rarity,
+      description: description || undefined,
+      notes: notes || undefined,
+      quantity: quantity || 1,
+      weight: weight || undefined,
+      estimated_value: estimatedValue || undefined,
+    }
+
+    try {
+      await updateItem.mutateAsync(itemData)
+      onClose()
+    } catch {
+      setFormError('Failed to update item. Please try again.')
+    }
+  }
+
+  return (
+    <div className="relative w-full max-w-lg bg-white rounded-lg shadow-xl">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b">
+        <h2 className="text-xl font-semibold text-gray-900">Edit Item</h2>
+        <button
+          onClick={onClose}
+          className="p-1 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+        >
+          <X className="w-6 h-6" />
+        </button>
+      </div>
+
+      {/* Body */}
+      <form onSubmit={handleSubmit} className="p-4 space-y-4 max-h-[70vh] overflow-y-auto">
+        {formError && (
+          <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+            {formError}
+          </div>
+        )}
+
+        {/* Name */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Name <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+
+        {/* Type and Rarity */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Type <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={type}
+              onChange={(e) => setType(e.target.value as ItemType)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              {ITEM_TYPES.map((t) => (
+                <option key={t} value={t}>
+                  {TYPE_LABELS[t]}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Rarity
+            </label>
+            <select
+              value={rarity}
+              onChange={(e) => setRarity(e.target.value as ItemRarity)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              {ITEM_RARITIES.map((r) => (
+                <option key={r} value={r}>
+                  {RARITY_LABELS[r]}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Category */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Category
+          </label>
+          <input
+            type="text"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            placeholder="e.g., Weapon, Armor, Adventuring Gear"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+
+        {/* Quantity and Weight */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Quantity
+            </label>
+            <input
+              type="number"
+              min="1"
+              value={quantity}
+              onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Weight (lbs)
+            </label>
+            <input
+              type="number"
+              min="0"
+              step="0.1"
+              value={weight}
+              onChange={(e) => setWeight(e.target.value ? parseFloat(e.target.value) : '')}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+        </div>
+
+        {/* Estimated Value */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Estimated Value (GP)
+          </label>
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            value={estimatedValue}
+            onChange={(e) => setEstimatedValue(e.target.value ? parseFloat(e.target.value) : '')}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+
+        {/* Description */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Description
+          </label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={3}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+          />
+        </div>
+
+        {/* Notes */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Notes
+          </label>
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            rows={2}
+            placeholder="Personal notes about this item..."
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+          />
+        </div>
+      </form>
+
+      {/* Footer */}
+      <div className="flex justify-end gap-3 p-4 border-t bg-gray-50 rounded-b-lg">
+        <button
+          type="button"
+          onClick={onClose}
+          className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleSubmit}
+          disabled={updateItem.isPending}
+          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+        >
+          {updateItem.isPending ? 'Saving...' : 'Save Changes'}
+        </button>
+      </div>
+    </div>
+  )
+}

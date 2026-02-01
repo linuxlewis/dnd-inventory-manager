@@ -26,3 +26,56 @@ export interface AuthResponse {
   success: boolean
   message?: string
 }
+
+// Item types
+export type ItemType = 'equipment' | 'potion' | 'scroll' | 'consumable' | 'misc'
+export type ItemRarity = 'common' | 'uncommon' | 'rare' | 'very_rare' | 'legendary' | 'artifact'
+
+export interface Item {
+  id: string
+  inventory_id: string
+  name: string
+  type: ItemType
+  category: string
+  rarity: ItemRarity
+  description: string
+  notes?: string
+  quantity: number
+  weight?: number
+  estimated_value?: number
+  thumbnail_url?: string
+  properties?: Record<string, unknown>
+  created_at: string
+  updated_at: string
+}
+
+export interface ItemCreate {
+  name: string
+  type: ItemType
+  category?: string
+  rarity?: ItemRarity
+  description?: string
+  notes?: string
+  quantity?: number
+  weight?: number
+  estimated_value?: number
+  thumbnail_url?: string
+  properties?: Record<string, unknown>
+}
+
+export type ItemUpdate = Partial<ItemCreate>
+
+export interface SrdItem {
+  index: string
+  name: string
+  equipment_category?: { name: string }
+  weapon_category?: string
+  armor_category?: string
+  desc?: string[]
+  cost?: { quantity: number; unit: string }
+  weight?: number
+  damage?: { damage_dice: string; damage_type: { name: string } }
+  armor_class?: { base: number; dex_bonus: boolean }
+  properties?: { name: string }[]
+  rarity?: { name: string }
+}
