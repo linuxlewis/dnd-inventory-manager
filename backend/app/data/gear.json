@@ -1,0 +1,551 @@
+[
+  {
+    "id": "backpack",
+    "name": "Backpack",
+    "type": "gear",
+    "category": "container",
+    "description": "A leather pack carried on the back, typically with straps to secure it.",
+    "weight": 5,
+    "value_gp": 2
+  },
+  {
+    "id": "bedroll",
+    "name": "Bedroll",
+    "type": "gear",
+    "category": "supply",
+    "description": "A portable sleeping mat that can be rolled up for easy transport.",
+    "weight": 7,
+    "value_gp": 1
+  },
+  {
+    "id": "blanket",
+    "name": "Blanket",
+    "type": "gear",
+    "category": "supply",
+    "description": "A thick cloth covering for warmth while sleeping or resting.",
+    "weight": 3,
+    "value_gp": 0.5
+  },
+  {
+    "id": "candle",
+    "name": "Candle",
+    "type": "gear",
+    "category": "supply",
+    "description": "For 1 hour, a candle sheds bright light in a 5-foot radius and dim light for an additional 5 feet.",
+    "weight": 0,
+    "value_gp": 0.01
+  },
+  {
+    "id": "chain-10ft",
+    "name": "Chain (10 ft.)",
+    "type": "gear",
+    "category": "tool",
+    "description": "A chain has 10 hit points. It can be burst with a successful DC 20 Strength check.",
+    "weight": 10,
+    "value_gp": 5
+  },
+  {
+    "id": "chalk",
+    "name": "Chalk (1 piece)",
+    "type": "gear",
+    "category": "supply",
+    "description": "A stick of chalk for marking surfaces.",
+    "weight": 0,
+    "value_gp": 0.01
+  },
+  {
+    "id": "climbers-kit",
+    "name": "Climber's Kit",
+    "type": "gear",
+    "category": "tool",
+    "description": "Includes special pitons, boot tips, gloves, and a harness. You can use it to anchor yourself; when you do, you can't fall more than 25 feet from the point where you anchored yourself, and you can't climb more than 25 feet away from that point without undoing the anchor.",
+    "weight": 12,
+    "value_gp": 25
+  },
+  {
+    "id": "clothes-common",
+    "name": "Clothes, Common",
+    "type": "gear",
+    "category": "clothing",
+    "description": "A simple set of clothes typical of common folk.",
+    "weight": 3,
+    "value_gp": 0.5
+  },
+  {
+    "id": "clothes-fine",
+    "name": "Clothes, Fine",
+    "type": "gear",
+    "category": "clothing",
+    "description": "Elegant clothing suitable for nobility or wealthy merchants.",
+    "weight": 6,
+    "value_gp": 15
+  },
+  {
+    "id": "clothes-travelers",
+    "name": "Clothes, Traveler's",
+    "type": "gear",
+    "category": "clothing",
+    "description": "Sturdy clothing designed for travel and outdoor activity.",
+    "weight": 4,
+    "value_gp": 2
+  },
+  {
+    "id": "component-pouch",
+    "name": "Component Pouch",
+    "type": "gear",
+    "category": "container",
+    "description": "A small, watertight leather belt pouch that has compartments to hold all the material components and other special items you need to cast your spells, except for those components that have a specific cost.",
+    "weight": 2,
+    "value_gp": 25
+  },
+  {
+    "id": "crowbar",
+    "name": "Crowbar",
+    "type": "gear",
+    "category": "tool",
+    "description": "Using a crowbar grants advantage to Strength checks where the crowbar's leverage can be applied.",
+    "weight": 5,
+    "value_gp": 2
+  },
+  {
+    "id": "flask",
+    "name": "Flask",
+    "type": "gear",
+    "category": "container",
+    "description": "A metal or ceramic container for holding liquids, typically about 1 pint capacity.",
+    "weight": 1,
+    "value_gp": 0.02
+  },
+  {
+    "id": "grappling-hook",
+    "name": "Grappling Hook",
+    "type": "gear",
+    "category": "tool",
+    "description": "A metal hook attached to a rope, used for climbing or catching objects.",
+    "weight": 4,
+    "value_gp": 2
+  },
+  {
+    "id": "hammer",
+    "name": "Hammer",
+    "type": "gear",
+    "category": "tool",
+    "description": "A standard hammer useful for driving pitons and other tasks.",
+    "weight": 3,
+    "value_gp": 1
+  },
+  {
+    "id": "healers-kit",
+    "name": "Healer's Kit",
+    "type": "gear",
+    "category": "tool",
+    "description": "This kit is a leather pouch containing bandages, salves, and splints. The kit has ten uses. As an action, you can expend one use to stabilize a creature that has 0 hit points, without needing to make a Wisdom (Medicine) check.",
+    "weight": 3,
+    "value_gp": 5
+  },
+  {
+    "id": "holy-symbol",
+    "name": "Holy Symbol",
+    "type": "gear",
+    "category": "tool",
+    "description": "A representation of a god or pantheon used as a spellcasting focus by clerics and paladins.",
+    "weight": 1,
+    "value_gp": 5
+  },
+  {
+    "id": "hourglass",
+    "name": "Hourglass",
+    "type": "gear",
+    "category": "tool",
+    "description": "A device for measuring the passage of time.",
+    "weight": 1,
+    "value_gp": 25
+  },
+  {
+    "id": "hunting-trap",
+    "name": "Hunting Trap",
+    "type": "gear",
+    "category": "tool",
+    "description": "When you use your action to set it, this trap forms a saw-toothed steel ring that snaps shut when a creature steps on a pressure plate in the center.",
+    "weight": 25,
+    "value_gp": 5
+  },
+  {
+    "id": "ink",
+    "name": "Ink (1 ounce bottle)",
+    "type": "gear",
+    "category": "supply",
+    "description": "An ounce bottle of black ink.",
+    "weight": 0,
+    "value_gp": 10
+  },
+  {
+    "id": "ink-pen",
+    "name": "Ink Pen",
+    "type": "gear",
+    "category": "tool",
+    "description": "A writing implement that uses ink.",
+    "weight": 0,
+    "value_gp": 0.02
+  },
+  {
+    "id": "ladder-10ft",
+    "name": "Ladder (10 ft.)",
+    "type": "gear",
+    "category": "tool",
+    "description": "A wooden ladder 10 feet in length.",
+    "weight": 25,
+    "value_gp": 0.1
+  },
+  {
+    "id": "lamp",
+    "name": "Lamp",
+    "type": "gear",
+    "category": "tool",
+    "description": "A lamp casts bright light in a 15-foot radius and dim light for an additional 30 feet. Once lit, it burns for 6 hours on a flask (1 pint) of oil.",
+    "weight": 1,
+    "value_gp": 0.5
+  },
+  {
+    "id": "lantern-bullseye",
+    "name": "Lantern, Bullseye",
+    "type": "gear",
+    "category": "tool",
+    "description": "A bullseye lantern casts bright light in a 60-foot cone and dim light for an additional 60 feet. Once lit, it burns for 6 hours on a flask (1 pint) of oil.",
+    "weight": 2,
+    "value_gp": 10
+  },
+  {
+    "id": "lantern-hooded",
+    "name": "Lantern, Hooded",
+    "type": "gear",
+    "category": "tool",
+    "description": "A hooded lantern casts bright light in a 30-foot radius and dim light for an additional 30 feet. Once lit, it burns for 6 hours on a flask (1 pint) of oil.",
+    "weight": 2,
+    "value_gp": 5
+  },
+  {
+    "id": "lock",
+    "name": "Lock",
+    "type": "gear",
+    "category": "tool",
+    "description": "A key is provided with the lock. Without the key, a creature proficient with thieves' tools can pick this lock with a successful DC 15 Dexterity check.",
+    "weight": 1,
+    "value_gp": 10
+  },
+  {
+    "id": "magnifying-glass",
+    "name": "Magnifying Glass",
+    "type": "gear",
+    "category": "tool",
+    "description": "This lens allows a closer look at small objects. It is also useful as a substitute for flint and steel when starting fires.",
+    "weight": 0,
+    "value_gp": 100
+  },
+  {
+    "id": "manacles",
+    "name": "Manacles",
+    "type": "gear",
+    "category": "tool",
+    "description": "These metal restraints can bind a Small or Medium creature. Escaping the manacles requires a successful DC 20 Dexterity check. Breaking them requires a successful DC 20 Strength check.",
+    "weight": 6,
+    "value_gp": 2
+  },
+  {
+    "id": "map-scroll-case",
+    "name": "Map or Scroll Case",
+    "type": "gear",
+    "category": "container",
+    "description": "This cylindrical leather case can hold up to ten rolled-up sheets of paper or five rolled-up sheets of parchment.",
+    "weight": 1,
+    "value_gp": 1
+  },
+  {
+    "id": "mess-kit",
+    "name": "Mess Kit",
+    "type": "gear",
+    "category": "supply",
+    "description": "This tin box contains a cup and simple cutlery. The box clamps together, and one side can be used as a cooking pan and the other as a plate or shallow bowl.",
+    "weight": 1,
+    "value_gp": 0.2
+  },
+  {
+    "id": "mirror-steel",
+    "name": "Mirror, Steel",
+    "type": "gear",
+    "category": "tool",
+    "description": "A small steel mirror useful for looking around corners.",
+    "weight": 0.5,
+    "value_gp": 5
+  },
+  {
+    "id": "oil",
+    "name": "Oil (flask)",
+    "type": "gear",
+    "category": "supply",
+    "description": "Oil usually comes in a clay flask that holds 1 pint. You can splash oil on a creature within 5 feet or throw it up to 20 feet, shattering on impact.",
+    "weight": 1,
+    "value_gp": 0.1
+  },
+  {
+    "id": "paper",
+    "name": "Paper (one sheet)",
+    "type": "gear",
+    "category": "supply",
+    "description": "A single sheet of paper for writing.",
+    "weight": 0,
+    "value_gp": 0.2
+  },
+  {
+    "id": "parchment",
+    "name": "Parchment (one sheet)",
+    "type": "gear",
+    "category": "supply",
+    "description": "A single sheet of parchment for writing.",
+    "weight": 0,
+    "value_gp": 0.1
+  },
+  {
+    "id": "perfume",
+    "name": "Perfume (vial)",
+    "type": "gear",
+    "category": "supply",
+    "description": "A small vial of fragrant perfume.",
+    "weight": 0,
+    "value_gp": 5
+  },
+  {
+    "id": "pick-miners",
+    "name": "Pick, Miner's",
+    "type": "gear",
+    "category": "tool",
+    "description": "A heavy pick used for mining.",
+    "weight": 10,
+    "value_gp": 2
+  },
+  {
+    "id": "piton",
+    "name": "Piton",
+    "type": "gear",
+    "category": "tool",
+    "description": "A metal spike that can be driven into a crack or seam in rock.",
+    "weight": 0.25,
+    "value_gp": 0.05
+  },
+  {
+    "id": "pole-10ft",
+    "name": "Pole (10 ft.)",
+    "type": "gear",
+    "category": "tool",
+    "description": "A 10-foot wooden pole useful for probing ahead.",
+    "weight": 7,
+    "value_gp": 0.05
+  },
+  {
+    "id": "pot-iron",
+    "name": "Pot, Iron",
+    "type": "gear",
+    "category": "supply",
+    "description": "An iron pot for cooking, holds 1 gallon.",
+    "weight": 10,
+    "value_gp": 2
+  },
+  {
+    "id": "pouch",
+    "name": "Pouch",
+    "type": "gear",
+    "category": "container",
+    "description": "A cloth or leather pouch can hold up to 20 sling bullets or 50 blowgun needles, among other things.",
+    "weight": 1,
+    "value_gp": 0.5
+  },
+  {
+    "id": "quiver",
+    "name": "Quiver",
+    "type": "gear",
+    "category": "container",
+    "description": "A quiver can hold up to 20 arrows.",
+    "weight": 1,
+    "value_gp": 1
+  },
+  {
+    "id": "rations",
+    "name": "Rations (1 day)",
+    "type": "gear",
+    "category": "supply",
+    "description": "Rations consist of dry foods suitable for extended travel, including jerky, dried fruit, hardtack, and nuts.",
+    "weight": 2,
+    "value_gp": 0.5
+  },
+  {
+    "id": "rope-hemp",
+    "name": "Rope, Hemp (50 ft.)",
+    "type": "gear",
+    "category": "tool",
+    "description": "A 50-foot length of hemp rope. It has 2 hit points and can be burst with a DC 17 Strength check.",
+    "weight": 10,
+    "value_gp": 1
+  },
+  {
+    "id": "rope-silk",
+    "name": "Rope, Silk (50 ft.)",
+    "type": "gear",
+    "category": "tool",
+    "description": "A 50-foot length of silk rope. It has 2 hit points and can be burst with a DC 17 Strength check.",
+    "weight": 5,
+    "value_gp": 10
+  },
+  {
+    "id": "sack",
+    "name": "Sack",
+    "type": "gear",
+    "category": "container",
+    "description": "A simple cloth sack that can hold up to 1 cubic foot or 30 pounds of gear.",
+    "weight": 0.5,
+    "value_gp": 0.01
+  },
+  {
+    "id": "scale-merchants",
+    "name": "Scale, Merchant's",
+    "type": "gear",
+    "category": "tool",
+    "description": "A scale includes a small balance, pans, and a suitable assortment of weights up to 2 pounds. With it, you can measure the exact weight of small objects.",
+    "weight": 3,
+    "value_gp": 5
+  },
+  {
+    "id": "sealing-wax",
+    "name": "Sealing Wax",
+    "type": "gear",
+    "category": "supply",
+    "description": "Wax used for sealing letters and documents.",
+    "weight": 0,
+    "value_gp": 0.5
+  },
+  {
+    "id": "shovel",
+    "name": "Shovel",
+    "type": "gear",
+    "category": "tool",
+    "description": "A tool for digging.",
+    "weight": 5,
+    "value_gp": 2
+  },
+  {
+    "id": "signal-whistle",
+    "name": "Signal Whistle",
+    "type": "gear",
+    "category": "tool",
+    "description": "A small whistle that can be heard up to 600 feet away.",
+    "weight": 0,
+    "value_gp": 0.05
+  },
+  {
+    "id": "signet-ring",
+    "name": "Signet Ring",
+    "type": "gear",
+    "category": "tool",
+    "description": "A ring bearing a personal seal or family crest.",
+    "weight": 0,
+    "value_gp": 5
+  },
+  {
+    "id": "soap",
+    "name": "Soap",
+    "type": "gear",
+    "category": "supply",
+    "description": "A bar of soap for cleaning.",
+    "weight": 0,
+    "value_gp": 0.02
+  },
+  {
+    "id": "spellbook",
+    "name": "Spellbook",
+    "type": "gear",
+    "category": "tool",
+    "description": "Essential for wizards, this leather-bound book has 100 blank vellum pages suitable for recording spells.",
+    "weight": 3,
+    "value_gp": 50
+  },
+  {
+    "id": "spikes-iron",
+    "name": "Spikes, Iron (10)",
+    "type": "gear",
+    "category": "tool",
+    "description": "A set of 10 iron spikes useful for securing doors or climbing.",
+    "weight": 5,
+    "value_gp": 1
+  },
+  {
+    "id": "spyglass",
+    "name": "Spyglass",
+    "type": "gear",
+    "category": "tool",
+    "description": "Objects viewed through a spyglass are magnified to twice their size.",
+    "weight": 1,
+    "value_gp": 1000
+  },
+  {
+    "id": "tent-two-person",
+    "name": "Tent, Two-Person",
+    "type": "gear",
+    "category": "supply",
+    "description": "A simple and portable canvas shelter for two people.",
+    "weight": 20,
+    "value_gp": 2
+  },
+  {
+    "id": "thieves-tools",
+    "name": "Thieves' Tools",
+    "type": "gear",
+    "category": "tool",
+    "description": "This set of tools includes a small file, a set of lock picks, a small mirror mounted on a metal handle, a set of narrow-bladed scissors, and a pair of pliers.",
+    "weight": 1,
+    "value_gp": 25
+  },
+  {
+    "id": "tinderbox",
+    "name": "Tinderbox",
+    "type": "gear",
+    "category": "tool",
+    "description": "This small container holds flint, fire steel, and tinder (usually dry cloth soaked in light oil) used to kindle a fire.",
+    "weight": 1,
+    "value_gp": 0.5
+  },
+  {
+    "id": "torch",
+    "name": "Torch",
+    "type": "gear",
+    "category": "supply",
+    "description": "A torch burns for 1 hour, providing bright light in a 20-foot radius and dim light for an additional 20 feet.",
+    "weight": 1,
+    "value_gp": 0.01
+  },
+  {
+    "id": "vial",
+    "name": "Vial",
+    "type": "gear",
+    "category": "container",
+    "description": "A small glass or crystal container that holds 4 ounces of liquid.",
+    "weight": 0,
+    "value_gp": 1
+  },
+  {
+    "id": "waterskin",
+    "name": "Waterskin",
+    "type": "gear",
+    "category": "container",
+    "description": "A leather pouch that can hold up to 4 pints of liquid.",
+    "weight": 5,
+    "value_gp": 0.2
+  },
+  {
+    "id": "whetstone",
+    "name": "Whetstone",
+    "type": "gear",
+    "category": "tool",
+    "description": "A stone used for sharpening blades.",
+    "weight": 1,
+    "value_gp": 0.01
+  }
+]
