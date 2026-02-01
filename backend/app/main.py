@@ -7,9 +7,10 @@ from app.config import settings
 from app.database import engine
 from app.db import (
     Base,  # noqa: F401 - import models to register with metadata
+    HistoryEntry,  # noqa: F401
     Inventory,  # noqa: F401
 )
-from app.routers import inventories_router
+from app.routers import currency_router, history_router, inventories_router
 
 
 @asynccontextmanager
@@ -34,6 +35,8 @@ app.add_middleware(
 
 # Register routers
 app.include_router(inventories_router)
+app.include_router(currency_router)
+app.include_router(history_router)
 
 
 @app.get("/health")
