@@ -7,10 +7,9 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import func, select
 
-from app.core.auth import verify_passphrase
+from app.core.auth import get_authenticated_inventory
 from app.database import get_db
 from app.models import (
-    Inventory,
     Item,
     ItemCreate,
     ItemListResponse,
@@ -23,27 +22,6 @@ from app.models import (
 router = APIRouter(prefix="/api/inventories", tags=["items"])
 
 
-async def get_authenticated_inventory(
-    slug: str,
-    db: AsyncSession,
-    x_passphrase: str | None,
-) -> Inventory:
-    """Helper to authenticate and retrieve inventory by slug."""
-    if x_passphrase is None:
-        raise HTTPException(status_code=401, detail="Passphrase required")
-
-    result = await db.execute(select(Inventory).where(Inventory.slug == slug))
-    inventory = result.scalar_one_or_none()
-
-    if inventory is None:
-        raise HTTPException(status_code=404, detail="Inventory not found")
-
-    if not verify_passphrase(x_passphrase, inventory.passphrase_hash):
-        raise HTTPException(status_code=401, detail="Invalid passphrase")
-
-    return inventory
-
-
 @router.post("/{slug}/items", response_model=ItemRead)
 async def create_item(
     slug: str,
@@ -54,22 +32,9 @@ async def create_item(
     """Create a new item in the inventory."""
     inventory = await get_authenticated_inventory(slug, db, x_passphrase)
 
-    # Create item
-    item = Item(
-        inventory_id=inventory.id,
-        name=data.name,
-        type=data.type,
-        category=data.category,
-        rarity=data.rarity,
-        description=data.description,
-        notes=data.notes,
-        quantity=data.quantity,
-        weight=data.weight,
-        estimated_value=data.estimated_value,
-        properties=data.properties,
-        is_standard_item=data.is_standard_item,
-        standard_item_id=data.standard_item_id,
-    )
+    # Create item using model_dump for cleaner field mapping
+    item_data = data.model_dump()
+    item = Item(inventory_id=inventory.id, **item_data)
 
     db.add(item)
     await db.commit()
@@ -117,7 +82,7 @@ async def list_items(
     result = await db.execute(query)
     items = result.scalars().all()
 
-    return ItemListResponse(items=list(items), total=total)
+    return ItemListResponse(items=items, total=total)
 
 
 @router.get("/{slug}/items/{item_id}", response_model=ItemRead)

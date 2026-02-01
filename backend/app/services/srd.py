@@ -4,47 +4,44 @@ Provides search functionality for standard D&D 5e items from the SRD.
 """
 
 import json
+import threading
 from pathlib import Path
 from typing import Any
 
-# In-memory cache for SRD data
+# In-memory cache for SRD data with thread-safe initialization
 _srd_cache: list[dict[str, Any]] | None = None
+_srd_cache_lock = threading.Lock()
 
-
-def _get_srd_index_path() -> Path:
-    """Get the path to the SRD index file."""
-    # Look for srd_index.json in various locations
-    possible_paths = [
-        Path(__file__).parent.parent.parent / "data" / "srd_index.json",
-        Path(__file__).parent.parent.parent.parent / "data" / "srd_index.json",
-        Path("data/srd_index.json"),
-    ]
-    for path in possible_paths:
-        if path.exists():
-            return path
-    return possible_paths[0]  # Return first path even if not exists
+# Project root is two levels up from this file (services -> app -> backend)
+_PROJECT_ROOT = Path(__file__).parent.parent.parent
+_SRD_INDEX_PATH = _PROJECT_ROOT / "data" / "srd_index.json"
 
 
 def load_srd_index() -> list[dict[str, Any]]:
-    """Load the SRD index into memory.
+    """Load the SRD index into memory (thread-safe).
 
     Returns empty list if index file doesn't exist.
     """
     global _srd_cache
 
+    # Fast path: if already loaded, return cached value
     if _srd_cache is not None:
         return _srd_cache
 
-    index_path = _get_srd_index_path()
+    # Slow path: acquire lock and load (only one thread does this)
+    with _srd_cache_lock:
+        # Double-check after acquiring lock (another thread may have loaded it)
+        if _srd_cache is not None:
+            return _srd_cache
 
-    if not index_path.exists():
-        _srd_cache = []
+        if not _SRD_INDEX_PATH.exists():
+            _srd_cache = []
+            return _srd_cache
+
+        with open(_SRD_INDEX_PATH) as f:
+            _srd_cache = json.load(f)
+
         return _srd_cache
-
-    with open(index_path) as f:
-        _srd_cache = json.load(f)
-
-    return _srd_cache
 
 
 def search_srd(
@@ -97,4 +94,5 @@ def search_srd(
 def clear_srd_cache() -> None:
     """Clear the SRD cache (useful for testing)."""
     global _srd_cache
-    _srd_cache = None
+    with _srd_cache_lock:
+        _srd_cache = None

@@ -74,9 +74,9 @@ class TestCreateItem:
     """Tests for POST /api/inventories/{slug}/items endpoint."""
 
     async def test_create_item_success(
-        self, client: AsyncClient, test_inventory: tuple[Inventory, str]
+        self, client: AsyncClient, test_inventory: tuple[Inventory, str], test_db: AsyncSession
     ) -> None:
-        """Test creating an item with valid data returns 200."""
+        """Test creating an item with valid data returns 200 and persists to database."""
         inventory, passphrase = test_inventory
         response = await client.post(
             f"/api/inventories/{inventory.slug}/items",
@@ -84,6 +84,20 @@ class TestCreateItem:
             headers={"X-Passphrase": passphrase},
         )
         assert response.status_code == 200
+
+        # Verify item was persisted to the database
+        data = response.json()
+        from uuid import UUID
+
+        from sqlmodel import select
+
+        item_id = UUID(data["id"])
+        result = await test_db.execute(select(Item).where(Item.id == item_id))
+        db_item = result.scalar_one_or_none()
+        assert db_item is not None
+        assert db_item.name == "Magic Sword"
+        assert db_item.type == ItemType.equipment
+        assert db_item.rarity == ItemRarity.rare
 
     async def test_create_item_response_fields(
         self, client: AsyncClient, test_inventory: tuple[Inventory, str]
@@ -140,9 +154,7 @@ class TestCreateItem:
         )
         assert response.status_code == 401
 
-    async def test_create_item_unknown_inventory_returns_404(
-        self, client: AsyncClient
-    ) -> None:
+    async def test_create_item_unknown_inventory_returns_404(self, client: AsyncClient) -> None:
         """Test creating item for unknown inventory returns 404."""
         response = await client.post(
             "/api/inventories/nonexistent-slug/items",

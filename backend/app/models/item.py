@@ -8,7 +8,6 @@ from enum import Enum
 from typing import Any
 from uuid import UUID, uuid4
 
-from pydantic import field_validator
 from sqlmodel import JSON, Column, Field, SQLModel
 
 
@@ -110,12 +109,6 @@ class ItemUpdate(SQLModel):
     estimated_value: float | None = Field(default=None, ge=0)
     thumbnail_url: str | None = None
     properties: dict[str, Any] | None = None
-
-    @field_validator("quantity", "weight", "estimated_value", mode="before")
-    @classmethod
-    def validate_non_negative(cls, v):
-        """Allow None values to pass through."""
-        return v
 
 
 class ItemListResponse(SQLModel):

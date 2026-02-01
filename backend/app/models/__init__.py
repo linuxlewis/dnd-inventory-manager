@@ -16,6 +16,7 @@ from app.models.item import (
     ItemType,
     ItemUpdate,
 )
+from app.models.srd import SrdItemRead
 
 __all__ = [
     "Inventory",
@@ -31,4 +32,5 @@ __all__ = [
     "ItemListResponse",
     "ItemType",
     "ItemRarity",
+    "SrdItemRead",
 ]
