@@ -36,15 +36,9 @@ find_available_port() {
 
 # Find backend port (8000-8099)
 BACKEND_PORT=$(find_available_port 8000 8099 "backend")
-if [[ $? -ne 0 ]]; then
-    exit 1
-fi
 
 # Find frontend port (5173-5199)
 FRONTEND_PORT=$(find_available_port 5173 5199 "frontend")
-if [[ $? -ne 0 ]]; then
-    exit 1
-fi
 
 # Output in sourceable format
 echo "BACKEND_PORT=$BACKEND_PORT"

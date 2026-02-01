@@ -50,7 +50,7 @@ echo ""
 
 # Start backend in background
 cd "$PROJECT_ROOT/backend"
-PORT=$BACKEND_PORT uv run uvicorn app.main:app --reload --port "$BACKEND_PORT" &
+uv run uvicorn app.main:app --reload --port "$BACKEND_PORT" &
 BACKEND_PID=$!
 echo "✅ Backend started (PID: $BACKEND_PID)"
 
@@ -65,4 +65,4 @@ fi
 
 # Start frontend in foreground
 cd "$PROJECT_ROOT/frontend"
-VITE_PORT=$VITE_PORT VITE_API_URL="http://localhost:$BACKEND_PORT" bun run dev --port "$VITE_PORT"
+VITE_API_URL="http://localhost:$BACKEND_PORT" bun run dev --port "$VITE_PORT"

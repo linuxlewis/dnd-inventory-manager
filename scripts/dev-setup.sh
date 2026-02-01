@@ -15,7 +15,8 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
 # Get available ports
 echo "🔍 Finding available ports..."
-eval "$("$SCRIPT_DIR/dev-ports.sh")"
+port_assignments=$("$SCRIPT_DIR/dev-ports.sh")
+eval "$port_assignments"
 
 # Create backend/.env.local
 BACKEND_ENV="$PROJECT_ROOT/backend/.env.local"
