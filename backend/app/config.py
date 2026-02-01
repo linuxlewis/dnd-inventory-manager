@@ -1,3 +1,5 @@
+import secrets
+
 from pydantic_settings import BaseSettings
 
 
@@ -12,6 +14,9 @@ class Settings(BaseSettings):
         "http://100.124.164.116:5173",
         "http://100.124.164.116:9080",
     ]
+    # Encryption key for API keys (32 bytes for AES-256)
+    # Generate with: python -c "import secrets; print(secrets.token_hex(32))"
+    encryption_key: str = secrets.token_hex(32)
 
     model_config = {"env_prefix": "", "env_file": ".env"}
 

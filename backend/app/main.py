@@ -8,8 +8,10 @@ from app.database import engine
 from app.db import (
     Base,  # noqa: F401 - import models to register with metadata
     Inventory,  # noqa: F401
+    Item,  # noqa: F401
+    OpenAIConnection,  # noqa: F401
 )
-from app.routers import inventories_router
+from app.routers import inventories_router, items_router, openai_router
 
 
 @asynccontextmanager
@@ -34,6 +36,8 @@ app.add_middleware(
 
 # Register routers
 app.include_router(inventories_router)
+app.include_router(items_router)
+app.include_router(openai_router)
 
 
 @app.get("/health")
