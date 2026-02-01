@@ -224,6 +224,7 @@ Before committing, run:
 cd backend
 uv run ruff check .
 uv run ruff format .
+uv run ty check app/
 uv run pytest -v
 
 # Frontend

@@ -1,6 +1,9 @@
 """Tests for inventory API endpoints."""
 
 from httpx import AsyncClient
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql import func
 
 from app.models import Inventory
 
@@ -8,13 +11,20 @@ from app.models import Inventory
 class TestCreateInventory:
     """Tests for POST /api/inventories endpoint."""
 
-    async def test_create_inventory_success(self, client: AsyncClient) -> None:
+    async def test_create_inventory_success(
+        self, client: AsyncClient, test_db: AsyncSession
+    ) -> None:
         """Test creating an inventory with valid data returns 200."""
         response = await client.post(
             "/api/inventories/",
             json={"name": "Dragon Slayers", "passphrase": "secret123"},
         )
         assert response.status_code == 200
+
+        # Verify inventory was persisted in database
+        result = await test_db.execute(select(func.count()).select_from(Inventory))
+        count = result.scalar()
+        assert count == 1
 
     async def test_create_inventory_response_fields(self, client: AsyncClient) -> None:
         """Test response includes required fields."""

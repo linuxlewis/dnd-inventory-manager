@@ -11,6 +11,7 @@ from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
 from pydantic import field_validator
+from sqlalchemy import func
 from sqlmodel import Field, SQLModel
 
 
@@ -42,7 +43,10 @@ class Inventory(InventoryBase, table=True):
 
     # Timestamps
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
-    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = Field(
+        default_factory=lambda: datetime.now(UTC),
+        sa_column_kwargs={"onupdate": func.now()},
+    )
 
 
 class InventoryCreate(SQLModel):
