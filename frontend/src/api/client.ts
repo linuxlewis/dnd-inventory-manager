@@ -1,10 +1,10 @@
 import axios from 'axios'
 import { useAuthStore } from '../stores/authStore'
 
-const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
-
+// In dev mode, Vite proxies /api requests to the backend
+// This allows the app to work from any device (phone, etc.)
 export const apiClient = axios.create({
-  baseURL,
+  baseURL: '',  // Use relative URLs - Vite proxy handles /api/*
   headers: {
     'Content-Type': 'application/json',
   },

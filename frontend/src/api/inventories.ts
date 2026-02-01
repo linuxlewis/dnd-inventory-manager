@@ -5,7 +5,7 @@ import type { InventoryCreate, InventoryResponse, InventoryAuth, AuthResponse } 
 export function useCreateInventory() {
   return useMutation({
     mutationFn: async (data: InventoryCreate): Promise<InventoryResponse> => {
-      const response = await apiClient.post<InventoryResponse>('/api/inventories', data)
+      const response = await apiClient.post<InventoryResponse>('/api/inventories/', data)
       return response.data
     },
   })
