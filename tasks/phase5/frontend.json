@@ -1,0 +1,88 @@
+{
+  "project": "D&D Party Inventory Manager",
+  "branchName": "feat/thumbnails-frontend",
+  "description": "Frontend UI for OpenAI connection and AI thumbnail management",
+  "userStories": [
+    {
+      "id": "FE-025",
+      "title": "Settings page",
+      "description": "As a user, I want a settings page to manage my inventory configuration.",
+      "acceptanceCriteria": [
+        "Create frontend/src/pages/Settings.tsx",
+        "Route: /{slug}/settings",
+        "Sections: General, OpenAI Integration, Danger Zone",
+        "Add to navigation",
+        "Mobile-friendly layout",
+        "bun run typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "FE-026",
+      "title": "OpenAI connection UI",
+      "description": "As a user, I want to connect my OpenAI API key.",
+      "acceptanceCriteria": [
+        "Create frontend/src/components/settings/OpenAIConnection.tsx",
+        "Show connection status (connected/not connected)",
+        "If not connected: form to enter API key",
+        "Test button to validate key before saving",
+        "If connected: show last used date, disconnect button",
+        "Success/error messages",
+        "bun run typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": "Never display the actual key after saving"
+    },
+    {
+      "id": "FE-027",
+      "title": "Thumbnail display in item cards",
+      "description": "As a user, I want to see AI-generated thumbnails on my items.",
+      "acceptanceCriteria": [
+        "Update ItemCard to show thumbnail_url if available",
+        "Fallback to type-based placeholder icon if no thumbnail",
+        "Loading state while thumbnail generates",
+        "Thumbnail click opens larger preview",
+        "bun run typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "FE-028",
+      "title": "Generate/regenerate thumbnail button",
+      "description": "As a user, I want to generate or regenerate item thumbnails.",
+      "acceptanceCriteria": [
+        "Add 'Generate Thumbnail' button to item detail view",
+        "Shows 'Regenerate' if thumbnail already exists",
+        "Disabled if no OpenAI connection",
+        "Tooltip explaining why disabled",
+        "Loading spinner while generating",
+        "Success updates item display",
+        "Rate limit indicator (cooldown after generation)",
+        "bun run typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "FE-029",
+      "title": "Thumbnail placeholder icons",
+      "description": "As a user, I want placeholder icons when no thumbnail is available.",
+      "acceptanceCriteria": [
+        "Create frontend/public/icons/ with type-based icons",
+        "Icons for: weapon, armor, potion, scroll, wand, ring, wondrous, misc",
+        "Update ItemCard to use appropriate placeholder",
+        "Icons styled consistently (same size, style)",
+        "bun run typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": "Can use Lucide icons or simple SVGs"
+    }
+  ]
+}

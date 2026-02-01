@@ -1,0 +1,92 @@
+{
+  "project": "D&D Party Inventory Manager",
+  "branchName": "feat/thumbnails-backend",
+  "description": "Backend API for OpenAI integration and AI-generated item thumbnails",
+  "userStories": [
+    {
+      "id": "BE-024",
+      "title": "OpenAI connection model",
+      "description": "As a developer, I need to store encrypted OpenAI API keys per inventory.",
+      "acceptanceCriteria": [
+        "Create OpenAIConnection SQLModel in models/openai.py",
+        "Fields: id, inventory_id (FK), encrypted_api_key, connected_at, last_used_at, is_valid",
+        "Use cryptography library for AES-256 encryption",
+        "Create encryption key from app secret",
+        "Never expose decrypted key in API responses",
+        "Ruff check passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Store encryption key in environment variable"
+    },
+    {
+      "id": "BE-025",
+      "title": "OpenAI connection endpoints",
+      "description": "As a user, I want to connect my OpenAI API key to enable thumbnails.",
+      "acceptanceCriteria": [
+        "Create backend/app/routers/openai.py",
+        "POST /api/inventories/{slug}/openai/connect - store encrypted key",
+        "POST /api/inventories/{slug}/openai/test - validate key with test API call",
+        "DELETE /api/inventories/{slug}/openai - remove connection",
+        "GET /api/inventories/{slug}/openai/status - returns { connected: bool, last_used?: date }",
+        "All require X-Passphrase auth",
+        "Ruff check passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "BE-026",
+      "title": "Thumbnail generation service",
+      "description": "As a developer, I need a service to generate thumbnails via DALL-E.",
+      "acceptanceCriteria": [
+        "Create backend/app/services/thumbnails.py",
+        "generate_thumbnail(item, api_key) async function",
+        "Build prompt from: item name, type, category, rarity, description",
+        "Style prompt: 'Fantasy RPG item icon, centered, simple background, digital art'",
+        "Call DALL-E 3 API, request 256x256 image",
+        "Return image URL or base64",
+        "Handle rate limits and errors gracefully",
+        "Ruff check passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": "Use openai Python package"
+    },
+    {
+      "id": "BE-027",
+      "title": "Thumbnail generation endpoint",
+      "description": "As a user, I want to generate or regenerate thumbnails for items.",
+      "acceptanceCriteria": [
+        "POST /api/inventories/{slug}/items/{item_id}/thumbnail endpoint",
+        "Retrieves OpenAI connection for inventory",
+        "Returns 400 if no API key configured",
+        "Calls thumbnail service",
+        "Stores thumbnail URL on item",
+        "Returns updated item",
+        "Ruff check passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "BE-028",
+      "title": "Auto-generate on item creation",
+      "description": "As a user, I want thumbnails generated automatically when I add items.",
+      "acceptanceCriteria": [
+        "Update item create endpoint",
+        "Check if inventory has OpenAI connection",
+        "If connected, trigger thumbnail generation (async/background)",
+        "Don't block item creation on thumbnail generation",
+        "Update item with thumbnail_url when ready",
+        "Broadcast item_updated event with new thumbnail",
+        "Ruff check passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": "Consider using background task or fire-and-forget"
+    }
+  ]
+}

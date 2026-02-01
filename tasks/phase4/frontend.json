@@ -1,0 +1,100 @@
+{
+  "project": "D&D Party Inventory Manager",
+  "branchName": "feat/realtime-frontend",
+  "description": "Frontend SSE integration for real-time inventory updates",
+  "userStories": [
+    {
+      "id": "FE-019",
+      "title": "useSSE hook",
+      "description": "As a developer, I need a hook to manage SSE connections.",
+      "acceptanceCriteria": [
+        "Create frontend/src/hooks/useSSE.ts",
+        "Opens EventSource connection to /api/inventories/{slug}/events",
+        "Handles reconnection with exponential backoff",
+        "Cleans up connection on unmount",
+        "Uses auth store to get passphrase for auth header",
+        "Returns connection status (connected, connecting, disconnected)",
+        "bun run typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "FE-020",
+      "title": "Real-time item updates",
+      "description": "As a user, I want my item list to update automatically when others make changes.",
+      "acceptanceCriteria": [
+        "useSSE listens for item_added, item_updated, item_removed events",
+        "On item_added: add to TanStack Query cache",
+        "On item_updated: update item in cache",
+        "On item_removed: remove from cache",
+        "UI updates without page refresh",
+        "bun run typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "FE-021",
+      "title": "Real-time currency updates",
+      "description": "As a user, I want to see currency changes in real-time.",
+      "acceptanceCriteria": [
+        "useSSE listens for currency_updated events",
+        "Updates inventory query cache with new currency values",
+        "Treasury widget updates automatically",
+        "bun run typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "FE-022",
+      "title": "Viewer count display",
+      "description": "As a user, I want to see how many party members are viewing.",
+      "acceptanceCriteria": [
+        "Create frontend/src/components/ViewerCount.tsx",
+        "Shows '👥 X party members viewing' or similar",
+        "Updates on connection_count events",
+        "Hide if count is 1 (just me)",
+        "Add to inventory header/nav area",
+        "bun run typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "FE-023",
+      "title": "Change notifications",
+      "description": "As a user, I want to be notified when others make changes.",
+      "acceptanceCriteria": [
+        "Toast notification on item changes by others",
+        "Format: 'Item added: Potion of Healing ×2'",
+        "Brief highlight animation on changed items",
+        "Option to mute notifications (stored in local state)",
+        "bun run typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "FE-024",
+      "title": "Connection status indicator",
+      "description": "As a user, I want to know if I'm connected for real-time updates.",
+      "acceptanceCriteria": [
+        "Show connection status in UI (green dot = connected, yellow = connecting, red = disconnected)",
+        "Tooltip with status details",
+        "Auto-reconnect indicator",
+        "Graceful degradation message if SSE unavailable",
+        "bun run typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

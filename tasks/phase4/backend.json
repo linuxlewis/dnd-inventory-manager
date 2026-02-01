@@ -1,0 +1,85 @@
+{
+  "project": "D&D Party Inventory Manager",
+  "branchName": "feat/realtime-backend",
+  "description": "Backend SSE infrastructure for real-time inventory synchronization",
+  "userStories": [
+    {
+      "id": "BE-019",
+      "title": "SSE connection manager",
+      "description": "As a developer, I need infrastructure to manage SSE connections per inventory.",
+      "acceptanceCriteria": [
+        "Create backend/app/core/sse.py",
+        "ConnectionManager class with connection pool per inventory slug",
+        "Methods: connect(slug, response), disconnect(slug, response), broadcast(slug, event)",
+        "Track active connection count per inventory",
+        "Thread-safe implementation",
+        "Heartbeat mechanism (every 30s)",
+        "Ruff check passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Use asyncio for async handling"
+    },
+    {
+      "id": "BE-020",
+      "title": "SSE events endpoint",
+      "description": "As a user, I want to receive real-time updates when the inventory changes.",
+      "acceptanceCriteria": [
+        "Add sse-starlette to dependencies",
+        "GET /api/inventories/{slug}/events endpoint",
+        "Accepts X-Passphrase header for auth",
+        "Returns EventSourceResponse (text/event-stream)",
+        "Sends heartbeat events every 30s",
+        "Supports Last-Event-ID header for reconnection",
+        "Returns 401 for invalid passphrase",
+        "Ruff check passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "BE-021",
+      "title": "Broadcast on item changes",
+      "description": "As a developer, I need item changes to broadcast to all connected clients.",
+      "acceptanceCriteria": [
+        "Update item router to broadcast after create/update/delete",
+        "Event types: item_added, item_updated, item_removed",
+        "Payload includes full item data (for add/update) or just item_id (for remove)",
+        "Include event_id and timestamp",
+        "Don't broadcast to the client that made the change (optional)",
+        "Ruff check passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "BE-022",
+      "title": "Broadcast on currency changes",
+      "description": "As a developer, I need currency changes to broadcast to all connected clients.",
+      "acceptanceCriteria": [
+        "Update currency router to broadcast after changes",
+        "Event type: currency_updated",
+        "Payload: { copper, silver, gold, platinum }",
+        "Ruff check passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "BE-023",
+      "title": "Connection count broadcast",
+      "description": "As a user, I want to see how many party members are viewing the inventory.",
+      "acceptanceCriteria": [
+        "Broadcast connection_count event on connect/disconnect",
+        "Payload: { viewers: number }",
+        "Ruff check passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

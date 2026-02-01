@@ -764,7 +764,243 @@ Enable editing and deleting items.
 
 **Goal:** Manage treasury and track all changes with undo capability.
 
-*Stories to be detailed after Phase 2 completion.*
+### 3.1 Backend
+
+#### BE-013: Currency Update Endpoint
+**Priority:** 1 | **Estimate:** 20 min | **Dependencies:** BE-006
+
+Endpoint to add or subtract currency from the treasury.
+
+**Deliverables:**
+- `backend/app/routers/currency.py`
+- POST `/api/inventories/{slug}/currency`
+- Request: `{ copper?: int, silver?: int, gold?: int, platinum?: int, note?: string }`
+- Positive values add, negative values subtract
+- Validates sufficient funds for subtractions
+
+**Acceptance Criteria:**
+- [ ] Can add currency (positive values)
+- [ ] Can subtract currency (negative values)
+- [ ] Returns 400 if insufficient funds
+- [ ] Returns updated totals
+- [ ] Requires X-Passphrase auth
+- [ ] `ruff check .` passes
+
+---
+
+#### BE-014: Currency Conversion Endpoint
+**Priority:** 2 | **Estimate:** 15 min | **Dependencies:** BE-013
+
+Endpoint to convert currency between denominations.
+
+**Deliverables:**
+- POST `/api/inventories/{slug}/currency/convert`
+- Request: `{ from: denomination, to: denomination, amount: int }`
+- Rates: 10 CP = 1 SP, 10 SP = 1 GP, 10 GP = 1 PP
+
+**Acceptance Criteria:**
+- [ ] Converts between any denominations
+- [ ] Validates sufficient funds
+- [ ] Returns updated totals
+- [ ] `ruff check .` passes
+
+---
+
+#### BE-015: HistoryEntry SQLModel
+**Priority:** 3 | **Estimate:** 20 min | **Dependencies:** None
+
+Model to track all inventory changes for undo/rollback.
+
+**Deliverables:**
+- `backend/app/models/history.py` with HistoryEntry SQLModel
+- Fields: id, inventory_id, action (enum), item_id, item_name, item_snapshot (JSON)
+- Fields: previous_value (JSON), new_value (JSON), note, timestamp
+- Fields: is_undone, undone_by
+- HistoryEntryRead schema for API
+
+**Acceptance Criteria:**
+- [ ] Model with all fields defined
+- [ ] Action enum covers all change types
+- [ ] JSON fields for flexible storage
+- [ ] `ruff check .` passes
+
+---
+
+#### BE-016: History Logging Service
+**Priority:** 4 | **Estimate:** 25 min | **Dependencies:** BE-015
+
+Service to log all inventory changes automatically.
+
+**Deliverables:**
+- `backend/app/services/history.py`
+- Functions: log_item_added, log_item_removed, log_item_updated
+- Functions: log_quantity_changed, log_currency_changed
+- Integrate with item and currency endpoints
+
+**Acceptance Criteria:**
+- [ ] All item changes logged
+- [ ] Currency changes logged
+- [ ] Stores enough data to reverse actions
+- [ ] `ruff check .` passes
+
+---
+
+#### BE-017: History List Endpoint
+**Priority:** 5 | **Estimate:** 15 min | **Dependencies:** BE-016
+
+Endpoint to retrieve inventory history.
+
+**Deliverables:**
+- `backend/app/routers/history.py`
+- GET `/api/inventories/{slug}/history`
+- Query params: action, limit, offset, item_id
+- Returns newest first
+
+**Acceptance Criteria:**
+- [ ] Returns paginated history
+- [ ] Filters work correctly
+- [ ] Requires auth
+- [ ] `ruff check .` passes
+
+---
+
+#### BE-018: Undo Action Endpoint
+**Priority:** 6 | **Estimate:** 25 min | **Dependencies:** BE-017
+
+Endpoint to undo a specific history entry.
+
+**Deliverables:**
+- POST `/api/inventories/{slug}/history/{entry_id}/undo`
+- Reverses action based on stored data
+- Creates new "undo" history entry
+- Marks original as is_undone=true
+
+**Acceptance Criteria:**
+- [ ] Can undo item_added (removes item)
+- [ ] Can undo item_removed (restores item)
+- [ ] Can undo currency changes
+- [ ] Creates audit trail
+- [ ] `ruff check .` passes
+
+---
+
+### 3.2 Frontend
+
+#### FE-013: Treasury Widget
+**Priority:** 1 | **Estimate:** 20 min | **Dependencies:** FE-007
+
+Component to display party currency.
+
+**Deliverables:**
+- `frontend/src/components/currency/TreasuryWidget.tsx`
+- Shows all 4 denominations with icons
+- Total GP equivalent
+- Compact/expanded modes
+
+**Acceptance Criteria:**
+- [ ] Displays all denominations
+- [ ] Shows total value
+- [ ] Mobile-responsive (2×2 grid)
+- [ ] `bun run typecheck` passes
+
+---
+
+#### FE-014: Add/Spend Currency Modal
+**Priority:** 2 | **Estimate:** 25 min | **Dependencies:** FE-013
+
+Modal for adding or spending currency.
+
+**Deliverables:**
+- `frontend/src/components/currency/CurrencyModal.tsx`
+- Mode toggle: Add/Spend
+- Input for each denomination
+- Optional note field
+- Preview of new totals
+
+**Acceptance Criteria:**
+- [ ] Can add funds
+- [ ] Can spend funds
+- [ ] Validates sufficient funds
+- [ ] Shows preview before confirming
+- [ ] `bun run typecheck` passes
+
+---
+
+#### FE-015: Currency Conversion Modal
+**Priority:** 3 | **Estimate:** 20 min | **Dependencies:** FE-014
+
+Modal for converting between denominations.
+
+**Deliverables:**
+- `frontend/src/components/currency/ConvertModal.tsx`
+- From/To dropdowns
+- Amount input
+- Conversion preview
+
+**Acceptance Criteria:**
+- [ ] Shows conversion preview
+- [ ] Validates sufficient funds
+- [ ] `bun run typecheck` passes
+
+---
+
+#### FE-016: History Page
+**Priority:** 4 | **Estimate:** 30 min | **Dependencies:** None
+
+Page showing full inventory history.
+
+**Deliverables:**
+- `frontend/src/pages/History.tsx`
+- Route: `/{slug}/history`
+- List of history entries
+- Filter by action type
+- Search by item name
+
+**Acceptance Criteria:**
+- [ ] Shows all history entries
+- [ ] Filters work
+- [ ] Pagination or infinite scroll
+- [ ] Added to navigation
+- [ ] `bun run typecheck` passes
+
+---
+
+#### FE-017: History Entry Component
+**Priority:** 5 | **Estimate:** 20 min | **Dependencies:** FE-016
+
+Component for individual history entries.
+
+**Deliverables:**
+- `frontend/src/components/history/HistoryEntry.tsx`
+- Action icon
+- Formatted timestamp
+- Change description
+- Undo button
+
+**Acceptance Criteria:**
+- [ ] Clear visual per action type
+- [ ] Relative timestamps
+- [ ] Shows item thumbnail if available
+- [ ] `bun run typecheck` passes
+
+---
+
+#### FE-018: Undo Functionality
+**Priority:** 6 | **Estimate:** 20 min | **Dependencies:** FE-017
+
+Enable undoing changes from history.
+
+**Deliverables:**
+- useUndoAction mutation hook
+- Confirmation dialog
+- Success/error feedback
+
+**Acceptance Criteria:**
+- [ ] Undo button works
+- [ ] Confirmation before undo
+- [ ] Undone entries show badge
+- [ ] Data refreshes after undo
+- [ ] `bun run typecheck` passes
 
 ---
 
@@ -772,7 +1008,198 @@ Enable editing and deleting items.
 
 **Goal:** SSE-based live updates for multi-user sessions.
 
-*Stories to be detailed after Phase 3 completion.*
+### 4.1 Backend
+
+#### BE-019: SSE Connection Manager
+**Priority:** 1 | **Estimate:** 25 min | **Dependencies:** None
+
+Infrastructure for managing SSE connections per inventory.
+
+**Deliverables:**
+- `backend/app/core/sse.py`
+- ConnectionManager class
+- Methods: connect, disconnect, broadcast
+- Heartbeat mechanism (30s)
+
+**Acceptance Criteria:**
+- [ ] Manages connections per inventory
+- [ ] Thread-safe
+- [ ] Sends heartbeats
+- [ ] `ruff check .` passes
+
+---
+
+#### BE-020: SSE Events Endpoint
+**Priority:** 2 | **Estimate:** 20 min | **Dependencies:** BE-019
+
+Endpoint for clients to connect to event stream.
+
+**Deliverables:**
+- Add sse-starlette dependency
+- GET `/api/inventories/{slug}/events`
+- X-Passphrase auth
+- Last-Event-ID support
+
+**Acceptance Criteria:**
+- [ ] Returns EventSourceResponse
+- [ ] Authenticates with passphrase
+- [ ] Reconnection support
+- [ ] `ruff check .` passes
+
+---
+
+#### BE-021: Broadcast Item Changes
+**Priority:** 3 | **Estimate:** 20 min | **Dependencies:** BE-020
+
+Broadcast events when items change.
+
+**Deliverables:**
+- Update item router to broadcast
+- Events: item_added, item_updated, item_removed
+- Include event_id and timestamp
+
+**Acceptance Criteria:**
+- [ ] Broadcasts on create
+- [ ] Broadcasts on update
+- [ ] Broadcasts on delete
+- [ ] `ruff check .` passes
+
+---
+
+#### BE-022: Broadcast Currency Changes
+**Priority:** 4 | **Estimate:** 10 min | **Dependencies:** BE-021
+
+Broadcast events when currency changes.
+
+**Deliverables:**
+- Update currency router to broadcast
+- Event: currency_updated
+
+**Acceptance Criteria:**
+- [ ] Broadcasts on currency change
+- [ ] `ruff check .` passes
+
+---
+
+#### BE-023: Connection Count Broadcast
+**Priority:** 5 | **Estimate:** 10 min | **Dependencies:** BE-022
+
+Show how many users are viewing the inventory.
+
+**Deliverables:**
+- Broadcast connection_count on connect/disconnect
+- Payload: { viewers: number }
+
+**Acceptance Criteria:**
+- [ ] Count updates on connect
+- [ ] Count updates on disconnect
+- [ ] `ruff check .` passes
+
+---
+
+### 4.2 Frontend
+
+#### FE-019: useSSE Hook
+**Priority:** 1 | **Estimate:** 25 min | **Dependencies:** None
+
+Hook to manage SSE connections.
+
+**Deliverables:**
+- `frontend/src/hooks/useSSE.ts`
+- Opens EventSource connection
+- Reconnection with exponential backoff
+- Cleanup on unmount
+
+**Acceptance Criteria:**
+- [ ] Connects to SSE endpoint
+- [ ] Reconnects on disconnect
+- [ ] Returns connection status
+- [ ] `bun run typecheck` passes
+
+---
+
+#### FE-020: Real-time Item Updates
+**Priority:** 2 | **Estimate:** 20 min | **Dependencies:** FE-019
+
+Update item list in real-time.
+
+**Deliverables:**
+- Listen for item events in useSSE
+- Update TanStack Query cache
+
+**Acceptance Criteria:**
+- [ ] Adds new items to list
+- [ ] Updates changed items
+- [ ] Removes deleted items
+- [ ] `bun run typecheck` passes
+
+---
+
+#### FE-021: Real-time Currency Updates
+**Priority:** 3 | **Estimate:** 15 min | **Dependencies:** FE-020
+
+Update currency display in real-time.
+
+**Deliverables:**
+- Listen for currency_updated events
+- Update inventory cache
+
+**Acceptance Criteria:**
+- [ ] Treasury widget updates
+- [ ] No page refresh needed
+- [ ] `bun run typecheck` passes
+
+---
+
+#### FE-022: Viewer Count Display
+**Priority:** 4 | **Estimate:** 15 min | **Dependencies:** FE-021
+
+Show how many party members are viewing.
+
+**Deliverables:**
+- `frontend/src/components/ViewerCount.tsx`
+- Shows viewer count
+- Updates on connection_count events
+
+**Acceptance Criteria:**
+- [ ] Shows count when > 1
+- [ ] Updates in real-time
+- [ ] `bun run typecheck` passes
+
+---
+
+#### FE-023: Change Notifications
+**Priority:** 5 | **Estimate:** 20 min | **Dependencies:** FE-022
+
+Toast notifications for changes by others.
+
+**Deliverables:**
+- Toast on item changes
+- Brief highlight on changed items
+- Option to mute
+
+**Acceptance Criteria:**
+- [ ] Shows toast for changes
+- [ ] Highlights changed items
+- [ ] Can mute notifications
+- [ ] `bun run typecheck` passes
+
+---
+
+#### FE-024: Connection Status Indicator
+**Priority:** 6 | **Estimate:** 15 min | **Dependencies:** FE-023
+
+Show SSE connection status.
+
+**Deliverables:**
+- Connection status indicator (dot)
+- Colors: green=connected, yellow=connecting, red=disconnected
+- Tooltip with details
+
+**Acceptance Criteria:**
+- [ ] Shows current status
+- [ ] Auto-reconnect indicator
+- [ ] `bun run typecheck` passes
 
 ---
 
@@ -780,15 +1207,213 @@ Enable editing and deleting items.
 
 **Goal:** DALL-E integration for item icons.
 
-*Stories to be detailed after Phase 4 completion.*
+### 5.1 Backend
+
+#### BE-024: OpenAI Connection Model
+**Priority:** 1 | **Estimate:** 20 min | **Dependencies:** None
+
+Store encrypted OpenAI API keys per inventory.
+
+**Deliverables:**
+- `backend/app/models/openai.py`
+- OpenAIConnection SQLModel
+- AES-256 encryption for API key
+- Never expose decrypted key in API
+
+**Acceptance Criteria:**
+- [ ] Model stores encrypted key
+- [ ] Can decrypt for use
+- [ ] Never exposed in responses
+- [ ] `ruff check .` passes
 
 ---
 
-## Phase 6: Deployment
+#### BE-025: OpenAI Connection Endpoints
+**Priority:** 2 | **Estimate:** 25 min | **Dependencies:** BE-024
 
-**Goal:** Docker + Tailscale Funnel for production.
+Endpoints to manage OpenAI connection.
 
-*Stories to be detailed after Phase 5 completion.*
+**Deliverables:**
+- `backend/app/routers/openai.py`
+- POST `/connect` - store key
+- POST `/test` - validate key
+- DELETE - remove connection
+- GET `/status` - check if connected
+
+**Acceptance Criteria:**
+- [ ] Can connect API key
+- [ ] Can test before saving
+- [ ] Can disconnect
+- [ ] Status endpoint works
+- [ ] `ruff check .` passes
+
+---
+
+#### BE-026: Thumbnail Generation Service
+**Priority:** 3 | **Estimate:** 25 min | **Dependencies:** BE-025
+
+Service to generate thumbnails via DALL-E.
+
+**Deliverables:**
+- `backend/app/services/thumbnails.py`
+- generate_thumbnail(item, api_key) function
+- Build prompt from item details
+- Call DALL-E 3 API
+
+**Acceptance Criteria:**
+- [ ] Generates prompt from item
+- [ ] Calls DALL-E API
+- [ ] Returns image URL
+- [ ] Handles errors gracefully
+- [ ] `ruff check .` passes
+
+---
+
+#### BE-027: Thumbnail Generation Endpoint
+**Priority:** 4 | **Estimate:** 20 min | **Dependencies:** BE-026
+
+Endpoint to generate/regenerate thumbnails.
+
+**Deliverables:**
+- POST `/api/inventories/{slug}/items/{item_id}/thumbnail`
+- Uses inventory's OpenAI connection
+- Stores thumbnail_url on item
+
+**Acceptance Criteria:**
+- [ ] Generates thumbnail
+- [ ] Updates item
+- [ ] Returns 400 if no API key
+- [ ] `ruff check .` passes
+
+---
+
+#### BE-028: Auto-generate on Item Creation
+**Priority:** 5 | **Estimate:** 20 min | **Dependencies:** BE-027
+
+Automatically generate thumbnails for new items.
+
+**Deliverables:**
+- Update item create endpoint
+- Trigger generation if OpenAI connected
+- Don't block creation on generation
+
+**Acceptance Criteria:**
+- [ ] Generates in background
+- [ ] Updates item when ready
+- [ ] Works without blocking
+- [ ] `ruff check .` passes
+
+---
+
+### 5.2 Frontend
+
+#### FE-025: Settings Page
+**Priority:** 1 | **Estimate:** 20 min | **Dependencies:** None
+
+Settings page for inventory configuration.
+
+**Deliverables:**
+- `frontend/src/pages/Settings.tsx`
+- Route: `/{slug}/settings`
+- Sections: General, OpenAI, Danger Zone
+- Add to navigation
+
+**Acceptance Criteria:**
+- [ ] Settings page renders
+- [ ] Added to nav
+- [ ] Mobile-friendly
+- [ ] `bun run typecheck` passes
+
+---
+
+#### FE-026: OpenAI Connection UI
+**Priority:** 2 | **Estimate:** 25 min | **Dependencies:** FE-025
+
+UI to connect OpenAI API key.
+
+**Deliverables:**
+- `frontend/src/components/settings/OpenAIConnection.tsx`
+- Connection status display
+- Form to enter API key
+- Test and save buttons
+- Disconnect option
+
+**Acceptance Criteria:**
+- [ ] Can connect API key
+- [ ] Can test before saving
+- [ ] Can disconnect
+- [ ] Never displays key after saving
+- [ ] `bun run typecheck` passes
+
+---
+
+#### FE-027: Thumbnail Display in Item Cards
+**Priority:** 3 | **Estimate:** 15 min | **Dependencies:** FE-009
+
+Show AI thumbnails on item cards.
+
+**Deliverables:**
+- Update ItemCard to show thumbnail_url
+- Fallback to placeholder icon
+- Loading state while generating
+
+**Acceptance Criteria:**
+- [ ] Shows thumbnail if available
+- [ ] Shows placeholder if not
+- [ ] Loading state works
+- [ ] `bun run typecheck` passes
+
+---
+
+#### FE-028: Generate/Regenerate Button
+**Priority:** 4 | **Estimate:** 20 min | **Dependencies:** FE-027
+
+Button to generate or regenerate thumbnails.
+
+**Deliverables:**
+- Add button to item detail view
+- Shows "Generate" or "Regenerate"
+- Disabled if no OpenAI connection
+- Loading spinner while generating
+
+**Acceptance Criteria:**
+- [ ] Button generates thumbnail
+- [ ] Shows appropriate label
+- [ ] Disabled state with tooltip
+- [ ] `bun run typecheck` passes
+
+---
+
+#### FE-029: Thumbnail Placeholder Icons
+**Priority:** 5 | **Estimate:** 15 min | **Dependencies:** FE-027
+
+Default icons when no thumbnail available.
+
+**Deliverables:**
+- Create/add icons in `frontend/public/icons/`
+- Icons for each item type
+- Update ItemCard to use placeholders
+
+**Acceptance Criteria:**
+- [ ] Icons for all types
+- [ ] Consistent styling
+- [ ] Used as fallback
+- [ ] `bun run typecheck` passes
+
+---
+
+## Phase 6: Production Hardening
+
+**Goal:** Production-ready deployment with monitoring and security.
+
+*Phase 6 is largely covered by the Docker deployment PRD (`tasks/infra/docker-local.json`). Additional stories for production hardening can be added here as needed:*
+
+- Rate limiting
+- Request validation/sanitization  
+- Error monitoring (Sentry)
+- Health check dashboard
+- Backup strategy
+- SSL/HTTPS configuration
 
 ---
 

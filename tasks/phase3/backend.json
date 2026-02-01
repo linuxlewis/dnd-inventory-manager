@@ -1,0 +1,112 @@
+{
+  "project": "D&D Party Inventory Manager",
+  "branchName": "feat/currency-history-backend",
+  "description": "Backend API for currency management, history logging, undo, and rollback",
+  "userStories": [
+    {
+      "id": "BE-013",
+      "title": "Currency update endpoint",
+      "description": "As a user, I want to add or subtract currency from my treasury.",
+      "acceptanceCriteria": [
+        "Create backend/app/routers/currency.py",
+        "POST /api/inventories/{slug}/currency endpoint",
+        "Request body: { copper?: int, silver?: int, gold?: int, platinum?: int, note?: string }",
+        "Positive values add, negative values subtract",
+        "Validate sufficient funds for subtractions",
+        "Return updated currency totals",
+        "Requires X-Passphrase auth",
+        "Ruff check passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Values are deltas, not absolute"
+    },
+    {
+      "id": "BE-014",
+      "title": "Currency conversion endpoint",
+      "description": "As a user, I want to convert currency between denominations.",
+      "acceptanceCriteria": [
+        "POST /api/inventories/{slug}/currency/convert endpoint",
+        "Request: { from: 'copper'|'silver'|'gold'|'platinum', to: same, amount: int }",
+        "Apply conversion rates: 10 CP = 1 SP, 10 SP = 1 GP, 10 GP = 1 PP",
+        "Validate sufficient funds",
+        "Return updated totals",
+        "Ruff check passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "BE-015",
+      "title": "HistoryEntry SQLModel",
+      "description": "As a developer, I need a model to track all inventory changes.",
+      "acceptanceCriteria": [
+        "Create HistoryEntry in models/history.py",
+        "Fields: id, inventory_id, action (enum), item_id (optional), item_name, item_snapshot (JSON)",
+        "Fields: previous_value (JSON), new_value (JSON), note, timestamp",
+        "Fields: is_undone (bool), undone_by (UUID, optional)",
+        "Action enum: item_added, item_removed, item_updated, quantity_changed, currency_changed, rollback, undo",
+        "Create HistoryEntryRead schema for API responses",
+        "Ruff check passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": "Store enough data to reverse any action"
+    },
+    {
+      "id": "BE-016",
+      "title": "History logging service",
+      "description": "As a developer, I need a service that logs all inventory changes.",
+      "acceptanceCriteria": [
+        "Create backend/app/services/history.py",
+        "log_item_added(item, inventory_id) function",
+        "log_item_removed(item, inventory_id) - stores full item snapshot",
+        "log_item_updated(item_id, previous, new, inventory_id) function",
+        "log_quantity_changed(item_id, old_qty, new_qty, inventory_id) function",
+        "log_currency_changed(previous, new, note, inventory_id) function",
+        "Integrate with item and currency endpoints",
+        "Ruff check passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "BE-017",
+      "title": "History list endpoint",
+      "description": "As a user, I want to see the history of changes to my inventory.",
+      "acceptanceCriteria": [
+        "Create backend/app/routers/history.py",
+        "GET /api/inventories/{slug}/history endpoint",
+        "Query params: action (filter), limit, offset, item_id (filter)",
+        "Returns list of HistoryEntryRead, newest first",
+        "Requires X-Passphrase auth",
+        "Ruff check passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "BE-018",
+      "title": "Undo action endpoint",
+      "description": "As a user, I want to undo a specific change.",
+      "acceptanceCriteria": [
+        "POST /api/inventories/{slug}/history/{entry_id}/undo endpoint",
+        "Reverses the action based on stored previous_value/item_snapshot",
+        "For item_added: removes the item",
+        "For item_removed: restores item from snapshot",
+        "For item_updated: restores previous values",
+        "For currency_changed: reverses the delta",
+        "Creates new history entry: 'undo' action",
+        "Marks original entry as is_undone=true",
+        "Returns success status",
+        "Ruff check passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

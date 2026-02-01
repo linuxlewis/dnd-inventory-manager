@@ -1,0 +1,114 @@
+{
+  "project": "D&D Party Inventory Manager",
+  "branchName": "feat/currency-history-frontend",
+  "description": "Frontend UI for currency management, history viewing, and undo functionality",
+  "userStories": [
+    {
+      "id": "FE-013",
+      "title": "Treasury widget component",
+      "description": "As a user, I want to see my party's currency at a glance.",
+      "acceptanceCriteria": [
+        "Create frontend/src/components/currency/TreasuryWidget.tsx",
+        "Display all 4 denominations: PP, GP, SP, CP",
+        "Show total value in GP equivalent",
+        "Compact mode for dashboard, expanded for detail",
+        "Currency icons or symbols",
+        "Mobile-responsive (2x2 grid on mobile)",
+        "bun run typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "FE-014",
+      "title": "Add/Spend currency modal",
+      "description": "As a user, I want to add or spend currency from my treasury.",
+      "acceptanceCriteria": [
+        "Create frontend/src/components/currency/CurrencyModal.tsx",
+        "Mode toggle: Add Funds / Spend",
+        "Input fields for each denomination",
+        "Optional note field",
+        "Preview of new totals before confirming",
+        "Validation: can't spend more than available",
+        "Submit calls currency API",
+        "Success closes modal and updates display",
+        "bun run typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "FE-015",
+      "title": "Currency conversion modal",
+      "description": "As a user, I want to convert currency between denominations.",
+      "acceptanceCriteria": [
+        "Create frontend/src/components/currency/ConvertModal.tsx",
+        "From/To denomination dropdowns",
+        "Amount input",
+        "Shows conversion preview (e.g., '100 CP → 10 SP')",
+        "Submit calls convert API",
+        "bun run typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "FE-016",
+      "title": "History page",
+      "description": "As a user, I want to see the full history of my inventory.",
+      "acceptanceCriteria": [
+        "Create frontend/src/pages/History.tsx",
+        "Route: /{slug}/history",
+        "List of history entries, newest first",
+        "Filter by action type",
+        "Search by item name",
+        "Pagination or infinite scroll",
+        "Each entry shows: timestamp, action icon, description, undo button",
+        "Add to navigation",
+        "bun run typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "FE-017",
+      "title": "History entry component",
+      "description": "As a user, I want to see details of each history entry.",
+      "acceptanceCriteria": [
+        "Create frontend/src/components/history/HistoryEntry.tsx",
+        "Icon based on action type",
+        "Formatted timestamp (relative: '2 hours ago')",
+        "Description of change (e.g., 'Added Potion of Healing ×3')",
+        "For items: show thumbnail if available",
+        "For currency: show delta (+150 GP, -30 SP)",
+        "Undo button (disabled if already undone)",
+        "Expandable detail view for item changes",
+        "bun run typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "FE-018",
+      "title": "Undo functionality",
+      "description": "As a user, I want to undo a change from the history.",
+      "acceptanceCriteria": [
+        "Add useUndoAction mutation hook",
+        "Undo button on history entries",
+        "Confirmation dialog before undo",
+        "Success: refresh history and relevant data",
+        "Undone entries show strikethrough or 'undone' badge",
+        "Toast notification on success/failure",
+        "bun run typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}
