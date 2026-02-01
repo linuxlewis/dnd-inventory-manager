@@ -18,6 +18,9 @@ RUN uv sync --frozen --no-dev
 # Production stage
 FROM python:3.12-slim
 
+# Create a non-root user and group
+RUN groupadd --system app && useradd --system --gid app app
+
 WORKDIR /app
 
 # Copy UV and virtual environment from builder
@@ -29,6 +32,12 @@ COPY app/ ./app/
 
 # Create data directory for SQLite database
 RUN mkdir -p /app/data
+
+# Change ownership to the app user
+RUN chown -R app:app /app
+
+# Switch to the non-root user
+USER app
 
 # Set environment variables
 ENV PATH="/app/.venv/bin:$PATH"

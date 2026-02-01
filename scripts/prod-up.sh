@@ -20,14 +20,12 @@ cd "$(dirname "$0")/.."
 # Create data directory if it doesn't exist
 mkdir -p data
 
-# Build and start containers
+# Build and start containers (--wait waits for healthchecks to pass)
 echo -e "${YELLOW}Building and starting containers...${NC}"
-docker-compose up -d --build
+docker-compose up -d --build --wait
 
-# Wait for services to be healthy
 echo ""
-echo -e "${YELLOW}Waiting for services to be ready...${NC}"
-sleep 5
+echo -e "${YELLOW}Containers started and healthy.${NC}"
 
 # Check container status
 if docker ps | grep -q "dnd-backend" && docker ps | grep -q "dnd-frontend"; then
