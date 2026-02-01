@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from app.database import get_db
 from app.db.base import Base
 from app.db.inventory import Inventory
+from app.db.item import Item  # noqa: F401 - Import to register model
 from app.main import app
 from app.routers.inventories import hash_passphrase
 
