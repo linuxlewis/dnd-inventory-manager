@@ -36,3 +36,55 @@ export function formatRarity(rarity: ItemRarity): string {
 export function formatType(type: ItemType): string {
   return TYPE_LABELS[type]
 }
+
+/**
+ * Format damage property for display.
+ * Handles both SRD format {damage_dice, damage_type: {name}} and simple strings.
+ */
+export function formatDamage(damage: unknown): string {
+  if (typeof damage === 'string') return damage
+  if (typeof damage === 'object' && damage !== null) {
+    const d = damage as Record<string, unknown>
+    const dice = d.damage_dice || d.dice || ''
+    const damageType = d.damage_type
+    const typeName = typeof damageType === 'object' && damageType !== null
+      ? (damageType as Record<string, unknown>).name
+      : damageType
+    if (dice && typeName) return `${dice} ${typeName}`
+    if (dice) return String(dice)
+  }
+  return String(damage)
+}
+
+/**
+ * Format armor class property for display.
+ * Handles both SRD format {base, dex_bonus} and simple numbers.
+ */
+export function formatArmorClass(ac: unknown): string {
+  if (typeof ac === 'number') return String(ac)
+  if (typeof ac === 'string') return ac
+  if (typeof ac === 'object' && ac !== null) {
+    const a = ac as Record<string, unknown>
+    const base = a.base ?? a.value
+    const dexBonus = a.dex_bonus
+    if (base !== undefined) {
+      if (dexBonus === true) return `${base} + Dex`
+      if (dexBonus === false) return String(base)
+      return String(base)
+    }
+  }
+  return String(ac)
+}
+
+/**
+ * Format healing property for display.
+ * Handles dice strings and object formats.
+ */
+export function formatHealing(healing: unknown): string {
+  if (typeof healing === 'string') return healing
+  if (typeof healing === 'object' && healing !== null) {
+    const h = healing as Record<string, unknown>
+    return h.dice || h.healing_dice || h.amount || String(healing)
+  }
+  return String(healing)
+}

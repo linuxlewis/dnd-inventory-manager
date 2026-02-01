@@ -11,16 +11,12 @@ export function useItems(slug: string | undefined, filters?: ItemFilters) {
   return useQuery({
     queryKey: ['items', slug, filters],
     queryFn: async () => {
-      const params = new URLSearchParams()
-      if (filters?.type && filters.type !== 'all') {
-        params.append('type', filters.type)
-      }
-      if (filters?.search) {
-        params.append('search', filters.search)
-      }
-      const queryString = params.toString()
-      const url = `/api/inventories/${slug}/items${queryString ? `?${queryString}` : ''}`
-      const response = await apiClient.get<Item[]>(url)
+      const response = await apiClient.get<Item[]>(`/api/inventories/${slug}/items`, {
+        params: {
+          type: filters?.type && filters.type !== 'all' ? filters.type : undefined,
+          search: filters?.search || undefined,
+        },
+      })
       return response.data
     },
     enabled: !!slug,

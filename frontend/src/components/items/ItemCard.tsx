@@ -1,6 +1,6 @@
 import { Sword, FlaskConical, ScrollText, Sparkles, Package } from 'lucide-react'
 import type { Item, ItemType } from '../../api/types'
-import { RARITY_COLORS, formatRarity } from './utils'
+import { RARITY_COLORS, formatRarity, formatDamage, formatArmorClass, formatHealing } from './utils'
 
 interface ItemCardProps {
   item: Item
@@ -60,13 +60,13 @@ export function ItemCard({ item, onClick }: ItemCardProps) {
           {item.properties && (
             <div className="mt-2 text-sm text-gray-600">
               {item.type === 'equipment' && item.properties.damage && (
-                <span>Damage: {String(item.properties.damage)}</span>
+                <span>Damage: {formatDamage(item.properties.damage)}</span>
               )}
               {item.type === 'equipment' && item.properties.armor_class && (
-                <span>AC: {String(item.properties.armor_class)}</span>
+                <span>AC: {formatArmorClass(item.properties.armor_class)}</span>
               )}
               {item.type === 'potion' && item.properties.healing && (
-                <span>Healing: {String(item.properties.healing)}</span>
+                <span>Healing: {formatHealing(item.properties.healing)}</span>
               )}
             </div>
           )}

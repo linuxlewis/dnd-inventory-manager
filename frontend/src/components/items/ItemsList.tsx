@@ -4,6 +4,7 @@ import { useItems } from '../../api/items'
 import type { Item, ItemType } from '../../api/types'
 import { ItemCard } from './ItemCard'
 import { TYPE_LABELS } from './utils'
+import { useDebounce } from '../../hooks/useDebounce'
 
 interface ItemsListProps {
   slug: string
@@ -30,14 +31,34 @@ const TABS: TabConfig[] = [
 export function ItemsList({ slug, onItemClick, onAddClick }: ItemsListProps) {
   const [activeTab, setActiveTab] = useState<TabType>('all')
   const [searchQuery, setSearchQuery] = useState('')
+  
+  // Debounce search to avoid API calls on every keystroke
+  const debouncedSearch = useDebounce(searchQuery, 300)
 
-  const { data: items = [], isLoading } = useItems(slug, {
-    type: activeTab === 'all' ? undefined : activeTab,
-    search: searchQuery || undefined,
-  })
+  // Fetch all items once - filter client-side to avoid duplicate API calls
+  const { data: allItems = [], isLoading } = useItems(slug)
+
+  // Filter items client-side based on tab and search
+  const items = useMemo(() => {
+    let filtered = allItems
+    
+    // Filter by type tab
+    if (activeTab !== 'all') {
+      filtered = filtered.filter(item => item.type === activeTab)
+    }
+    
+    // Filter by search query
+    if (debouncedSearch) {
+      const query = debouncedSearch.toLowerCase()
+      filtered = filtered.filter(item => 
+        item.name.toLowerCase().includes(query)
+      )
+    }
+    
+    return filtered
+  }, [allItems, activeTab, debouncedSearch])
 
   // Count items by type for badges
-  const { data: allItems = [] } = useItems(slug)
   const typeCounts = useMemo(() => {
     const counts: Record<string, number> = { all: allItems.length }
     for (const item of allItems) {

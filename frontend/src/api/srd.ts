@@ -6,7 +6,6 @@ export function useSrdSearch(query: string) {
   return useQuery({
     queryKey: ['srd-search', query],
     queryFn: async () => {
-      if (!query || query.length < 2) return []
       const response = await apiClient.get<SrdItem[]>(`/api/srd/search`, {
         params: { q: query },
       })

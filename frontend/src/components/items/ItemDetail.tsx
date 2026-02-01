@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { X, Pencil, Trash2, Sword, FlaskConical, ScrollText, Sparkles, Package, AlertTriangle } from 'lucide-react'
 import type { Item, ItemType } from '../../api/types'
 import { useDeleteItem } from '../../api/items'
-import { RARITY_COLORS, formatRarity, formatType } from './utils'
+import { RARITY_COLORS, formatRarity, formatType, formatDamage, formatArmorClass, formatHealing } from './utils'
 
 interface ItemDetailProps {
   item: Item
@@ -128,19 +128,19 @@ export function ItemDetail({ item, slug, isOpen, onClose, onEdit }: ItemDetailPr
                 {item.type === 'equipment' && item.properties.damage && (
                   <div className="flex justify-between py-2 border-b border-gray-100">
                     <dt className="text-gray-500">Damage</dt>
-                    <dd className="font-medium text-gray-900">{String(item.properties.damage)}</dd>
+                    <dd className="font-medium text-gray-900">{formatDamage(item.properties.damage)}</dd>
                   </div>
                 )}
                 {item.type === 'equipment' && item.properties.armor_class && (
                   <div className="flex justify-between py-2 border-b border-gray-100">
                     <dt className="text-gray-500">Armor Class</dt>
-                    <dd className="font-medium text-gray-900">{String(item.properties.armor_class)}</dd>
+                    <dd className="font-medium text-gray-900">{formatArmorClass(item.properties.armor_class)}</dd>
                   </div>
                 )}
                 {item.type === 'potion' && item.properties.healing && (
                   <div className="flex justify-between py-2 border-b border-gray-100">
                     <dt className="text-gray-500">Healing</dt>
-                    <dd className="font-medium text-gray-900">{String(item.properties.healing)}</dd>
+                    <dd className="font-medium text-gray-900">{formatHealing(item.properties.healing)}</dd>
                   </div>
                 )}
                 {item.type === 'potion' && item.properties.duration && (

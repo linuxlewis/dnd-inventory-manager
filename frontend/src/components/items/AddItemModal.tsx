@@ -4,6 +4,16 @@ import { useCreateItem } from '../../api/items'
 import { useSrdSearch } from '../../api/srd'
 import type { ItemType, ItemRarity, SrdItem, ItemCreate } from '../../api/types'
 import { ITEM_TYPES, ITEM_RARITIES, TYPE_LABELS, RARITY_LABELS } from './utils'
+import { useDebounce } from '../../hooks/useDebounce'
+
+// Currency conversion rates to gold pieces
+const CURRENCY_TO_GP: Record<string, number> = {
+  gp: 1,
+  sp: 0.1,
+  cp: 0.01,
+  pp: 10,
+  ep: 0.5,
+}
 
 interface AddItemModalProps {
   slug: string
@@ -34,7 +44,6 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
   const createItem = useCreateItem(slug)
   
   const [searchQuery, setSearchQuery] = useState('')
-  const [debouncedQuery, setDebouncedQuery] = useState('')
   const [showDropdown, setShowDropdown] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   
@@ -51,11 +60,8 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
   const dropdownRef = useRef<HTMLDivElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
-  // Debounce search
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedQuery(searchQuery), 300)
-    return () => clearTimeout(timer)
-  }, [searchQuery])
+  // Debounce search using custom hook
+  const debouncedQuery = useDebounce(searchQuery, 300)
 
   const { data: srdResults = [], isLoading: srdLoading } = useSrdSearch(debouncedQuery)
 
@@ -97,12 +103,9 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
     setDescription(srdItem.desc?.join('\n') || '')
     if (srdItem.weight) setWeight(srdItem.weight)
     if (srdItem.cost) {
-      // Convert to gold pieces for estimate
-      const costInGp = srdItem.cost.unit === 'gp' 
-        ? srdItem.cost.quantity 
-        : srdItem.cost.unit === 'sp' 
-          ? srdItem.cost.quantity / 10 
-          : srdItem.cost.quantity / 100
+      // Convert to gold pieces using conversion rates
+      const rate = CURRENCY_TO_GP[srdItem.cost.unit] ?? 0
+      const costInGp = srdItem.cost.quantity * rate
       setEstimatedValue(costInGp)
     }
     setSearchQuery('')
@@ -215,10 +218,11 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
 
             {/* Name */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="add-item-name" className="block text-sm font-medium text-gray-700 mb-1">
                 Name <span className="text-red-500">*</span>
               </label>
               <input
+                id="add-item-name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -230,10 +234,11 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
             {/* Type and Rarity */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="add-item-type" className="block text-sm font-medium text-gray-700 mb-1">
                   Type <span className="text-red-500">*</span>
                 </label>
                 <select
+                  id="add-item-type"
                   value={type}
                   onChange={(e) => setType(e.target.value as ItemType)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -246,10 +251,11 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="add-item-rarity" className="block text-sm font-medium text-gray-700 mb-1">
                   Rarity
                 </label>
                 <select
+                  id="add-item-rarity"
                   value={rarity}
                   onChange={(e) => setRarity(e.target.value as ItemRarity)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -265,10 +271,11 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
 
             {/* Category */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="add-item-category" className="block text-sm font-medium text-gray-700 mb-1">
                 Category
               </label>
               <input
+                id="add-item-category"
                 type="text"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
@@ -280,10 +287,11 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
             {/* Quantity and Weight */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="add-item-quantity" className="block text-sm font-medium text-gray-700 mb-1">
                   Quantity
                 </label>
                 <input
+                  id="add-item-quantity"
                   type="number"
                   min="1"
                   value={quantity}
@@ -292,10 +300,11 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="add-item-weight" className="block text-sm font-medium text-gray-700 mb-1">
                   Weight (lbs)
                 </label>
                 <input
+                  id="add-item-weight"
                   type="number"
                   min="0"
                   step="0.1"
@@ -308,10 +317,11 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
 
             {/* Estimated Value */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="add-item-value" className="block text-sm font-medium text-gray-700 mb-1">
                 Estimated Value (GP)
               </label>
               <input
+                id="add-item-value"
                 type="number"
                 min="0"
                 step="0.01"
@@ -323,10 +333,11 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="add-item-description" className="block text-sm font-medium text-gray-700 mb-1">
                 Description
               </label>
               <textarea
+                id="add-item-description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
@@ -336,10 +347,11 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
 
             {/* Notes */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="add-item-notes" className="block text-sm font-medium text-gray-700 mb-1">
                 Notes
               </label>
               <textarea
+                id="add-item-notes"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={2}

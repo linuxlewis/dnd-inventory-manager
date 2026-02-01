@@ -100,10 +100,11 @@ function EditItemForm({ item, slug, onClose }: EditItemFormProps) {
 
         {/* Name */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="edit-item-name" className="block text-sm font-medium text-gray-700 mb-1">
             Name <span className="text-red-500">*</span>
           </label>
           <input
+            id="edit-item-name"
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -115,10 +116,11 @@ function EditItemForm({ item, slug, onClose }: EditItemFormProps) {
         {/* Type and Rarity */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="edit-item-type" className="block text-sm font-medium text-gray-700 mb-1">
               Type <span className="text-red-500">*</span>
             </label>
             <select
+              id="edit-item-type"
               value={type}
               onChange={(e) => setType(e.target.value as ItemType)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -131,10 +133,11 @@ function EditItemForm({ item, slug, onClose }: EditItemFormProps) {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="edit-item-rarity" className="block text-sm font-medium text-gray-700 mb-1">
               Rarity
             </label>
             <select
+              id="edit-item-rarity"
               value={rarity}
               onChange={(e) => setRarity(e.target.value as ItemRarity)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -150,10 +153,11 @@ function EditItemForm({ item, slug, onClose }: EditItemFormProps) {
 
         {/* Category */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="edit-item-category" className="block text-sm font-medium text-gray-700 mb-1">
             Category
           </label>
           <input
+            id="edit-item-category"
             type="text"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
@@ -165,10 +169,11 @@ function EditItemForm({ item, slug, onClose }: EditItemFormProps) {
         {/* Quantity and Weight */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="edit-item-quantity" className="block text-sm font-medium text-gray-700 mb-1">
               Quantity
             </label>
             <input
+              id="edit-item-quantity"
               type="number"
               min="1"
               value={quantity}
@@ -177,10 +182,11 @@ function EditItemForm({ item, slug, onClose }: EditItemFormProps) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="edit-item-weight" className="block text-sm font-medium text-gray-700 mb-1">
               Weight (lbs)
             </label>
             <input
+              id="edit-item-weight"
               type="number"
               min="0"
               step="0.1"
@@ -193,10 +199,11 @@ function EditItemForm({ item, slug, onClose }: EditItemFormProps) {
 
         {/* Estimated Value */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="edit-item-value" className="block text-sm font-medium text-gray-700 mb-1">
             Estimated Value (GP)
           </label>
           <input
+            id="edit-item-value"
             type="number"
             min="0"
             step="0.01"
@@ -208,10 +215,11 @@ function EditItemForm({ item, slug, onClose }: EditItemFormProps) {
 
         {/* Description */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="edit-item-description" className="block text-sm font-medium text-gray-700 mb-1">
             Description
           </label>
           <textarea
+            id="edit-item-description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={3}
@@ -221,10 +229,11 @@ function EditItemForm({ item, slug, onClose }: EditItemFormProps) {
 
         {/* Notes */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="edit-item-notes" className="block text-sm font-medium text-gray-700 mb-1">
             Notes
           </label>
           <textarea
+            id="edit-item-notes"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={2}
