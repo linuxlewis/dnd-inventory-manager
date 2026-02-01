@@ -5,8 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.database import init_db
-from app.models import Inventory  # noqa: F401 - import to register with SQLModel metadata
-from app.routers import inventories_router
+from app.models import Inventory, Item  # noqa: F401 - import to register with SQLModel metadata
+from app.routers import inventories_router, items_router, srd_router
 
 
 @asynccontextmanager
@@ -30,6 +30,8 @@ app.add_middleware(
 
 # Register routers
 app.include_router(inventories_router)
+app.include_router(items_router)
+app.include_router(srd_router)
 
 
 @app.get("/health")
