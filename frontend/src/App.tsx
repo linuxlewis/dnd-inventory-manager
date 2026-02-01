@@ -3,6 +3,7 @@ import { AppLayout } from './components/layout/AppLayout'
 import { Home } from './pages/Home'
 import { Inventory } from './pages/Inventory'
 import { NotFound } from './pages/NotFound'
+import { ToastContainer } from './components/Toast'
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
+      <ToastContainer />
     </BrowserRouter>
   )
 }

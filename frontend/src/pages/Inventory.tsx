@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, BellOff, Bell } from 'lucide-react'
 import { apiClient } from '../api/client'
 import { useAuth } from '../hooks/useAuth'
 import { useAuthenticateInventory } from '../api/inventories'
+import { useInventorySSE } from '../hooks/useInventorySSE'
+import { useToastStore } from '../stores/toastStore'
+import { ConnectionStatus } from '../components/ConnectionStatus'
+import { ViewerCount } from '../components/ViewerCount'
 import type { InventoryResponse } from '../api/types'
 import { AxiosError } from 'axios'
 
@@ -19,6 +23,16 @@ export function Inventory() {
   const [authError, setAuthError] = useState<string | null>(null)
 
   const isAuthenticated = slug ? hasSession(slug) : false
+
+  // Notification mute state
+  const muted = useToastStore((state) => state.muted)
+  const setMuted = useToastStore((state) => state.setMuted)
+
+  // SSE connection for real-time updates
+  const { status: sseStatus, viewerCount } = useInventorySSE(slug, {
+    enabled: isAuthenticated,
+    showNotifications: !muted,
+  })
 
   const {
     data: inventory,
@@ -182,12 +196,38 @@ export function Inventory() {
   return (
     <div>
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          {inventory?.name}
-        </h1>
-        {inventory?.description && (
-          <p className="text-gray-600">{inventory.description}</p>
-        )}
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              {inventory?.name}
+            </h1>
+            {inventory?.description && (
+              <p className="text-gray-600">{inventory.description}</p>
+            )}
+          </div>
+
+          {/* Real-time status indicators */}
+          <div className="flex items-center gap-4 shrink-0">
+            <ViewerCount count={viewerCount} />
+
+            {/* Notification mute toggle */}
+            <button
+              onClick={() => setMuted(!muted)}
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              title={muted ? 'Unmute notifications' : 'Mute notifications'}
+              aria-label={muted ? 'Unmute notifications' : 'Mute notifications'}
+            >
+              {muted ? (
+                <BellOff className="w-5 h-5 text-gray-400" />
+              ) : (
+                <Bell className="w-5 h-5 text-gray-600" />
+              )}
+            </button>
+
+            {/* Connection status indicator */}
+            <ConnectionStatus status={sseStatus} />
+          </div>
+        </div>
       </div>
 
       <div className="bg-white rounded-lg shadow-md p-6">
