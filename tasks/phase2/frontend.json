@@ -1,0 +1,135 @@
+{
+  "project": "D&D Party Inventory Manager",
+  "branchName": "feat/items-frontend",
+  "description": "Frontend UI for inventory item management with SRD integration",
+  "userStories": [
+    {
+      "id": "FE-007",
+      "title": "Inventory Dashboard Page",
+      "description": "As a user, I want to see my inventory overview after logging in.",
+      "acceptanceCriteria": [
+        "Update frontend/src/pages/Inventory.tsx",
+        "Fetch inventory data on mount using slug from URL",
+        "Display party name and description",
+        "Show currency summary (CP, SP, GP, PP) in a card",
+        "Placeholder section for items list",
+        "Loading spinner while fetching",
+        "Error state for failed fetch",
+        "Handle 401: redirect to home with error message",
+        "Create useInventory(slug) query hook in api/inventories.ts",
+        "Mobile-friendly layout",
+        "bun run typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "FE-008",
+      "title": "Items List with Category Tabs",
+      "description": "As a user, I want to browse my items organized by category.",
+      "acceptanceCriteria": [
+        "Create frontend/src/components/items/ItemsList.tsx",
+        "Tab bar: All, Equipment, Potions, Scrolls, Consumables, Misc",
+        "Clicking tab filters items by type",
+        "Search input for filtering by name",
+        "Empty state when no items (with Add button prompt)",
+        "Create useItems(slug, filters) query hook in api/items.ts",
+        "Integrate into Inventory page",
+        "Show item count badge on each tab",
+        "Mobile: horizontal scrolling tabs",
+        "bun run typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "FE-009",
+      "title": "Item Card Component",
+      "description": "As a user, I want to see item previews in a visually appealing card format.",
+      "acceptanceCriteria": [
+        "Create frontend/src/components/items/ItemCard.tsx",
+        "Thumbnail placeholder (or actual image if thumbnail_url exists)",
+        "Item name and type icon",
+        "Rarity indicator: colored border or badge",
+        "Quantity badge when > 1",
+        "Key stats preview based on type (damage/AC/healing)",
+        "Click handler prop for opening details",
+        "Rarity colors: common=gray, uncommon=green, rare=blue, very_rare=purple, legendary=orange, artifact=red",
+        "Responsive card sizing",
+        "bun run typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "FE-010",
+      "title": "Add Item Modal with SRD Search",
+      "description": "As a user, I want to add items by searching the SRD or entering custom items.",
+      "acceptanceCriteria": [
+        "Create frontend/src/components/items/AddItemModal.tsx",
+        "Modal overlay with close button",
+        "Name input with SRD autocomplete dropdown (debounced search)",
+        "Selecting SRD item auto-populates all fields",
+        "Manual entry mode for custom items",
+        "Type/category/rarity select dropdowns",
+        "Quantity input (number, min 1)",
+        "Description textarea",
+        "Properties section (dynamic fields based on type)",
+        "Create useSrdSearch(query) hook in api/srd.ts with 300ms debounce",
+        "Create useCreateItem(slug) mutation in api/items.ts",
+        "Success: close modal, refresh items list",
+        "Form validates required fields (name, type)",
+        "bun run typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "FE-011",
+      "title": "Item Detail View",
+      "description": "As a user, I want to see full details of an item.",
+      "acceptanceCriteria": [
+        "Create frontend/src/components/items/ItemDetail.tsx",
+        "Slide-over panel or modal layout",
+        "Large thumbnail image",
+        "Item name with rarity badge",
+        "All base properties displayed",
+        "Type-specific sections: Equipment (damage, AC, properties), Potion (healing, duration), Scroll (spell info)",
+        "User notes section",
+        "Edit button (opens edit modal)",
+        "Delete button with confirmation dialog",
+        "Close/dismiss functionality",
+        "bun run typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "FE-012",
+      "title": "Edit/Delete Item",
+      "description": "As a user, I want to modify or remove items from my inventory.",
+      "acceptanceCriteria": [
+        "Create frontend/src/components/items/EditItemModal.tsx",
+        "Pre-populate form with existing item data",
+        "Same fields as AddItemModal",
+        "Save button updates item",
+        "Cancel discards changes",
+        "Delete confirmation dialog with item name",
+        "Create useUpdateItem(slug, itemId) mutation in api/items.ts",
+        "Create useDeleteItem(slug, itemId) mutation in api/items.ts",
+        "Optimistic updates for smooth UX",
+        "Error handling with toast/message",
+        "List refreshes after save/delete",
+        "bun run typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

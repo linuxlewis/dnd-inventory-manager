@@ -427,23 +427,336 @@ Create searchable index.
 
 **Goal:** Full CRUD for inventory items with SRD integration.
 
-*Stories to be detailed after Phase 1 completion. High-level:*
-
 ### 2.1 Backend
-- BE-007: Item ORM model with polymorphic properties
-- BE-008: Item Pydantic schemas (base + type-specific)
-- BE-009: Create item endpoint
-- BE-010: List items endpoint (with filters)
-- BE-011: Get/Update/Delete item endpoints
-- BE-012: SRD search endpoint
+
+#### BE-007: Item ORM Model
+**Priority:** 1 | **Estimate:** 25 min | **Dependencies:** BE-003
+
+Create the SQLAlchemy ORM model for inventory items with flexible properties storage.
+
+**Deliverables:**
+- `backend/app/db/item.py` with `Item` model:
+  - `id`: UUID primary key
+  - `inventory_id`: UUID foreign key to Inventory
+  - `name`: String, required
+  - `type`: Enum ('equipment', 'potion', 'scroll', 'consumable', 'misc')
+  - `category`: String (e.g., 'weapon', 'armor', 'wondrous')
+  - `rarity`: Enum ('common', 'uncommon', 'rare', 'very_rare', 'legendary', 'artifact')
+  - `description`: Text
+  - `notes`: Text, nullable (user notes)
+  - `quantity`: Integer, default 1
+  - `weight`: Decimal, nullable
+  - `estimated_value`: Integer, nullable (in GP)
+  - `thumbnail_url`: String, nullable
+  - `is_standard_item`: Boolean, default false
+  - `standard_item_id`: String, nullable (SRD reference)
+  - `properties`: JSON field for type-specific data (damage_dice, ac_bonus, healing_dice, etc.)
+  - `created_at`, `updated_at`: DateTime
+- Add relationship to Inventory model
+- Update table creation in lifespan
+
+**Acceptance Criteria:**
+- [ ] Model imports without error
+- [ ] Foreign key relationship works
+- [ ] JSON properties field accepts arbitrary dict
+- [ ] `ruff check .` passes
+
+---
+
+#### BE-008: Item Pydantic Schemas
+**Priority:** 2 | **Estimate:** 20 min | **Dependencies:** BE-007
+
+Create Pydantic v2 models for item API request/response.
+
+**Deliverables:**
+- `backend/app/models/item.py`:
+  - `ItemType` enum
+  - `ItemRarity` enum
+  - `ItemBase`: shared fields (name, type, category, rarity, description, quantity, weight, estimated_value)
+  - `ItemCreate`: ItemBase + notes, properties dict
+  - `ItemUpdate`: all fields optional
+  - `ItemResponse`: full item with id, timestamps, thumbnail_url, etc.
+  - `ItemListResponse`: list of items with count
+- Type-specific property schemas (optional, for validation):
+  - `WeaponProperties`: damage_dice, damage_type, weapon_properties[], range
+  - `ArmorProperties`: ac_base, ac_bonus, armor_type, stealth_disadvantage
+  - `PotionProperties`: healing_dice, effect_description, duration
+
+**Acceptance Criteria:**
+- [ ] All models use Pydantic v2 `model_config`
+- [ ] Enums serialize to strings
+- [ ] Properties dict accepts flexible structure
+- [ ] `ruff check .` passes
+
+---
+
+#### BE-009: Create Item Endpoint
+**Priority:** 3 | **Estimate:** 20 min | **Dependencies:** BE-008
+
+Implement endpoint to add items to an inventory.
+
+**Deliverables:**
+- `backend/app/routers/items.py`:
+  - `POST /api/inventories/{slug}/items` - create item
+  - Requires auth (X-Passphrase header)
+  - Validates item data
+  - Returns ItemResponse
+- Register router in `main.py`
+
+**Acceptance Criteria:**
+- [ ] Creates item linked to inventory
+- [ ] Returns 401 without valid passphrase
+- [ ] Returns 404 for unknown inventory
+- [ ] Returns 422 for invalid data
+- [ ] Returns created item with ID
+- [ ] `ruff check .` passes
+
+---
+
+#### BE-010: List Items Endpoint
+**Priority:** 4 | **Estimate:** 20 min | **Dependencies:** BE-009
+
+Implement endpoint to list and filter inventory items.
+
+**Deliverables:**
+- Updates to `backend/app/routers/items.py`:
+  - `GET /api/inventories/{slug}/items` - list items
+  - Query params: `type`, `category`, `rarity`, `search` (name contains)
+  - Requires auth
+  - Returns ItemListResponse with count
+- Pagination support: `limit`, `offset` params
+
+**Acceptance Criteria:**
+- [ ] Returns all items for inventory
+- [ ] Filters work correctly (type, category, rarity)
+- [ ] Search matches partial name (case-insensitive)
+- [ ] Pagination works
+- [ ] Returns 401 without auth
+- [ ] `ruff check .` passes
+
+---
+
+#### BE-011: Get/Update/Delete Item Endpoints
+**Priority:** 5 | **Estimate:** 25 min | **Dependencies:** BE-010
+
+Implement remaining CRUD operations for items.
+
+**Deliverables:**
+- Updates to `backend/app/routers/items.py`:
+  - `GET /api/inventories/{slug}/items/{item_id}` - get single item
+  - `PATCH /api/inventories/{slug}/items/{item_id}` - update item
+  - `DELETE /api/inventories/{slug}/items/{item_id}` - delete item
+- All require auth
+- Update returns modified item
+- Delete returns 204
+
+**Acceptance Criteria:**
+- [ ] Get returns single item by ID
+- [ ] Update modifies only provided fields
+- [ ] Delete removes item
+- [ ] All return 404 for unknown item
+- [ ] All return 401 without auth
+- [ ] `ruff check .` passes
+
+---
+
+#### BE-012: SRD Search Endpoint
+**Priority:** 6 | **Estimate:** 20 min | **Dependencies:** SRD-005
+
+Implement endpoint to search SRD item database for autocomplete.
+
+**Deliverables:**
+- `backend/app/services/srd.py`:
+  - Load SRD index on startup (cache in memory)
+  - `search_srd(query, type?, category?, limit=10)` function
+  - Returns matching items with full data from source files
+- `backend/app/routers/srd.py`:
+  - `GET /api/srd/search?q=<query>&type=<type>&limit=<n>`
+  - No auth required (SRD is public data)
+  - Returns list of SRD items
+
+**Acceptance Criteria:**
+- [ ] Search returns matching items
+- [ ] Can filter by type
+- [ ] Results include full item data
+- [ ] Case-insensitive matching
+- [ ] Returns empty list for no matches
+- [ ] `ruff check .` passes
+
+---
 
 ### 2.2 Frontend
-- FE-007: Inventory dashboard page
-- FE-008: Items list with category tabs
-- FE-009: Item card component
-- FE-010: Add item modal with SRD search
-- FE-011: Item detail view
-- FE-012: Edit/Delete item
+
+#### FE-007: Inventory Dashboard Page
+**Priority:** 1 | **Estimate:** 25 min | **Dependencies:** FE-006
+
+Build the main inventory view that users see after authenticating.
+
+**Deliverables:**
+- `frontend/src/pages/Inventory.tsx`:
+  - Fetch inventory data on mount
+  - Display party name and description
+  - Show currency summary (CP, SP, GP, PP)
+  - Placeholder for items list
+  - Loading and error states
+- `frontend/src/api/inventories.ts`:
+  - `useInventory(slug)` query hook
+- Handle 401 (redirect to home with error)
+
+**Acceptance Criteria:**
+- [ ] Displays inventory info
+- [ ] Shows currency totals
+- [ ] Loading spinner while fetching
+- [ ] Error state for failed fetch
+- [ ] Redirects on auth failure
+- [ ] Mobile-friendly layout
+- [ ] `bun run typecheck` passes
+
+---
+
+#### FE-008: Items List with Category Tabs
+**Priority:** 2 | **Estimate:** 30 min | **Dependencies:** FE-007
+
+Display inventory items organized by category.
+
+**Deliverables:**
+- `frontend/src/components/items/ItemsList.tsx`:
+  - Tab bar for categories: All, Equipment, Potions, Scrolls, Consumables, Misc
+  - Fetches items with category filter
+  - Search input for filtering by name
+  - Empty state when no items
+  - Grid/list layout toggle (optional)
+- `frontend/src/api/items.ts`:
+  - `useItems(slug, filters)` query hook
+- Integration in Inventory page
+
+**Acceptance Criteria:**
+- [ ] Tabs filter by item type
+- [ ] Search filters by name
+- [ ] Shows item count per category
+- [ ] Empty state for new inventories
+- [ ] Mobile: tabs scroll horizontally
+- [ ] `bun run typecheck` passes
+
+---
+
+#### FE-009: Item Card Component
+**Priority:** 3 | **Estimate:** 25 min | **Dependencies:** FE-008
+
+Create reusable card component for displaying items.
+
+**Deliverables:**
+- `frontend/src/components/items/ItemCard.tsx`:
+  - Thumbnail placeholder (or AI image if available)
+  - Item name and type icon
+  - Rarity indicator (color-coded border/badge)
+  - Quantity badge
+  - Key stats preview (damage for weapons, AC for armor, healing for potions)
+  - Click to expand/view details
+- Rarity color scheme:
+  - Common: gray
+  - Uncommon: green
+  - Rare: blue
+  - Very Rare: purple
+  - Legendary: orange
+  - Artifact: red
+
+**Acceptance Criteria:**
+- [ ] Displays all item types correctly
+- [ ] Rarity colors match D&D convention
+- [ ] Quantity shows when > 1
+- [ ] Clickable (triggers callback)
+- [ ] Responsive sizing
+- [ ] `bun run typecheck` passes
+
+---
+
+#### FE-010: Add Item Modal with SRD Search
+**Priority:** 4 | **Estimate:** 35 min | **Dependencies:** FE-009
+
+Modal for adding new items with SRD autocomplete.
+
+**Deliverables:**
+- `frontend/src/components/items/AddItemModal.tsx`:
+  - Modal overlay with form
+  - Name input with SRD autocomplete dropdown
+  - When SRD item selected: auto-populate all fields
+  - Manual entry mode for custom items
+  - Type/category/rarity selects
+  - Quantity input
+  - Description textarea
+  - Properties section (dynamic based on type)
+  - Submit creates item
+- `frontend/src/api/srd.ts`:
+  - `useSrdSearch(query)` query hook with debounce
+- `frontend/src/api/items.ts`:
+  - `useCreateItem(slug)` mutation
+
+**Acceptance Criteria:**
+- [ ] SRD search shows suggestions as you type
+- [ ] Selecting SRD item fills form
+- [ ] Can override SRD values
+- [ ] Can create fully custom item
+- [ ] Form validates required fields
+- [ ] Success closes modal and refreshes list
+- [ ] `bun run typecheck` passes
+
+---
+
+#### FE-011: Item Detail View
+**Priority:** 5 | **Estimate:** 25 min | **Dependencies:** FE-010
+
+Expanded view showing full item details.
+
+**Deliverables:**
+- `frontend/src/components/items/ItemDetail.tsx`:
+  - Slide-over panel or full modal
+  - Large thumbnail
+  - Full item name with rarity badge
+  - All properties displayed in organized sections
+  - User notes section
+  - "Edit" button
+  - "Delete" button with confirmation
+- Equipment-specific: damage, AC, properties, attunement
+- Potion-specific: healing dice, duration, effects
+- Scroll-specific: spell name, level, school, description
+
+**Acceptance Criteria:**
+- [ ] Shows all item data
+- [ ] Type-specific sections render correctly
+- [ ] Edit button opens edit mode
+- [ ] Delete shows confirmation
+- [ ] Can close/dismiss
+- [ ] `bun run typecheck` passes
+
+---
+
+#### FE-012: Edit/Delete Item
+**Priority:** 6 | **Estimate:** 25 min | **Dependencies:** FE-011
+
+Enable editing and deleting items.
+
+**Deliverables:**
+- `frontend/src/components/items/EditItemModal.tsx`:
+  - Pre-populated form from existing item
+  - Same fields as AddItemModal
+  - Save updates item
+  - Cancel discards changes
+- Delete confirmation dialog:
+  - "Are you sure?" with item name
+  - Confirm deletes and closes detail view
+- `frontend/src/api/items.ts`:
+  - `useUpdateItem(slug, itemId)` mutation
+  - `useDeleteItem(slug, itemId)` mutation
+- Optimistic updates for smooth UX
+
+**Acceptance Criteria:**
+- [ ] Edit form pre-fills current values
+- [ ] Save persists changes
+- [ ] Delete removes item after confirmation
+- [ ] List updates immediately (optimistic)
+- [ ] Errors show toast/message
+- [ ] `bun run typecheck` passes
 
 ---
 

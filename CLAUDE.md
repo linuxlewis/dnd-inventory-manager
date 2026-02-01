@@ -53,29 +53,76 @@ dnd-helper-wt-2/              # Can work on any branch/PRD
 dnd-helper-wt-3/              # Can work on any branch/PRD
 ```
 
-## Port Configuration
+## Development
 
-To avoid conflicts when running multiple worktrees simultaneously:
+### Quick Start (Recommended)
 
-**Backend:** Set `PORT` env var
+Run the full stack with a single command:
+
 ```bash
-PORT=8001 uv run uvicorn app.main:app --port $PORT
+./scripts/dev.sh
 ```
 
-**Frontend:** Set `VITE_PORT` in `.env.local` or pass --port
+This will:
+- Auto-detect available ports (no conflicts with other worktrees)
+- Create `.env.local` files if missing
+- Start backend and frontend together
+- Clean up both processes on Ctrl+C
+
+### First-Time Setup
+
+To configure your environment without starting servers:
+
 ```bash
-VITE_PORT=5174 bun run dev
-# or
-bun run dev --port 5174
+./scripts/dev-setup.sh
 ```
 
-**Assigned Ports:**
-| Worktree | Backend Port | Frontend Port |
-|----------|--------------|---------------|
-| wt-1 | 8001 | 5174 |
-| wt-2 | 8002 | 5175 |
-| wt-3 | 8003 | 5176 |
-| **Production** | **9000** | **9080** |
+This creates:
+- `backend/.env.local` with `PORT=XXXX`
+- `frontend/.env.local` with `VITE_PORT=XXXX` and `VITE_API_URL=...`
+
+### Manual Workflow
+
+After running setup, you can start services individually:
+
+```bash
+# Terminal 1 - Backend
+cd backend
+source .env.local
+uv run uvicorn app.main:app --reload --port $PORT
+
+# Terminal 2 - Frontend
+cd frontend
+source .env.local
+bun run dev --port $VITE_PORT
+```
+
+### Port Assignment
+
+Ports are dynamically assigned to avoid conflicts:
+- **Backend:** First available port in 8000-8099
+- **Frontend:** First available port in 5173-5199
+
+The `.env.local` files are **gitignored** and auto-generated. Each worktree gets its own ports.
+
+**Production uses fixed ports:**
+| Service | Port |
+|---------|------|
+| Backend | 9000 |
+| Frontend | 9080 |
+
+### Troubleshooting
+
+**Ports seem stuck or conflicting?**
+```bash
+rm backend/.env.local frontend/.env.local
+./scripts/dev-setup.sh
+```
+
+**Check which ports are in use:**
+```bash
+./scripts/dev-ports.sh
+```
 
 ## Production Deployment (Docker)
 
