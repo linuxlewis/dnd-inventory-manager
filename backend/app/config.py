@@ -6,6 +6,8 @@ class Settings(BaseSettings):
 
     database_url: str = "sqlite+aiosqlite:///./data/dnd_inventory.db"
     port: int = 8000
+    log_file: str = "data/app.log"
+    log_level: str = "INFO"
     cors_origins: list[str] = [
         "http://localhost:5173",
         "http://localhost:9080",

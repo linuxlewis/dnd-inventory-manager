@@ -1,5 +1,6 @@
 """Inventory API endpoints using SQLModel."""
 
+import logging
 import re
 import secrets
 
@@ -17,6 +18,8 @@ from app.models import (
     InventoryCreate,
     InventoryRead,
 )
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/inventories", tags=["inventories"])
 
@@ -50,6 +53,8 @@ async def create_inventory(
     result = await db.execute(select(Inventory).where(Inventory.slug == slug))
     if result.scalar_one_or_none() is not None:
         slug = f"{base_slug}-{secrets.token_hex(2)}"
+
+    logger.info("Creating inventory with slug: %s", slug)
 
     # Create inventory using SQLModel
     inventory = Inventory(
