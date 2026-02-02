@@ -30,9 +30,6 @@ def setup_logging(log_file: str, log_level: str) -> None:
     root_logger.addHandler(file_handler)
     root_logger.addHandler(console_handler)
 
-    # Also capture uvicorn logs
+    # Capture uvicorn logs by removing default handlers (propagation to root handles the rest)
     for logger_name in ["uvicorn", "uvicorn.access", "uvicorn.error"]:
-        logger = logging.getLogger(logger_name)
-        logger.handlers = []  # Remove default handlers
-        logger.addHandler(file_handler)
-        logger.addHandler(console_handler)
+        logging.getLogger(logger_name).handlers = []
