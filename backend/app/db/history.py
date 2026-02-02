@@ -56,8 +56,8 @@ class HistoryEntry(Base):
     is_undone: Mapped[bool] = mapped_column(Boolean, default=False)
     undone_by: Mapped[str | None] = mapped_column(String(36), nullable=True)
 
-    # Timestamp
-    timestamp: Mapped[datetime] = mapped_column(DateTime, default=utc_now, index=True)
+    # Timestamp (using created_at to match project conventions)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now, index=True)
 
     # Version for optimistic locking (future use)
     version: Mapped[int] = mapped_column(Integer, default=1)

@@ -3,6 +3,8 @@
 from typing import TYPE_CHECKING
 
 from httpx import AsyncClient
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 if TYPE_CHECKING:
     from app.db.inventory import Inventory
@@ -12,9 +14,11 @@ class TestUpdateCurrency:
     """Tests for POST /api/inventories/{slug}/currency endpoint."""
 
     async def test_add_currency_success(
-        self, client: AsyncClient, test_inventory: tuple["Inventory", str]
+        self, client: AsyncClient, test_inventory: tuple["Inventory", str], test_db: AsyncSession
     ) -> None:
-        """Test adding currency successfully."""
+        """Test adding currency successfully and persists to database."""
+        from app.db.inventory import Inventory as InventoryModel
+
         inventory, passphrase = test_inventory
         response = await client.post(
             f"/api/inventories/{inventory.slug}/currency",
@@ -27,6 +31,14 @@ class TestUpdateCurrency:
         assert data["gold"] == 50
         assert data["silver"] == 0
         assert data["platinum"] == 0
+
+        # Verify persistence to database
+        result = await test_db.execute(
+            select(InventoryModel).where(InventoryModel.id == inventory.id)
+        )
+        db_inventory = result.scalar_one()
+        assert db_inventory.copper == 100
+        assert db_inventory.gold == 50
 
     async def test_subtract_currency_success(
         self, client: AsyncClient, test_inventory: tuple["Inventory", str]

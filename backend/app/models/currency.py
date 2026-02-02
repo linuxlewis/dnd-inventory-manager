@@ -1,7 +1,6 @@
 """Pydantic schemas for currency operations."""
 
 from enum import Enum
-from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -39,12 +38,8 @@ class CurrencyResponse(BaseModel):
 class CurrencyConvert(BaseModel):
     """Schema for currency conversion request."""
 
-    from_currency: Literal["copper", "silver", "gold", "platinum"] = Field(
-        alias="from", description="Source currency type"
-    )
-    to: Literal["copper", "silver", "gold", "platinum"] = Field(
-        description="Target currency type"
-    )
+    from_currency: CurrencyType = Field(alias="from", description="Source currency type")
+    to: CurrencyType = Field(description="Target currency type")
     amount: int = Field(gt=0, description="Amount to convert (must be positive)")
 
     model_config = {"populate_by_name": True}

@@ -1,16 +1,16 @@
 """History tracking and undo endpoints."""
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Query
+from fastapi import APIRouter, Depends, Header, HTTPException
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.auth import verify_passphrase
+from app.core.auth import get_authenticated_inventory
 from app.database import get_db
 from app.db.history import HistoryAction, HistoryEntry
-from app.db.inventory import Inventory
 from app.models.history import (
     HistoryEntryRead,
     HistoryListResponse,
+    HistoryQueryParams,
     UndoResponse,
 )
 from app.services.history import log_currency_changed, log_undo
@@ -18,34 +18,10 @@ from app.services.history import log_currency_changed, log_undo
 router = APIRouter(prefix="/api/inventories", tags=["history"])
 
 
-async def get_authenticated_inventory(
-    slug: str,
-    db: AsyncSession,
-    x_passphrase: str | None,
-) -> Inventory:
-    """Get inventory and verify authentication."""
-    if x_passphrase is None:
-        raise HTTPException(status_code=401, detail="Passphrase required")
-
-    result = await db.execute(select(Inventory).where(Inventory.slug == slug))
-    inventory = result.scalar_one_or_none()
-
-    if inventory is None:
-        raise HTTPException(status_code=404, detail="Inventory not found")
-
-    if not verify_passphrase(x_passphrase, inventory.passphrase_hash):
-        raise HTTPException(status_code=401, detail="Invalid passphrase")
-
-    return inventory
-
-
 @router.get("/{slug}/history", response_model=HistoryListResponse)
 async def list_history(
     slug: str,
-    action: HistoryAction | None = Query(default=None, description="Filter by action type"),
-    item_id: str | None = Query(default=None, description="Filter by item ID"),
-    limit: int = Query(default=50, ge=1, le=100, description="Maximum entries to return"),
-    offset: int = Query(default=0, ge=0, description="Offset for pagination"),
+    params: HistoryQueryParams = Depends(),
     db: AsyncSession = Depends(get_db),
     x_passphrase: str | None = Header(default=None),
 ) -> HistoryListResponse:
@@ -60,10 +36,10 @@ async def list_history(
     query = select(HistoryEntry).where(HistoryEntry.inventory_id == inventory.id)
 
     # Apply filters
-    if action is not None:
-        query = query.where(HistoryEntry.action == action.value)
-    if item_id is not None:
-        query = query.where(HistoryEntry.item_id == item_id)
+    if params.action is not None:
+        query = query.where(HistoryEntry.action == params.action.value)
+    if params.item_id is not None:
+        query = query.where(HistoryEntry.item_id == str(params.item_id))
 
     # Get total count
     count_query = select(func.count()).select_from(query.subquery())
@@ -71,7 +47,7 @@ async def list_history(
     total = total_result.scalar() or 0
 
     # Apply ordering and pagination
-    query = query.order_by(HistoryEntry.timestamp.desc()).offset(offset).limit(limit)
+    query = query.order_by(HistoryEntry.created_at.desc()).offset(params.offset).limit(params.limit)
 
     result = await db.execute(query)
     entries = result.scalars().all()
@@ -79,8 +55,8 @@ async def list_history(
     return HistoryListResponse(
         items=[HistoryEntryRead.model_validate(e) for e in entries],
         total=total,
-        limit=limit,
-        offset=offset,
+        limit=params.limit,
+        offset=params.offset,
     )
 
 

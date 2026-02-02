@@ -1,10 +1,9 @@
 """Currency management endpoints."""
 
 from fastapi import APIRouter, Depends, Header, HTTPException
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.auth import verify_passphrase
+from app.core.auth import get_authenticated_inventory
 from app.database import get_db
 from app.db.inventory import Inventory
 from app.models.currency import (
@@ -17,26 +16,8 @@ from app.services.history import log_currency_changed
 
 router = APIRouter(prefix="/api/inventories", tags=["currency"])
 
-
-async def get_authenticated_inventory(
-    slug: str,
-    db: AsyncSession,
-    x_passphrase: str | None,
-) -> Inventory:
-    """Get inventory and verify authentication."""
-    if x_passphrase is None:
-        raise HTTPException(status_code=401, detail="Passphrase required")
-
-    result = await db.execute(select(Inventory).where(Inventory.slug == slug))
-    inventory = result.scalar_one_or_none()
-
-    if inventory is None:
-        raise HTTPException(status_code=404, detail="Inventory not found")
-
-    if not verify_passphrase(x_passphrase, inventory.passphrase_hash):
-        raise HTTPException(status_code=401, detail="Invalid passphrase")
-
-    return inventory
+# Currency types for validation loop
+CURRENCY_TYPES = ["copper", "silver", "gold", "platinum"]
 
 
 @router.post("/{slug}/currency", response_model=CurrencyResponse)
@@ -45,7 +26,7 @@ async def update_currency(
     data: CurrencyUpdate,
     db: AsyncSession = Depends(get_db),
     x_passphrase: str | None = Header(default=None),
-) -> CurrencyResponse:
+) -> Inventory:
     """
     Add or subtract currency from the treasury.
 
@@ -55,54 +36,24 @@ async def update_currency(
     inventory = await get_authenticated_inventory(slug, db, x_passphrase)
 
     # Store previous values for history
-    previous = {
-        "copper": inventory.copper,
-        "silver": inventory.silver,
-        "gold": inventory.gold,
-        "platinum": inventory.platinum,
-    }
+    previous = {ct: getattr(inventory, ct) for ct in CURRENCY_TYPES}
 
-    # Calculate new values and validate
-    new_copper = inventory.copper + data.copper
-    new_silver = inventory.silver + data.silver
-    new_gold = inventory.gold + data.gold
-    new_platinum = inventory.platinum + data.platinum
-
-    # Validate sufficient funds for subtractions
-    if new_copper < 0:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Insufficient copper: have {inventory.copper}, need {-data.copper}",
-        )
-    if new_silver < 0:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Insufficient silver: have {inventory.silver}, need {-data.silver}",
-        )
-    if new_gold < 0:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Insufficient gold: have {inventory.gold}, need {-data.gold}",
-        )
-    if new_platinum < 0:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Insufficient platinum: have {inventory.platinum}, need {-data.platinum}",
-        )
+    # Calculate new values and validate sufficient funds
+    new_values = {}
+    for currency_type in CURRENCY_TYPES:
+        current = getattr(inventory, currency_type)
+        delta = getattr(data, currency_type)
+        new_value = current + delta
+        if new_value < 0:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Insufficient {currency_type}: have {current}, need {-delta}",
+            )
+        new_values[currency_type] = new_value
 
     # Apply changes
-    inventory.copper = new_copper
-    inventory.silver = new_silver
-    inventory.gold = new_gold
-    inventory.platinum = new_platinum
-
-    # Store new values for history
-    new_values = {
-        "copper": inventory.copper,
-        "silver": inventory.silver,
-        "gold": inventory.gold,
-        "platinum": inventory.platinum,
-    }
+    for currency_type, new_value in new_values.items():
+        setattr(inventory, currency_type, new_value)
 
     # Log to history
     await log_currency_changed(
@@ -116,12 +67,7 @@ async def update_currency(
     await db.commit()
     await db.refresh(inventory)
 
-    return CurrencyResponse(
-        copper=inventory.copper,
-        silver=inventory.silver,
-        gold=inventory.gold,
-        platinum=inventory.platinum,
-    )
+    return inventory
 
 
 @router.post("/{slug}/currency/convert", response_model=CurrencyResponse)
@@ -130,7 +76,7 @@ async def convert_currency(
     data: CurrencyConvert,
     db: AsyncSession = Depends(get_db),
     x_passphrase: str | None = Header(default=None),
-) -> CurrencyResponse:
+) -> Inventory:
     """
     Convert currency between denominations.
 
@@ -145,12 +91,7 @@ async def convert_currency(
         raise HTTPException(status_code=400, detail="Cannot convert currency to the same type")
 
     # Store previous values for history
-    previous = {
-        "copper": inventory.copper,
-        "silver": inventory.silver,
-        "gold": inventory.gold,
-        "platinum": inventory.platinum,
-    }
+    previous = {ct: getattr(inventory, ct) for ct in CURRENCY_TYPES}
 
     # Get current amount of source currency
     current_from = getattr(inventory, from_type)
@@ -185,12 +126,7 @@ async def convert_currency(
     setattr(inventory, to_type, current_to + target_amount)
 
     # Store new values for history
-    new_values = {
-        "copper": inventory.copper,
-        "silver": inventory.silver,
-        "gold": inventory.gold,
-        "platinum": inventory.platinum,
-    }
+    new_values = {ct: getattr(inventory, ct) for ct in CURRENCY_TYPES}
 
     # Log to history
     await log_currency_changed(
@@ -204,9 +140,4 @@ async def convert_currency(
     await db.commit()
     await db.refresh(inventory)
 
-    return CurrencyResponse(
-        copper=inventory.copper,
-        silver=inventory.silver,
-        gold=inventory.gold,
-        platinum=inventory.platinum,
-    )
+    return inventory

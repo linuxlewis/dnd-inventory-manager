@@ -23,7 +23,7 @@ class HistoryEntryRead(BaseModel):
     note: str | None = None
     is_undone: bool
     undone_by: UUID | None = None
-    timestamp: datetime
+    created_at: datetime
 
     model_config = {"from_attributes": True}
 
