@@ -5,7 +5,8 @@ import { Eye, EyeOff } from 'lucide-react'
 import { apiClient } from '../api/client'
 import { useAuth } from '../hooks/useAuth'
 import { useAuthenticateInventory } from '../api/inventories'
-import type { InventoryResponse } from '../api/types'
+import type { InventoryResponse, Item } from '../api/types'
+import { ItemsList, ItemDetail, AddItemModal, EditItemModal } from '../components/items'
 import { AxiosError } from 'axios'
 
 export function Inventory() {
@@ -17,6 +18,11 @@ export function Inventory() {
   const [passphrase, setPassphrase] = useState('')
   const [showPassphrase, setShowPassphrase] = useState(false)
   const [authError, setAuthError] = useState<string | null>(null)
+
+  // Items UI state
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null)
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
 
   const isAuthenticated = slug ? hasSession(slug) : false
 
@@ -178,6 +184,23 @@ export function Inventory() {
     )
   }
 
+  // Handlers for item interactions
+  const handleItemClick = (item: Item) => {
+    setSelectedItem(item)
+  }
+
+  const handleEditItem = () => {
+    setShowEditModal(true)
+  }
+
+  const handleCloseDetail = () => {
+    setSelectedItem(null)
+  }
+
+  const handleCloseEdit = () => {
+    setShowEditModal(false)
+  }
+
   // Show inventory content
   return (
     <div>
@@ -190,7 +213,7 @@ export function Inventory() {
         )}
       </div>
 
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Treasury</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-amber-100 rounded-lg p-4 text-center">
@@ -212,9 +235,44 @@ export function Inventory() {
         </div>
       </div>
 
-      <p className="mt-6 text-center text-gray-500 text-sm">
-        Inventory items will be added in Phase 2.
-      </p>
+      {/* Items Section */}
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">Items</h2>
+        {slug && (
+          <ItemsList
+            slug={slug}
+            onItemClick={handleItemClick}
+            onAddClick={() => setShowAddModal(true)}
+          />
+        )}
+      </div>
+
+      {/* Modals */}
+      {slug && (
+        <AddItemModal
+          slug={slug}
+          isOpen={showAddModal}
+          onClose={() => setShowAddModal(false)}
+        />
+      )}
+
+      {selectedItem && slug && (
+        <>
+          <ItemDetail
+            item={selectedItem}
+            slug={slug}
+            isOpen={!showEditModal}
+            onClose={handleCloseDetail}
+            onEdit={handleEditItem}
+          />
+          <EditItemModal
+            item={selectedItem}
+            slug={slug}
+            isOpen={showEditModal}
+            onClose={handleCloseEdit}
+          />
+        </>
+      )}
     </div>
   )
 }
