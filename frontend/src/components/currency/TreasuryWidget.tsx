@@ -1,0 +1,86 @@
+import { Plus, Minus, ArrowLeftRight } from 'lucide-react'
+import type { Currency } from '../../api/types'
+
+interface TreasuryWidgetProps {
+  currency: Currency | undefined
+  isLoading: boolean
+  onAddFunds: () => void
+  onSpend: () => void
+  onConvert: () => void
+}
+
+export function TreasuryWidget({
+  currency,
+  isLoading,
+  onAddFunds,
+  onSpend,
+  onConvert,
+}: TreasuryWidgetProps) {
+  if (isLoading) {
+    return (
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">Treasury</h2>
+        <div className="flex items-center justify-center py-8">
+          <div className="inline-block animate-spin rounded-full h-6 w-6 border-4 border-indigo-600 border-t-transparent"></div>
+          <span className="ml-2 text-gray-600">Loading treasury...</span>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-4">
+        <h2 className="text-xl font-semibold text-gray-900">Treasury</h2>
+        <div className="flex gap-2">
+          <button
+            onClick={onAddFunds}
+            className="flex items-center gap-1 px-3 py-1.5 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            Add Funds
+          </button>
+          <button
+            onClick={onSpend}
+            className="flex items-center gap-1 px-3 py-1.5 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            <Minus className="w-4 h-4" />
+            Spend
+          </button>
+          <button
+            onClick={onConvert}
+            className="flex items-center gap-1 px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+          >
+            <ArrowLeftRight className="w-4 h-4" />
+            Convert
+          </button>
+        </div>
+      </div>
+
+      {/* Currency grid - 2x2 on mobile, 4 columns on desktop */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+        <div className="bg-slate-200 rounded-lg p-4 text-center">
+          <p className="text-2xl font-bold text-slate-700">{currency?.platinum ?? 0}</p>
+          <p className="text-sm text-slate-500 font-medium">PP</p>
+        </div>
+        <div className="bg-yellow-100 rounded-lg p-4 text-center">
+          <p className="text-2xl font-bold text-yellow-700">{currency?.gold ?? 0}</p>
+          <p className="text-sm text-yellow-600 font-medium">GP</p>
+        </div>
+        <div className="bg-gray-200 rounded-lg p-4 text-center">
+          <p className="text-2xl font-bold text-gray-700">{currency?.silver ?? 0}</p>
+          <p className="text-sm text-gray-500 font-medium">SP</p>
+        </div>
+        <div className="bg-amber-100 rounded-lg p-4 text-center">
+          <p className="text-2xl font-bold text-amber-800">{currency?.copper ?? 0}</p>
+          <p className="text-sm text-amber-600 font-medium">CP</p>
+        </div>
+      </div>
+
+      {/* Total value */}
+      <div className="text-center text-gray-600 text-sm">
+        Total value: <span className="font-semibold">{(currency?.total_gp ?? 0).toFixed(2)} GP</span>
+      </div>
+    </div>
+  )
+}

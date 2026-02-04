@@ -3,10 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { Eye, EyeOff } from 'lucide-react'
 import { apiClient } from '../api/client'
+import { useCurrency } from '../api/currency'
 import { useAuth } from '../hooks/useAuth'
 import { useAuthenticateInventory } from '../api/inventories'
 import type { InventoryResponse, Item } from '../api/types'
 import { ItemsList, ItemDetail, AddItemModal, EditItemModal } from '../components/items'
+import { TreasuryWidget } from '../components/currency/TreasuryWidget'
+import { CurrencyModal } from '../components/currency/CurrencyModal'
+import { ConvertModal } from '../components/currency/ConvertModal'
 import { AxiosError } from 'axios'
 
 export function Inventory() {
@@ -24,7 +28,15 @@ export function Inventory() {
   const [showAddModal, setShowAddModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
 
+  // Currency modal state
+  const [showAddFundsModal, setShowAddFundsModal] = useState(false)
+  const [showSpendModal, setShowSpendModal] = useState(false)
+  const [showConvertModal, setShowConvertModal] = useState(false)
+
   const isAuthenticated = slug ? hasSession(slug) : false
+
+  // Currency data
+  const { data: currency, isLoading: currencyLoading } = useCurrency(isAuthenticated ? slug : undefined)
 
   const {
     data: inventory,
@@ -213,27 +225,14 @@ export function Inventory() {
         )}
       </div>
 
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Treasury</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-amber-100 rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-amber-800">{inventory?.copper ?? 0}</p>
-            <p className="text-sm text-amber-600">Copper</p>
-          </div>
-          <div className="bg-gray-200 rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-gray-700">{inventory?.silver ?? 0}</p>
-            <p className="text-sm text-gray-500">Silver</p>
-          </div>
-          <div className="bg-yellow-100 rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-yellow-700">{inventory?.gold ?? 0}</p>
-            <p className="text-sm text-yellow-600">Gold</p>
-          </div>
-          <div className="bg-slate-200 rounded-lg p-4 text-center">
-            <p className="text-2xl font-bold text-slate-700">{inventory?.platinum ?? 0}</p>
-            <p className="text-sm text-slate-500">Platinum</p>
-          </div>
-        </div>
-      </div>
+      {/* Treasury Widget */}
+      <TreasuryWidget
+        currency={currency}
+        isLoading={currencyLoading}
+        onAddFunds={() => setShowAddFundsModal(true)}
+        onSpend={() => setShowSpendModal(true)}
+        onConvert={() => setShowConvertModal(true)}
+      />
 
       {/* Items Section */}
       <div className="bg-white rounded-lg shadow-md p-6">
@@ -247,7 +246,7 @@ export function Inventory() {
         )}
       </div>
 
-      {/* Modals */}
+      {/* Item Modals */}
       {slug && (
         <AddItemModal
           slug={slug}
@@ -270,6 +269,32 @@ export function Inventory() {
             slug={slug}
             isOpen={showEditModal}
             onClose={handleCloseEdit}
+          />
+        </>
+      )}
+
+      {/* Currency Modals */}
+      {slug && (
+        <>
+          <CurrencyModal
+            slug={slug}
+            mode="add"
+            isOpen={showAddFundsModal}
+            onClose={() => setShowAddFundsModal(false)}
+            currentCurrency={currency}
+          />
+          <CurrencyModal
+            slug={slug}
+            mode="spend"
+            isOpen={showSpendModal}
+            onClose={() => setShowSpendModal(false)}
+            currentCurrency={currency}
+          />
+          <ConvertModal
+            slug={slug}
+            isOpen={showConvertModal}
+            onClose={() => setShowConvertModal(false)}
+            currentCurrency={currency}
           />
         </>
       )}
