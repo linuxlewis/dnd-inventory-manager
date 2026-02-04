@@ -1,4 +1,10 @@
 # Pydantic/SQLModel schemas package
+from app.models.currency import (
+    CurrencyConvert,
+    CurrencyDenomination,
+    CurrencyResponse,
+    CurrencyUpdate,
+)
 from app.models.inventory import (
     AuthResponse,
     Inventory,
@@ -19,6 +25,10 @@ from app.models.item import (
 from app.models.srd import SrdItemRead
 
 __all__ = [
+    "CurrencyConvert",
+    "CurrencyDenomination",
+    "CurrencyResponse",
+    "CurrencyUpdate",
     "Inventory",
     "InventoryCreate",
     "InventoryRead",
