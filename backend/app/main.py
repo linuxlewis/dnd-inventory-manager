@@ -8,7 +8,7 @@ from app.config import settings
 from app.database import init_db
 from app.logging_config import setup_logging
 from app.models import Inventory, Item  # noqa: F401 - import to register with SQLModel metadata
-from app.routers import inventories_router, items_router, srd_router
+from app.routers import currency_router, inventories_router, items_router, srd_router
 
 
 @asynccontextmanager
@@ -37,6 +37,7 @@ app.add_middleware(
 app.include_router(inventories_router)
 app.include_router(items_router)
 app.include_router(srd_router)
+app.include_router(currency_router)
 
 
 @app.get("/health")

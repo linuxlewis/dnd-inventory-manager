@@ -67,3 +67,43 @@ async def test_inventory(test_db: AsyncSession) -> tuple[Inventory, str]:
     await test_db.refresh(inventory)
 
     return inventory, passphrase
+
+
+@pytest.fixture
+def inventory_factory(test_db: AsyncSession):
+    """Factory fixture for creating inventories with custom attributes.
+
+    Usage:
+        inventory, passphrase = await inventory_factory(
+            slug="my-party",
+            gold=100,
+            silver=50,
+        )
+    """
+
+    async def _create_inventory(
+        slug: str,
+        name: str | None = None,
+        passphrase: str = "test-pass-123",
+        copper: int = 0,
+        silver: int = 0,
+        gold: int = 0,
+        platinum: int = 0,
+        **kwargs,
+    ) -> tuple[Inventory, str]:
+        inventory = Inventory(
+            slug=slug,
+            name=name or slug.replace("-", " ").title(),
+            passphrase_hash=hash_passphrase(passphrase),
+            copper=copper,
+            silver=silver,
+            gold=gold,
+            platinum=platinum,
+            **kwargs,
+        )
+        test_db.add(inventory)
+        await test_db.commit()
+        await test_db.refresh(inventory)
+        return inventory, passphrase
+
+    return _create_inventory
