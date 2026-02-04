@@ -33,26 +33,19 @@ class TestGetCurrency:
 
     @pytest.mark.asyncio
     async def test_get_currency_with_balance(
-        self, client: AsyncClient, test_db: AsyncSession
+        self, client: AsyncClient, inventory_factory
     ) -> None:
         """Test getting currency with existing balance."""
-        from app.routers.inventories import hash_passphrase
-
-        passphrase = "test-pass-123"
-        inventory = Inventory(
+        inventory, passphrase = await inventory_factory(
             slug="rich-party",
-            name="Rich Party",
-            passphrase_hash=hash_passphrase(passphrase),
             copper=50,
             silver=25,
             gold=100,
             platinum=5,
         )
-        test_db.add(inventory)
-        await test_db.commit()
 
         response = await client.get(
-            "/api/inventories/rich-party/currency",
+            f"/api/inventories/{inventory.slug}/currency",
             headers={"X-Passphrase": passphrase},
         )
 
@@ -140,23 +133,17 @@ class TestUpdateCurrency:
     async def test_spend_currency(
         self,
         client: AsyncClient,
+        inventory_factory,
         test_db: AsyncSession,
     ) -> None:
         """Test spending currency decreases balance."""
-        from app.routers.inventories import hash_passphrase
-
-        passphrase = "test-pass-123"
-        inventory = Inventory(
+        inventory, passphrase = await inventory_factory(
             slug="spender-party",
-            name="Spender Party",
-            passphrase_hash=hash_passphrase(passphrase),
             gold=100,
         )
-        test_db.add(inventory)
-        await test_db.commit()
 
         response = await client.post(
-            "/api/inventories/spender-party/currency",
+            f"/api/inventories/{inventory.slug}/currency",
             json={"gold": -30},
             headers={"X-Passphrase": passphrase},
         )
@@ -211,23 +198,16 @@ class TestConvertCurrency:
     async def test_convert_gold_to_silver(
         self,
         client: AsyncClient,
-        test_db: AsyncSession,
+        inventory_factory,
     ) -> None:
         """Test converting gold to silver (down-conversion)."""
-        from app.routers.inventories import hash_passphrase
-
-        passphrase = "test-pass-123"
-        inventory = Inventory(
+        inventory, passphrase = await inventory_factory(
             slug="convert-party",
-            name="Convert Party",
-            passphrase_hash=hash_passphrase(passphrase),
             gold=10,
         )
-        test_db.add(inventory)
-        await test_db.commit()
 
         response = await client.post(
-            "/api/inventories/convert-party/currency/convert",
+            f"/api/inventories/{inventory.slug}/currency/convert",
             json={
                 "from_denomination": "gold",
                 "to_denomination": "silver",
@@ -245,26 +225,19 @@ class TestConvertCurrency:
     async def test_convert_copper_to_gold(
         self,
         client: AsyncClient,
-        test_db: AsyncSession,
+        inventory_factory,
     ) -> None:
         """Test converting copper to gold (up-conversion).
 
         250 CP -> 2 GP + 50 CP remainder. Only 200 CP is consumed.
         """
-        from app.routers.inventories import hash_passphrase
-
-        passphrase = "test-pass-123"
-        inventory = Inventory(
+        inventory, passphrase = await inventory_factory(
             slug="copper-party",
-            name="Copper Party",
-            passphrase_hash=hash_passphrase(passphrase),
             copper=250,
         )
-        test_db.add(inventory)
-        await test_db.commit()
 
         response = await client.post(
-            "/api/inventories/copper-party/currency/convert",
+            f"/api/inventories/{inventory.slug}/currency/convert",
             json={
                 "from_denomination": "copper",
                 "to_denomination": "gold",
@@ -284,27 +257,20 @@ class TestConvertCurrency:
     async def test_convert_silver_to_platinum(
         self,
         client: AsyncClient,
-        test_db: AsyncSession,
+        inventory_factory,
     ) -> None:
         """Test converting silver to platinum (skipping gold).
 
         150 SP requested, but only 100 SP needed for 1 PP.
         50 SP remains (preserved in source denomination).
         """
-        from app.routers.inventories import hash_passphrase
-
-        passphrase = "test-pass-123"
-        inventory = Inventory(
+        inventory, passphrase = await inventory_factory(
             slug="silver-party",
-            name="Silver Party",
-            passphrase_hash=hash_passphrase(passphrase),
             silver=150,
         )
-        test_db.add(inventory)
-        await test_db.commit()
 
         response = await client.post(
-            "/api/inventories/silver-party/currency/convert",
+            f"/api/inventories/{inventory.slug}/currency/convert",
             json={
                 "from_denomination": "silver",
                 "to_denomination": "platinum",
@@ -348,23 +314,16 @@ class TestConvertCurrency:
     async def test_convert_same_denomination(
         self,
         client: AsyncClient,
-        test_db: AsyncSession,
+        inventory_factory,
     ) -> None:
         """Test converting to same denomination returns 400."""
-        from app.routers.inventories import hash_passphrase
-
-        passphrase = "test-pass-123"
-        inventory = Inventory(
+        inventory, passphrase = await inventory_factory(
             slug="same-party",
-            name="Same Party",
-            passphrase_hash=hash_passphrase(passphrase),
             gold=10,
         )
-        test_db.add(inventory)
-        await test_db.commit()
 
         response = await client.post(
-            "/api/inventories/same-party/currency/convert",
+            f"/api/inventories/{inventory.slug}/currency/convert",
             json={
                 "from_denomination": "gold",
                 "to_denomination": "gold",
@@ -380,23 +339,16 @@ class TestConvertCurrency:
     async def test_convert_amount_too_small(
         self,
         client: AsyncClient,
-        test_db: AsyncSession,
+        inventory_factory,
     ) -> None:
         """Test converting too small amount returns 400."""
-        from app.routers.inventories import hash_passphrase
-
-        passphrase = "test-pass-123"
-        inventory = Inventory(
+        inventory, passphrase = await inventory_factory(
             slug="small-party",
-            name="Small Party",
-            passphrase_hash=hash_passphrase(passphrase),
             copper=5,
         )
-        test_db.add(inventory)
-        await test_db.commit()
 
         response = await client.post(
-            "/api/inventories/small-party/currency/convert",
+            f"/api/inventories/{inventory.slug}/currency/convert",
             json={
                 "from_denomination": "copper",
                 "to_denomination": "gold",
@@ -432,11 +384,9 @@ class TestConvertCurrency:
     async def test_convert_all_denomination_pairs(
         self,
         client: AsyncClient,
-        test_db: AsyncSession,
+        inventory_factory,
     ) -> None:
         """Test conversion works for various denomination pairs."""
-        from app.routers.inventories import hash_passphrase
-
         test_cases = [
             # (from, to, initial, amount, expected_from, expected_to, expected_copper)
             ("copper", "silver", {"copper": 100}, 100, 0, 10, 0),
@@ -444,24 +394,19 @@ class TestConvertCurrency:
             ("gold", "platinum", {"gold": 100}, 100, 0, 10, 0),
             ("platinum", "gold", {"platinum": 10}, 10, 0, 100, 0),
             ("gold", "silver", {"gold": 10}, 10, 0, 100, 0),
-            ("silver", "copper", {"silver": 10}, 10, 0, 100, 0),
+            ("silver", "copper", {"silver": 10}, 10, 0, 100, 100),
         ]
 
         for i, (from_d, to_d, initial, amount, exp_from, exp_to, exp_cp) in enumerate(
             test_cases
         ):
-            passphrase = f"test-pass-{i}"
-            inventory = Inventory(
+            inventory, passphrase = await inventory_factory(
                 slug=f"pair-test-{i}",
-                name=f"Pair Test {i}",
-                passphrase_hash=hash_passphrase(passphrase),
                 **initial,
             )
-            test_db.add(inventory)
-            await test_db.commit()
 
             response = await client.post(
-                f"/api/inventories/pair-test-{i}/currency/convert",
+                f"/api/inventories/{inventory.slug}/currency/convert",
                 json={
                     "from_denomination": from_d,
                     "to_denomination": to_d,
@@ -474,3 +419,4 @@ class TestConvertCurrency:
             data = response.json()
             assert data[from_d] == exp_from, f"Wrong {from_d} for {from_d} -> {to_d}"
             assert data[to_d] == exp_to, f"Wrong {to_d} for {from_d} -> {to_d}"
+            assert data["copper"] == exp_cp, f"Wrong copper for {from_d} -> {to_d}"

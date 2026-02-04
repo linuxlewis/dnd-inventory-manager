@@ -9,20 +9,12 @@ from fastapi import HTTPException
 from app.models import CurrencyDenomination, CurrencyResponse, CurrencyUpdate, Inventory
 
 # Value of each denomination in copper pieces
-CONVERSION_RATES: dict[str, int] = {
-    "copper": 1,
-    "silver": 10,
-    "gold": 100,
-    "platinum": 1000,
+CONVERSION_RATES: dict[CurrencyDenomination, int] = {
+    CurrencyDenomination.copper: 1,
+    CurrencyDenomination.silver: 10,
+    CurrencyDenomination.gold: 100,
+    CurrencyDenomination.platinum: 1000,
 }
-
-
-def calculate_total_gp(copper: int, silver: int, gold: int, platinum: int) -> float:
-    """Calculate total value in gold pieces.
-
-    Formula: (copper/100) + (silver/10) + gold + (platinum*10)
-    """
-    return copper / 100 + silver / 10 + gold + platinum * 10
 
 
 def validate_sufficient_funds(inventory: Inventory, delta: CurrencyUpdate) -> bool:
@@ -89,8 +81,8 @@ def convert_currency(
         )
 
     # Calculate conversion
-    from_rate = CONVERSION_RATES[from_denom.value]
-    to_rate = CONVERSION_RATES[to_denom.value]
+    from_rate = CONVERSION_RATES[from_denom]
+    to_rate = CONVERSION_RATES[to_denom]
 
     # Convert to copper, then to target
     total_copper = amount * from_rate

@@ -4,9 +4,13 @@ Conversion rates: 10 CP = 1 SP, 10 SP = 1 GP, 10 GP = 1 PP
 """
 
 from enum import Enum
+from typing import TYPE_CHECKING
 
 from pydantic import Field
 from sqlmodel import SQLModel
+
+if TYPE_CHECKING:
+    from .inventory import Inventory
 
 
 class CurrencyDenomination(str, Enum):
@@ -51,7 +55,7 @@ class CurrencyResponse(SQLModel):
     model_config = {"from_attributes": True}
 
     @classmethod
-    def from_inventory(cls, inventory) -> "CurrencyResponse":
+    def from_inventory(cls, inventory: "Inventory") -> "CurrencyResponse":
         """Create a CurrencyResponse from an Inventory model."""
         total_gp = (
             inventory.copper / 100
