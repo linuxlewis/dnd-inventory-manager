@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.auth import get_authenticated_inventory
 from app.database import get_db
 from app.models import CurrencyResponse, CurrencyUpdate
+from app.services import get_currency_snapshot, log_currency_updated
 from app.services.currency import apply_currency_delta
 
 router = APIRouter(prefix="/api/inventories", tags=["currency"])
@@ -40,6 +41,9 @@ async def update_currency(
     """
     inventory = await get_authenticated_inventory(slug, db, x_passphrase)
 
+    # Capture old currency values for history logging
+    old_currency = get_currency_snapshot(inventory)
+
     # Apply the delta (raises HTTPException on insufficient funds)
     response = apply_currency_delta(inventory, data)
 
@@ -50,6 +54,10 @@ async def update_currency(
     db.add(inventory)
     await db.commit()
     await db.refresh(inventory)
+
+    # Log history entry after successful commit
+    new_currency = get_currency_snapshot(inventory)
+    await log_currency_updated(db, inventory.id, old_currency, new_currency, data.note)
 
     # TODO: Broadcast SSE 'currency_updated' event when SSE manager exists
 

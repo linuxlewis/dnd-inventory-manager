@@ -1,6 +1,7 @@
 """Item API endpoints using SQLModel."""
 
 from datetime import UTC, datetime
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query
@@ -18,6 +19,7 @@ from app.models import (
     ItemType,
     ItemUpdate,
 )
+from app.services import compute_changes, log_item_added, log_item_removed, log_item_updated
 
 router = APIRouter(prefix="/api/inventories", tags=["items"])
 
@@ -39,6 +41,9 @@ async def create_item(
     db.add(item)
     await db.commit()
     await db.refresh(item)
+
+    # Log history entry after successful commit
+    await log_item_added(db, inventory.id, item)
 
     return item
 
@@ -106,6 +111,23 @@ async def get_item(
     return item
 
 
+def _get_item_snapshot(item: Item) -> dict[str, Any]:
+    """Get a snapshot of item fields for change tracking."""
+    return {
+        "name": item.name,
+        "type": item.type.value if item.type else None,
+        "category": item.category,
+        "rarity": item.rarity.value if item.rarity else None,
+        "description": item.description,
+        "quantity": item.quantity,
+        "weight": item.weight,
+        "estimated_value": item.estimated_value,
+        "notes": item.notes,
+        "thumbnail_url": item.thumbnail_url,
+        "properties": item.properties,
+    }
+
+
 @router.patch("/{slug}/items/{item_id}", response_model=ItemRead)
 async def update_item(
     slug: str,
@@ -125,6 +147,9 @@ async def update_item(
     if item is None:
         raise HTTPException(status_code=404, detail="Item not found")
 
+    # Capture old values for change tracking
+    old_values = _get_item_snapshot(item)
+
     # Apply updates
     update_data = data.model_dump(exclude_unset=True)
     for key, value in update_data.items():
@@ -136,6 +161,12 @@ async def update_item(
     db.add(item)
     await db.commit()
     await db.refresh(item)
+
+    # Compute changes and log history entry after successful commit
+    new_values = _get_item_snapshot(item)
+    changes = compute_changes(old_values, new_values)
+    if changes:
+        await log_item_updated(db, inventory.id, item, changes)
 
     return item
 
@@ -158,5 +189,18 @@ async def delete_item(
     if item is None:
         raise HTTPException(status_code=404, detail="Item not found")
 
+    # Capture item data before deletion for history
+    item_snapshot = Item(
+        id=item.id,
+        inventory_id=item.inventory_id,
+        name=item.name,
+        quantity=item.quantity,
+        type=item.type,
+        rarity=item.rarity,
+    )
+
     await db.delete(item)
     await db.commit()
+
+    # Log history entry after successful commit
+    await log_item_removed(db, inventory.id, item_snapshot)

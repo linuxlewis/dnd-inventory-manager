@@ -5,6 +5,13 @@ from app.models.currency import (
     CurrencyResponse,
     CurrencyUpdate,
 )
+from app.models.history import (
+    HistoryAction,
+    HistoryEntityType,
+    HistoryEntry,
+    HistoryEntryRead,
+    HistoryListResponse,
+)
 from app.models.inventory import (
     AuthResponse,
     Inventory,
@@ -29,6 +36,11 @@ __all__ = [
     "CurrencyDenomination",
     "CurrencyResponse",
     "CurrencyUpdate",
+    "HistoryAction",
+    "HistoryEntityType",
+    "HistoryEntry",
+    "HistoryEntryRead",
+    "HistoryListResponse",
     "Inventory",
     "InventoryCreate",
     "InventoryRead",
