@@ -7,17 +7,22 @@ export interface ItemFilters {
   search?: string
 }
 
+interface ItemsResponse {
+  items: Item[]
+  total: number
+}
+
 export function useItems(slug: string | undefined, filters?: ItemFilters) {
   return useQuery({
     queryKey: ['items', slug, filters],
     queryFn: async () => {
-      const response = await apiClient.get<Item[]>(`/api/inventories/${slug}/items`, {
+      const response = await apiClient.get<ItemsResponse>(`/api/inventories/${slug}/items`, {
         params: {
           type: filters?.type && filters.type !== 'all' ? filters.type : undefined,
           search: filters?.search || undefined,
         },
       })
-      return response.data
+      return response.data.items
     },
     enabled: !!slug,
   })
