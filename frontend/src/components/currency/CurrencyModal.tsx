@@ -56,18 +56,28 @@ export function CurrencyModal({
   // Check if spending exceeds total available (not per-denomination)
   const exceedsTotal = isSpendMode && totalSpendCopper > totalAvailableCopper
 
-  // Calculate new totals for preview (backend will optimize denominations)
-  const newTotalCopper = isSpendMode 
-    ? totalAvailableCopper - totalSpendCopper 
-    : totalAvailableCopper + totalSpendCopper
-  
-  // Preview: show what the backend will calculate (optimal denominations)
-  const previewPlatinum = Math.floor(newTotalCopper / COPPER_RATES.platinum)
-  const remainingAfterPP = newTotalCopper % COPPER_RATES.platinum
-  const previewGold = Math.floor(remainingAfterPP / COPPER_RATES.gold)
-  const remainingAfterGP = remainingAfterPP % COPPER_RATES.gold
-  const previewSilver = Math.floor(remainingAfterGP / COPPER_RATES.silver)
-  const previewCopper = remainingAfterGP % COPPER_RATES.silver
+  // Preview calculation
+  let previewPlatinum: number
+  let previewGold: number
+  let previewSilver: number
+  let previewCopper: number
+
+  if (isSpendMode && totalSpendCopper > 0) {
+    // Spend mode with actual spending: show optimized denominations (what backend returns)
+    const newTotalCopper = totalAvailableCopper - totalSpendCopper
+    previewPlatinum = Math.floor(newTotalCopper / COPPER_RATES.platinum)
+    const remainingAfterPP = newTotalCopper % COPPER_RATES.platinum
+    previewGold = Math.floor(remainingAfterPP / COPPER_RATES.gold)
+    const remainingAfterGP = remainingAfterPP % COPPER_RATES.gold
+    previewSilver = Math.floor(remainingAfterGP / COPPER_RATES.silver)
+    previewCopper = remainingAfterGP % COPPER_RATES.silver
+  } else {
+    // Add mode or no spending: just add/show current denominations
+    previewPlatinum = (currentCurrency?.platinum ?? 0) + (isSpendMode ? 0 : platinumVal)
+    previewGold = (currentCurrency?.gold ?? 0) + (isSpendMode ? 0 : goldVal)
+    previewSilver = (currentCurrency?.silver ?? 0) + (isSpendMode ? 0 : silverVal)
+    previewCopper = (currentCurrency?.copper ?? 0) + (isSpendMode ? 0 : copperVal)
+  }
 
   const resetForm = () => {
     setPlatinum('')
