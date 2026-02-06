@@ -257,6 +257,22 @@ export function CurrencyModal({
                   <p className="font-medium">{currentCurrency?.copper ?? 0} → <span className={exceedsTotal ? 'text-red-600' : ''}>{previewCopper}</span></p>
                 </div>
               </div>
+              {/* Total GP value */}
+              <div className="mt-3 pt-3 border-t border-gray-200 text-center">
+                <p className="text-sm text-gray-600">
+                  Total: <span className="font-semibold">{(totalAvailableCopper / COPPER_RATES.gold).toFixed(2)} GP</span>
+                  {' → '}
+                  <span className={`font-semibold ${exceedsTotal ? 'text-red-600' : isSpendMode && totalSpendCopper > 0 ? 'text-amber-600' : 'text-green-600'}`}>
+                    {((totalAvailableCopper + (isSpendMode ? -totalSpendCopper : totalSpendCopper)) / COPPER_RATES.gold).toFixed(2)} GP
+                  </span>
+                  {isSpendMode && totalSpendCopper > 0 && !exceedsTotal && (
+                    <span className="text-gray-500 ml-1">(-{(totalSpendCopper / COPPER_RATES.gold).toFixed(2)})</span>
+                  )}
+                  {!isSpendMode && totalSpendCopper > 0 && (
+                    <span className="text-gray-500 ml-1">(+{(totalSpendCopper / COPPER_RATES.gold).toFixed(2)})</span>
+                  )}
+                </p>
+              </div>
             </div>
 
             {/* Note */}
