@@ -24,9 +24,20 @@ export function useUpdateCurrency(slug: string | undefined) {
       )
       return response.data
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['currency', slug] })
-      queryClient.invalidateQueries({ queryKey: ['inventory', slug] })
+    onSuccess: (data) => {
+      // Update cache directly with response - no refetch needed
+      queryClient.setQueryData(['currency', slug], data)
+      // Also update the inventory cache's currency fields
+      queryClient.setQueryData(['inventory', slug], (old: Record<string, unknown> | undefined) => {
+        if (!old) return old
+        return {
+          ...old,
+          copper: data.copper,
+          silver: data.silver,
+          gold: data.gold,
+          platinum: data.platinum,
+        }
+      })
     },
   })
 }
