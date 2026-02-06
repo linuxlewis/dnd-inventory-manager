@@ -84,7 +84,8 @@ export function formatHealing(healing: unknown): string {
   if (typeof healing === 'string') return healing
   if (typeof healing === 'object' && healing !== null) {
     const h = healing as Record<string, unknown>
-    return h.dice || h.healing_dice || h.amount || String(healing)
+    const value = h.dice ?? h.healing_dice ?? h.amount
+    if (value !== undefined) return String(value)
   }
   return String(healing)
 }

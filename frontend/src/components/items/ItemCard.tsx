@@ -59,15 +59,15 @@ export function ItemCard({ item, onClick }: ItemCardProps) {
           {/* Key stats preview */}
           {item.properties && (
             <div className="mt-2 text-sm text-gray-600">
-              {item.type === 'equipment' && item.properties.damage && (
+              {item.type === 'equipment' && item.properties.damage ? (
                 <span>Damage: {formatDamage(item.properties.damage)}</span>
-              )}
-              {item.type === 'equipment' && item.properties.armor_class && (
+              ) : null}
+              {item.type === 'equipment' && item.properties.armor_class ? (
                 <span>AC: {formatArmorClass(item.properties.armor_class)}</span>
-              )}
-              {item.type === 'potion' && item.properties.healing && (
+              ) : null}
+              {item.type === 'potion' && item.properties.healing ? (
                 <span>Healing: {formatHealing(item.properties.healing)}</span>
-              )}
+              ) : null}
             </div>
           )}
         </div>

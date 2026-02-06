@@ -79,3 +79,28 @@ export interface SrdItem {
   properties?: { name: string }[]
   rarity?: { name: string }
 }
+
+// Currency types
+export type CurrencyDenomination = 'copper' | 'silver' | 'gold' | 'platinum'
+
+export interface Currency {
+  copper: number
+  silver: number
+  gold: number
+  platinum: number
+  total_gp: number
+}
+
+export interface CurrencyUpdateRequest {
+  copper?: number
+  silver?: number
+  gold?: number
+  platinum?: number
+  note?: string
+}
+
+export interface CurrencyConvertRequest {
+  from_denomination: CurrencyDenomination
+  to_denomination: CurrencyDenomination
+  amount: number
+}

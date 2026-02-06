@@ -17,17 +17,41 @@ CONVERSION_RATES: dict[CurrencyDenomination, int] = {
 }
 
 
-def validate_sufficient_funds(inventory: Inventory, delta: CurrencyUpdate) -> bool:
-    """Check if inventory has sufficient funds for the delta.
+def get_total_copper(inventory: Inventory) -> int:
+    """Calculate total value of inventory in copper pieces."""
+    return (
+        inventory.copper
+        + inventory.silver * CONVERSION_RATES[CurrencyDenomination.silver]
+        + inventory.gold * CONVERSION_RATES[CurrencyDenomination.gold]
+        + inventory.platinum * CONVERSION_RATES[CurrencyDenomination.platinum]
+    )
 
-    Returns True if all resulting values would be non-negative.
+
+def get_delta_copper(delta: CurrencyUpdate) -> int:
+    """Calculate total value of delta in copper pieces."""
+    return (
+        (delta.copper or 0)
+        + (delta.silver or 0) * CONVERSION_RATES[CurrencyDenomination.silver]
+        + (delta.gold or 0) * CONVERSION_RATES[CurrencyDenomination.gold]
+        + (delta.platinum or 0) * CONVERSION_RATES[CurrencyDenomination.platinum]
+    )
+
+
+def copper_to_denominations(copper: int) -> tuple[int, int, int, int]:
+    """Convert copper value to optimal denomination breakdown.
+
+    Returns (platinum, gold, silver, copper) tuple.
     """
-    new_copper = inventory.copper + (delta.copper or 0)
-    new_silver = inventory.silver + (delta.silver or 0)
-    new_gold = inventory.gold + (delta.gold or 0)
-    new_platinum = inventory.platinum + (delta.platinum or 0)
+    platinum = copper // CONVERSION_RATES[CurrencyDenomination.platinum]
+    copper %= CONVERSION_RATES[CurrencyDenomination.platinum]
 
-    return new_copper >= 0 and new_silver >= 0 and new_gold >= 0 and new_platinum >= 0
+    gold = copper // CONVERSION_RATES[CurrencyDenomination.gold]
+    copper %= CONVERSION_RATES[CurrencyDenomination.gold]
+
+    silver = copper // CONVERSION_RATES[CurrencyDenomination.silver]
+    copper %= CONVERSION_RATES[CurrencyDenomination.silver]
+
+    return (platinum, gold, silver, copper)
 
 
 def apply_currency_delta(inventory: Inventory, delta: CurrencyUpdate) -> CurrencyResponse:
@@ -35,18 +59,40 @@ def apply_currency_delta(inventory: Inventory, delta: CurrencyUpdate) -> Currenc
 
     Modifies the inventory in place and returns the new currency state.
     Raises HTTPException(400) if insufficient funds.
+
+    For spending (negative deltas), automatically makes change from higher
+    denominations if needed. For example, spending 15 GP when you only have
+    10 GP and 1 PP will break the platinum to cover the difference.
     """
-    if not validate_sufficient_funds(inventory, delta):
+    delta_copper = get_delta_copper(delta)
+
+    # If adding funds, just add directly
+    if delta_copper >= 0:
+        if delta.copper is not None:
+            inventory.copper += delta.copper
+        if delta.silver is not None:
+            inventory.silver += delta.silver
+        if delta.gold is not None:
+            inventory.gold += delta.gold
+        if delta.platinum is not None:
+            inventory.platinum += delta.platinum
+        return CurrencyResponse.from_inventory(inventory)
+
+    # Spending: check total value and make change if needed
+    total_copper = get_total_copper(inventory)
+    spend_copper = abs(delta_copper)
+
+    if total_copper < spend_copper:
         raise HTTPException(status_code=400, detail="Insufficient funds")
 
-    if delta.copper is not None:
-        inventory.copper += delta.copper
-    if delta.silver is not None:
-        inventory.silver += delta.silver
-    if delta.gold is not None:
-        inventory.gold += delta.gold
-    if delta.platinum is not None:
-        inventory.platinum += delta.platinum
+    # Calculate new total and convert back to denominations
+    new_total = total_copper - spend_copper
+    new_pp, new_gp, new_sp, new_cp = copper_to_denominations(new_total)
+
+    inventory.platinum = new_pp
+    inventory.gold = new_gp
+    inventory.silver = new_sp
+    inventory.copper = new_cp
 
     return CurrencyResponse.from_inventory(inventory)
 
