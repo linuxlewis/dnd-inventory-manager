@@ -20,12 +20,18 @@ export function CurrencyModal({
 }: CurrencyModalProps) {
   const updateCurrency = useUpdateCurrency(slug)
 
-  const [platinum, setPlatinum] = useState(0)
-  const [gold, setGold] = useState(0)
-  const [silver, setSilver] = useState(0)
-  const [copper, setCopper] = useState(0)
+  const [platinum, setPlatinum] = useState('')
+  const [gold, setGold] = useState('')
+  const [silver, setSilver] = useState('')
+  const [copper, setCopper] = useState('')
   const [note, setNote] = useState('')
   const [error, setError] = useState<string | null>(null)
+
+  // Parse values (empty string = 0)
+  const platinumVal = platinum === '' ? 0 : parseInt(platinum) || 0
+  const goldVal = gold === '' ? 0 : parseInt(gold) || 0
+  const silverVal = silver === '' ? 0 : parseInt(silver) || 0
+  const copperVal = copper === '' ? 0 : parseInt(copper) || 0
 
   const isSpendMode = mode === 'spend'
   const title = isSpendMode ? 'Spend Currency' : 'Add Funds'
@@ -42,10 +48,10 @@ export function CurrencyModal({
 
   // Calculate total spend in copper
   const totalSpendCopper = 
-    platinum * COPPER_RATES.platinum +
-    gold * COPPER_RATES.gold +
-    silver * COPPER_RATES.silver +
-    copper * COPPER_RATES.copper
+    platinumVal * COPPER_RATES.platinum +
+    goldVal * COPPER_RATES.gold +
+    silverVal * COPPER_RATES.silver +
+    copperVal * COPPER_RATES.copper
 
   // Check if spending exceeds total available (not per-denomination)
   const exceedsTotal = isSpendMode && totalSpendCopper > totalAvailableCopper
@@ -64,10 +70,10 @@ export function CurrencyModal({
   const previewCopper = remainingAfterGP % COPPER_RATES.silver
 
   const resetForm = () => {
-    setPlatinum(0)
-    setGold(0)
-    setSilver(0)
-    setCopper(0)
+    setPlatinum('')
+    setGold('')
+    setSilver('')
+    setCopper('')
     setNote('')
     setError(null)
   }
@@ -90,10 +96,10 @@ export function CurrencyModal({
     // Build request - negative values for spend mode
     const multiplier = isSpendMode ? -1 : 1
     const data: CurrencyUpdateRequest = {
-      ...(platinum !== 0 && { platinum: platinum * multiplier }),
-      ...(gold !== 0 && { gold: gold * multiplier }),
-      ...(silver !== 0 && { silver: silver * multiplier }),
-      ...(copper !== 0 && { copper: copper * multiplier }),
+      ...(platinumVal !== 0 && { platinum: platinumVal * multiplier }),
+      ...(goldVal !== 0 && { gold: goldVal * multiplier }),
+      ...(silverVal !== 0 && { silver: silverVal * multiplier }),
+      ...(copperVal !== 0 && { copper: copperVal * multiplier }),
       ...(note.trim() && { note: note.trim() }),
     }
 
@@ -159,7 +165,8 @@ export function CurrencyModal({
                   type="number"
                   min="0"
                   value={platinum}
-                  onChange={(e) => setPlatinum(Math.max(0, parseInt(e.target.value) || 0))}
+                  onChange={(e) => setPlatinum(e.target.value)}
+                  placeholder="0"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
                 {isSpendMode && (
@@ -175,7 +182,8 @@ export function CurrencyModal({
                   type="number"
                   min="0"
                   value={gold}
-                  onChange={(e) => setGold(Math.max(0, parseInt(e.target.value) || 0))}
+                  onChange={(e) => setGold(e.target.value)}
+                  placeholder="0"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
                 {isSpendMode && (
@@ -191,7 +199,8 @@ export function CurrencyModal({
                   type="number"
                   min="0"
                   value={silver}
-                  onChange={(e) => setSilver(Math.max(0, parseInt(e.target.value) || 0))}
+                  onChange={(e) => setSilver(e.target.value)}
+                  placeholder="0"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
                 {isSpendMode && (
@@ -207,7 +216,8 @@ export function CurrencyModal({
                   type="number"
                   min="0"
                   value={copper}
-                  onChange={(e) => setCopper(Math.max(0, parseInt(e.target.value) || 0))}
+                  onChange={(e) => setCopper(e.target.value)}
+                  placeholder="0"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
                 {isSpendMode && (
