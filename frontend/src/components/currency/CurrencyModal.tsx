@@ -30,18 +30,38 @@ export function CurrencyModal({
   const isSpendMode = mode === 'spend'
   const title = isSpendMode ? 'Spend Currency' : 'Add Funds'
 
-  // Check if spending exceeds available
-  const exceedsPlatinum = isSpendMode && platinum > (currentCurrency?.platinum ?? 0)
-  const exceedsGold = isSpendMode && gold > (currentCurrency?.gold ?? 0)
-  const exceedsSilver = isSpendMode && silver > (currentCurrency?.silver ?? 0)
-  const exceedsCopper = isSpendMode && copper > (currentCurrency?.copper ?? 0)
-  const exceedsAny = exceedsPlatinum || exceedsGold || exceedsSilver || exceedsCopper
+  // Conversion rates (in copper)
+  const COPPER_RATES = { platinum: 1000, gold: 100, silver: 10, copper: 1 }
 
-  // Calculate new totals for preview
-  const newPlatinum = (currentCurrency?.platinum ?? 0) + (isSpendMode ? -platinum : platinum)
-  const newGold = (currentCurrency?.gold ?? 0) + (isSpendMode ? -gold : gold)
-  const newSilver = (currentCurrency?.silver ?? 0) + (isSpendMode ? -silver : silver)
-  const newCopper = (currentCurrency?.copper ?? 0) + (isSpendMode ? -copper : copper)
+  // Calculate total available in copper
+  const totalAvailableCopper = 
+    (currentCurrency?.platinum ?? 0) * COPPER_RATES.platinum +
+    (currentCurrency?.gold ?? 0) * COPPER_RATES.gold +
+    (currentCurrency?.silver ?? 0) * COPPER_RATES.silver +
+    (currentCurrency?.copper ?? 0) * COPPER_RATES.copper
+
+  // Calculate total spend in copper
+  const totalSpendCopper = 
+    platinum * COPPER_RATES.platinum +
+    gold * COPPER_RATES.gold +
+    silver * COPPER_RATES.silver +
+    copper * COPPER_RATES.copper
+
+  // Check if spending exceeds total available (not per-denomination)
+  const exceedsTotal = isSpendMode && totalSpendCopper > totalAvailableCopper
+
+  // Calculate new totals for preview (backend will optimize denominations)
+  const newTotalCopper = isSpendMode 
+    ? totalAvailableCopper - totalSpendCopper 
+    : totalAvailableCopper + totalSpendCopper
+  
+  // Preview: show what the backend will calculate (optimal denominations)
+  const previewPlatinum = Math.floor(newTotalCopper / COPPER_RATES.platinum)
+  const remainingAfterPP = newTotalCopper % COPPER_RATES.platinum
+  const previewGold = Math.floor(remainingAfterPP / COPPER_RATES.gold)
+  const remainingAfterGP = remainingAfterPP % COPPER_RATES.gold
+  const previewSilver = Math.floor(remainingAfterGP / COPPER_RATES.silver)
+  const previewCopper = remainingAfterGP % COPPER_RATES.silver
 
   const resetForm = () => {
     setPlatinum(0)
@@ -61,9 +81,9 @@ export function CurrencyModal({
     e.preventDefault()
     setError(null)
 
-    // Validate spend mode
-    if (isSpendMode && exceedsAny) {
-      setError('Cannot spend more than available funds')
+    // Validate spend mode - check total value, not per-denomination
+    if (isSpendMode && exceedsTotal) {
+      setError('Cannot spend more than total available funds')
       return
     }
 
@@ -121,10 +141,10 @@ export function CurrencyModal({
             )}
 
             {/* Spend mode warning */}
-            {isSpendMode && exceedsAny && (
+            {isSpendMode && exceedsTotal && (
               <div className="flex items-center gap-2 p-3 bg-amber-100 border border-amber-400 text-amber-800 rounded">
                 <AlertTriangle className="w-5 h-5 flex-shrink-0" />
-                <span>Some amounts exceed available funds</span>
+                <span>Total spend exceeds available funds</span>
               </div>
             )}
 
@@ -140,9 +160,7 @@ export function CurrencyModal({
                   min="0"
                   value={platinum}
                   onChange={(e) => setPlatinum(Math.max(0, parseInt(e.target.value) || 0))}
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                    exceedsPlatinum ? 'border-red-400 bg-red-50' : 'border-gray-300'
-                  }`}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
                 {isSpendMode && (
                   <p className="text-xs text-gray-500 mt-1">Available: {currentCurrency?.platinum ?? 0}</p>
@@ -158,9 +176,7 @@ export function CurrencyModal({
                   min="0"
                   value={gold}
                   onChange={(e) => setGold(Math.max(0, parseInt(e.target.value) || 0))}
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                    exceedsGold ? 'border-red-400 bg-red-50' : 'border-gray-300'
-                  }`}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
                 {isSpendMode && (
                   <p className="text-xs text-gray-500 mt-1">Available: {currentCurrency?.gold ?? 0}</p>
@@ -176,9 +192,7 @@ export function CurrencyModal({
                   min="0"
                   value={silver}
                   onChange={(e) => setSilver(Math.max(0, parseInt(e.target.value) || 0))}
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                    exceedsSilver ? 'border-red-400 bg-red-50' : 'border-gray-300'
-                  }`}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
                 {isSpendMode && (
                   <p className="text-xs text-gray-500 mt-1">Available: {currentCurrency?.silver ?? 0}</p>
@@ -194,9 +208,7 @@ export function CurrencyModal({
                   min="0"
                   value={copper}
                   onChange={(e) => setCopper(Math.max(0, parseInt(e.target.value) || 0))}
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                    exceedsCopper ? 'border-red-400 bg-red-50' : 'border-gray-300'
-                  }`}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
                 {isSpendMode && (
                   <p className="text-xs text-gray-500 mt-1">Available: {currentCurrency?.copper ?? 0}</p>
@@ -210,19 +222,19 @@ export function CurrencyModal({
               <div className="grid grid-cols-4 gap-2 text-center text-sm">
                 <div>
                   <p className="text-gray-500">PP</p>
-                  <p className="font-medium">{currentCurrency?.platinum ?? 0} → <span className={newPlatinum < 0 ? 'text-red-600' : ''}>{newPlatinum}</span></p>
+                  <p className="font-medium">{currentCurrency?.platinum ?? 0} → <span className={exceedsTotal ? 'text-red-600' : ''}>{previewPlatinum}</span></p>
                 </div>
                 <div>
                   <p className="text-gray-500">GP</p>
-                  <p className="font-medium">{currentCurrency?.gold ?? 0} → <span className={newGold < 0 ? 'text-red-600' : ''}>{newGold}</span></p>
+                  <p className="font-medium">{currentCurrency?.gold ?? 0} → <span className={exceedsTotal ? 'text-red-600' : ''}>{previewGold}</span></p>
                 </div>
                 <div>
                   <p className="text-gray-500">SP</p>
-                  <p className="font-medium">{currentCurrency?.silver ?? 0} → <span className={newSilver < 0 ? 'text-red-600' : ''}>{newSilver}</span></p>
+                  <p className="font-medium">{currentCurrency?.silver ?? 0} → <span className={exceedsTotal ? 'text-red-600' : ''}>{previewSilver}</span></p>
                 </div>
                 <div>
                   <p className="text-gray-500">CP</p>
-                  <p className="font-medium">{currentCurrency?.copper ?? 0} → <span className={newCopper < 0 ? 'text-red-600' : ''}>{newCopper}</span></p>
+                  <p className="font-medium">{currentCurrency?.copper ?? 0} → <span className={exceedsTotal ? 'text-red-600' : ''}>{previewCopper}</span></p>
                 </div>
               </div>
             </div>
@@ -254,7 +266,7 @@ export function CurrencyModal({
             </button>
             <button
               onClick={handleSubmit}
-              disabled={updateCurrency.isPending || (isSpendMode && exceedsAny)}
+              disabled={updateCurrency.isPending || (isSpendMode && exceedsTotal)}
               className={`px-4 py-2 text-white rounded-lg transition-colors disabled:opacity-50 ${
                 isSpendMode
                   ? 'bg-red-600 hover:bg-red-700'
