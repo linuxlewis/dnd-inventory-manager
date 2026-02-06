@@ -3,14 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { Eye, EyeOff } from 'lucide-react'
 import { apiClient } from '../api/client'
-import { useCurrency } from '../api/currency'
+import { useCurrency, useUpdateCurrency } from '../api/currency'
 import { useAuth } from '../hooks/useAuth'
 import { useAuthenticateInventory } from '../api/inventories'
 import type { InventoryResponse, Item } from '../api/types'
 import { ItemsList, ItemDetail, AddItemModal, EditItemModal } from '../components/items'
 import { TreasuryWidget } from '../components/currency/TreasuryWidget'
 import { CurrencyModal } from '../components/currency/CurrencyModal'
-import { ConvertModal } from '../components/currency/ConvertModal'
 import { AxiosError } from 'axios'
 
 export function Inventory() {
@@ -31,12 +30,12 @@ export function Inventory() {
   // Currency modal state
   const [showAddFundsModal, setShowAddFundsModal] = useState(false)
   const [showSpendModal, setShowSpendModal] = useState(false)
-  const [showConvertModal, setShowConvertModal] = useState(false)
 
   const isAuthenticated = slug ? hasSession(slug) : false
 
-  // Currency data
+  // Currency data and mutations
   const { data: currency, isLoading: currencyLoading } = useCurrency(isAuthenticated ? slug : undefined)
+  const updateCurrency = useUpdateCurrency(isAuthenticated ? slug : undefined)
 
   const {
     data: inventory,
@@ -229,9 +228,9 @@ export function Inventory() {
       <TreasuryWidget
         currency={currency}
         isLoading={currencyLoading}
+        isMutating={updateCurrency.isPending}
         onAddFunds={() => setShowAddFundsModal(true)}
         onSpend={() => setShowSpendModal(true)}
-        onConvert={() => setShowConvertModal(true)}
       />
 
       {/* Items Section */}
@@ -288,12 +287,6 @@ export function Inventory() {
             mode="spend"
             isOpen={showSpendModal}
             onClose={() => setShowSpendModal(false)}
-            currentCurrency={currency}
-          />
-          <ConvertModal
-            slug={slug}
-            isOpen={showConvertModal}
-            onClose={() => setShowConvertModal(false)}
             currentCurrency={currency}
           />
         </>

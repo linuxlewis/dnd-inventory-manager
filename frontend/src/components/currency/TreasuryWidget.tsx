@@ -1,20 +1,20 @@
-import { Plus, Minus, ArrowLeftRight } from 'lucide-react'
+import { Plus, Minus } from 'lucide-react'
 import type { Currency } from '../../api/types'
 
 interface TreasuryWidgetProps {
   currency: Currency | undefined
   isLoading: boolean
+  isMutating?: boolean
   onAddFunds: () => void
   onSpend: () => void
-  onConvert: () => void
 }
 
 export function TreasuryWidget({
   currency,
   isLoading,
+  isMutating = false,
   onAddFunds,
   onSpend,
-  onConvert,
 }: TreasuryWidgetProps) {
   if (isLoading) {
     return (
@@ -29,30 +29,32 @@ export function TreasuryWidget({
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+    <div className="bg-white rounded-lg shadow-md p-6 mb-6 relative">
+      {/* Loading overlay */}
+      {isMutating && (
+        <div className="absolute inset-0 bg-white/70 flex items-center justify-center rounded-lg z-10">
+          <div className="inline-block animate-spin rounded-full h-6 w-6 border-4 border-indigo-600 border-t-transparent"></div>
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-4">
         <h2 className="text-xl font-semibold text-gray-900">Treasury</h2>
         <div className="flex gap-2">
           <button
             onClick={onAddFunds}
-            className="flex items-center gap-1 px-3 py-1.5 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            disabled={isMutating}
+            className="flex items-center gap-1 px-3 py-1.5 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
           >
             <Plus className="w-4 h-4" />
             Add Funds
           </button>
           <button
             onClick={onSpend}
-            className="flex items-center gap-1 px-3 py-1.5 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            disabled={isMutating}
+            className="flex items-center gap-1 px-3 py-1.5 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
           >
             <Minus className="w-4 h-4" />
             Spend
-          </button>
-          <button
-            onClick={onConvert}
-            className="flex items-center gap-1 px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-          >
-            <ArrowLeftRight className="w-4 h-4" />
-            Convert
           </button>
         </div>
       </div>
