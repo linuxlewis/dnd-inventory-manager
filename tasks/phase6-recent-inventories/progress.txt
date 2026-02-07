@@ -31,3 +31,31 @@ Started: 2026-02-07T16:58:06.456Z
   - Tailwind patterns: `hover:border-indigo-300 hover:shadow-sm transition-all` for interactive list items
   - Nested buttons need `type="button"` and `e.stopPropagation()` to prevent parent click handlers
 ---
+
+## 2026-02-07 - FE-012
+- Integrated `RecentInventoriesList` into Home page (`frontend/src/pages/Home.tsx`)
+- Imported `useRecentInventories` hook and `RecentInventoriesList` component
+- Added "Recent Inventories" section between Create and Access sections
+- Section conditionally rendered only when `recentInventories.length > 0` (clean for new users)
+- `onSelect` navigates to `/${slug}` (matching existing route pattern `/:slug`)
+- `onRemove` calls `removeRecent` from hook
+- Files changed: `frontend/src/pages/Home.tsx` (modified)
+- **Learnings for future iterations:**
+  - PRD said navigate to `/i/{slug}` but actual route pattern is `/:slug` — always check App.tsx routes
+  - Home.tsx uses `useNavigate()` for programmatic navigation
+  - The Home page has three main sections: Hero, Create Inventory, Access Existing Inventory
+  - Recent inventories section fits naturally between Create and Access sections
+---
+
+## 2026-02-07 - FE-013
+- Added inventory access tracking in `frontend/src/pages/Inventory.tsx`
+- Imported `useRecentInventories` hook, destructured `addRecent`
+- Added `useEffect` that calls `addRecent(slug, inventory.name)` when `isAuthenticated && inventory && slug`
+- Effect triggers when inventory data loads successfully from TanStack Query
+- Files changed: `frontend/src/pages/Inventory.tsx` (modified — 10 lines added)
+- **Learnings for future iterations:**
+  - Inventory page uses TanStack Query with `enabled: !!slug && isAuthenticated` — data only loads after auth
+  - The `inventory` object from useQuery is `InventoryResponse` type with `.name` property
+  - `addRecent` from the hook is wrapped in `useCallback` so it's stable for useEffect deps
+  - Keep useEffect deps exhaustive — include `addRecent` since ESLint enforces react-hooks/exhaustive-deps
+---
