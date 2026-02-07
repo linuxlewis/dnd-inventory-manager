@@ -10,6 +10,8 @@ import type { InventoryResponse, Item } from '../api/types'
 import { ItemsList, ItemDetail, AddItemModal, EditItemModal } from '../components/items'
 import { TreasuryWidget } from '../components/currency/TreasuryWidget'
 import { CurrencyModal } from '../components/currency/CurrencyModal'
+import { ActivityWidget, HistoryPanel } from '../components/history'
+import { useHistory } from '../api/history'
 import { AxiosError } from 'axios'
 
 export function Inventory() {
@@ -31,11 +33,20 @@ export function Inventory() {
   const [showAddFundsModal, setShowAddFundsModal] = useState(false)
   const [showSpendModal, setShowSpendModal] = useState(false)
 
+  // History panel state
+  const [showHistoryPanel, setShowHistoryPanel] = useState(false)
+
   const isAuthenticated = slug ? hasSession(slug) : false
 
   // Currency data and mutations
   const { data: currency, isLoading: currencyLoading } = useCurrency(isAuthenticated ? slug : undefined)
   const updateCurrency = useUpdateCurrency(isAuthenticated ? slug : undefined)
+
+  // History data (fetch latest entry for widget)
+  const { data: historyData, isLoading: historyLoading } = useHistory(
+    isAuthenticated ? slug : undefined,
+    { limit: 1 }
+  )
 
   const {
     data: inventory,
@@ -233,6 +244,13 @@ export function Inventory() {
         onSpend={() => setShowSpendModal(true)}
       />
 
+      {/* Activity Widget */}
+      <ActivityWidget
+        lastEntry={historyData?.entries[0]}
+        isLoading={historyLoading}
+        onClick={() => setShowHistoryPanel(true)}
+      />
+
       {/* Items Section */}
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Items</h2>
@@ -290,6 +308,15 @@ export function Inventory() {
             currentCurrency={currency}
           />
         </>
+      )}
+
+      {/* History Panel */}
+      {slug && (
+        <HistoryPanel
+          slug={slug}
+          isOpen={showHistoryPanel}
+          onClose={() => setShowHistoryPanel(false)}
+        />
       )}
     </div>
   )
