@@ -1,12 +1,12 @@
 import type { ItemRarity, ItemType } from '../../api/types'
 
 export const RARITY_COLORS: Record<ItemRarity, { bg: string; border: string; text: string; badge: string }> = {
-  common: { bg: 'bg-gray-100', border: 'border-gray-300', text: 'text-gray-600', badge: 'bg-gray-200 text-gray-700' },
-  uncommon: { bg: 'bg-green-50', border: 'border-green-400', text: 'text-green-600', badge: 'bg-green-100 text-green-700' },
-  rare: { bg: 'bg-blue-50', border: 'border-blue-400', text: 'text-blue-600', badge: 'bg-blue-100 text-blue-700' },
-  very_rare: { bg: 'bg-purple-50', border: 'border-purple-400', text: 'text-purple-600', badge: 'bg-purple-100 text-purple-700' },
-  legendary: { bg: 'bg-orange-50', border: 'border-orange-400', text: 'text-orange-600', badge: 'bg-orange-100 text-orange-700' },
-  artifact: { bg: 'bg-red-50', border: 'border-red-400', text: 'text-red-600', badge: 'bg-red-100 text-red-700' },
+  common: { bg: 'bg-gray-800', border: 'border-gray-500', text: 'text-gray-400', badge: 'bg-gray-700 text-gray-300' },
+  uncommon: { bg: 'bg-green-900/30', border: 'border-green-500', text: 'text-green-400', badge: 'bg-green-900/40 text-green-300' },
+  rare: { bg: 'bg-blue-900/30', border: 'border-blue-500', text: 'text-blue-400', badge: 'bg-blue-900/40 text-blue-300' },
+  very_rare: { bg: 'bg-purple-900/30', border: 'border-purple-500', text: 'text-purple-400', badge: 'bg-purple-900/40 text-purple-300' },
+  legendary: { bg: 'bg-orange-900/30', border: 'border-orange-500', text: 'text-orange-400', badge: 'bg-orange-900/40 text-orange-300' },
+  artifact: { bg: 'bg-red-900/30', border: 'border-red-500', text: 'text-red-400', badge: 'bg-red-900/40 text-red-300' },
 }
 
 export const TYPE_LABELS: Record<ItemType, string> = {

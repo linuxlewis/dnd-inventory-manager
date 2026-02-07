@@ -78,13 +78,13 @@ function EditItemForm({ item, slug, onClose }: EditItemFormProps) {
   }
 
   return (
-    <div className="relative w-full max-w-lg bg-white rounded-lg shadow-xl">
+    <div className="relative w-full max-w-lg bg-gray-800 rounded-lg shadow-xl">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b">
-        <h2 className="text-xl font-semibold text-gray-900">Edit Item</h2>
+      <div className="flex items-center justify-between p-4 border-b border-gray-700">
+        <h2 className="text-xl font-semibold text-gray-100">Edit Item</h2>
         <button
           onClick={onClose}
-          className="p-1 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+          className="p-1 text-gray-400 hover:text-gray-200 rounded-lg hover:bg-gray-700"
         >
           <X className="w-6 h-6" />
         </button>
@@ -93,14 +93,14 @@ function EditItemForm({ item, slug, onClose }: EditItemFormProps) {
       {/* Body */}
       <form onSubmit={handleSubmit} className="p-4 space-y-4 max-h-[70vh] overflow-y-auto">
         {formError && (
-          <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+          <div className="p-3 bg-red-900/30 border border-red-500 text-red-400 rounded">
             {formError}
           </div>
         )}
 
         {/* Name */}
         <div>
-          <label htmlFor="edit-item-name" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="edit-item-name" className="block text-sm font-medium text-gray-300 mb-1">
             Name <span className="text-red-500">*</span>
           </label>
           <input
@@ -109,21 +109,21 @@ function EditItemForm({ item, slug, onClose }: EditItemFormProps) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-3 py-2 bg-gray-700 text-gray-100 placeholder-gray-400 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800"
           />
         </div>
 
         {/* Type and Rarity */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="edit-item-type" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="edit-item-type" className="block text-sm font-medium text-gray-300 mb-1">
               Type <span className="text-red-500">*</span>
             </label>
             <select
               id="edit-item-type"
               value={type}
               onChange={(e) => setType(e.target.value as ItemType)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 bg-gray-700 text-gray-100 placeholder-gray-400 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800"
             >
               {ITEM_TYPES.map((t) => (
                 <option key={t} value={t}>
@@ -133,14 +133,14 @@ function EditItemForm({ item, slug, onClose }: EditItemFormProps) {
             </select>
           </div>
           <div>
-            <label htmlFor="edit-item-rarity" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="edit-item-rarity" className="block text-sm font-medium text-gray-300 mb-1">
               Rarity
             </label>
             <select
               id="edit-item-rarity"
               value={rarity}
               onChange={(e) => setRarity(e.target.value as ItemRarity)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 bg-gray-700 text-gray-100 placeholder-gray-400 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800"
             >
               {ITEM_RARITIES.map((r) => (
                 <option key={r} value={r}>
@@ -153,7 +153,7 @@ function EditItemForm({ item, slug, onClose }: EditItemFormProps) {
 
         {/* Category */}
         <div>
-          <label htmlFor="edit-item-category" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="edit-item-category" className="block text-sm font-medium text-gray-300 mb-1">
             Category
           </label>
           <input
@@ -162,14 +162,14 @@ function EditItemForm({ item, slug, onClose }: EditItemFormProps) {
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             placeholder="e.g., Weapon, Armor, Adventuring Gear"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-3 py-2 bg-gray-700 text-gray-100 placeholder-gray-400 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800"
           />
         </div>
 
         {/* Quantity and Weight */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="edit-item-quantity" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="edit-item-quantity" className="block text-sm font-medium text-gray-300 mb-1">
               Quantity
             </label>
             <input
@@ -178,11 +178,11 @@ function EditItemForm({ item, slug, onClose }: EditItemFormProps) {
               min="1"
               value={quantity}
               onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 bg-gray-700 text-gray-100 placeholder-gray-400 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800"
             />
           </div>
           <div>
-            <label htmlFor="edit-item-weight" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="edit-item-weight" className="block text-sm font-medium text-gray-300 mb-1">
               Weight (lbs)
             </label>
             <input
@@ -192,14 +192,14 @@ function EditItemForm({ item, slug, onClose }: EditItemFormProps) {
               step="0.1"
               value={weight}
               onChange={(e) => setWeight(e.target.value ? parseFloat(e.target.value) : '')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 bg-gray-700 text-gray-100 placeholder-gray-400 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800"
             />
           </div>
         </div>
 
         {/* Estimated Value */}
         <div>
-          <label htmlFor="edit-item-value" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="edit-item-value" className="block text-sm font-medium text-gray-300 mb-1">
             Estimated Value (GP)
           </label>
           <input
@@ -209,13 +209,13 @@ function EditItemForm({ item, slug, onClose }: EditItemFormProps) {
             step="0.01"
             value={estimatedValue}
             onChange={(e) => setEstimatedValue(e.target.value ? parseFloat(e.target.value) : '')}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-3 py-2 bg-gray-700 text-gray-100 placeholder-gray-400 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800"
           />
         </div>
 
         {/* Description */}
         <div>
-          <label htmlFor="edit-item-description" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="edit-item-description" className="block text-sm font-medium text-gray-300 mb-1">
             Description
           </label>
           <textarea
@@ -223,13 +223,13 @@ function EditItemForm({ item, slug, onClose }: EditItemFormProps) {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+            className="w-full px-3 py-2 bg-gray-700 text-gray-100 placeholder-gray-400 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800 resize-none"
           />
         </div>
 
         {/* Notes */}
         <div>
-          <label htmlFor="edit-item-notes" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="edit-item-notes" className="block text-sm font-medium text-gray-300 mb-1">
             Notes
           </label>
           <textarea
@@ -238,17 +238,17 @@ function EditItemForm({ item, slug, onClose }: EditItemFormProps) {
             onChange={(e) => setNotes(e.target.value)}
             rows={2}
             placeholder="Personal notes about this item..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+            className="w-full px-3 py-2 bg-gray-700 text-gray-100 placeholder-gray-400 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800 resize-none"
           />
         </div>
       </form>
 
       {/* Footer */}
-      <div className="flex justify-end gap-3 p-4 border-t bg-gray-50 rounded-b-lg">
+      <div className="flex justify-end gap-3 p-4 border-t border-gray-700 bg-gray-900 rounded-b-lg">
         <button
           type="button"
           onClick={onClose}
-          className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+          className="px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors"
         >
           Cancel
         </button>
