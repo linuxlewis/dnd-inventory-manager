@@ -1,0 +1,45 @@
+# Ralph Progress Log
+Started: 2026-02-07T18:53:59.768Z
+---
+
+## Codebase Patterns
+- The 5e SRD GraphQL API at dnd5eapi.co/graphql uses union types for equipment (AnyEquipment = Armor | Weapon | Tool | Gear | Pack | Ammunition | Vehicle). Use `... on IEquipment { }` inline fragment for shared fields (index, name, cost, weight, desc).
+- MagicItem is a simple OBJECT type (not a union) with fields: index, name, desc, rarity, equipment_category, image, variants, variant.
+- Generated GraphQL types go in `src/generated/graphql.ts` — this directory is excluded from eslint via `globalIgnores(['dist', 'src/generated'])` in eslint.config.js.
+- Backend dev dependencies (ruff, pytest, httpx, pytest-asyncio) are in `[dependency-groups] dev` in pyproject.toml.
+- Import `srdApi` from `src/api/srd/client.ts` for all SRD GraphQL queries. Methods: `SearchEquipment({name})`, `SearchMagicItems({name})`, `GetEquipmentByIndex({index})`, `GetMagicItemByIndex({index})`.
+- Equipment search results include `__typename` to discriminate union types (Weapon, Armor, Gear, Tool, Vehicle, Pack, Ammunition).
+
+## 2026-02-07 - FE-030
+- Installed graphql + graphql-request as dependencies
+- Installed @graphql-codegen/cli, @graphql-codegen/typescript, @graphql-codegen/typescript-operations, @graphql-codegen/typescript-graphql-request as devDependencies
+- Created codegen.yml pointing to https://www.dnd5eapi.co/graphql with typescript + typescript-operations + typescript-graphql-request plugins
+- Added `codegen` script to package.json
+- Created placeholder src/api/srd/queries.graphql with SearchEquipment query using IEquipment inline fragment
+- Generated src/generated/graphql.ts (2734 lines of types + SDK)
+- Added src/generated to eslint globalIgnores
+- Formalized backend dev dependencies (ruff, pytest, httpx, pytest-asyncio) in pyproject.toml
+- Files changed: frontend/package.json, frontend/bun.lock, frontend/codegen.yml, frontend/eslint.config.js, frontend/src/api/srd/queries.graphql, frontend/src/generated/graphql.ts, backend/pyproject.toml, backend/uv.lock
+- **Learnings for future iterations:**
+  - AnyEquipment is a union type — you MUST use inline fragments (`... on IEquipment`) to query common fields
+  - MagicItem is NOT a union, so you can query fields directly
+  - The codegen generates a `getSdk(client)` function that returns typed methods for each query
+  - eslint needed the generated directory excluded to avoid lint errors on codegen output
+---
+
+## 2026-02-07 - FE-031
+- Created full queries.graphql with 4 queries: SearchEquipment, SearchMagicItems, GetEquipmentByIndex, GetMagicItemByIndex
+- SearchEquipment uses inline fragments for IEquipment (shared fields), Weapon (damage, range, properties), Armor (armor_class, stealth_disadvantage), Gear (equipment_category)
+- SearchMagicItems queries MagicItem directly (not a union) with index, name, desc, rarity, equipment_category
+- GetEquipmentByIndex has full detail inline fragments for all 7 union types (Weapon, Armor, Gear, Tool, Vehicle, Pack, Ammunition)
+- GetMagicItemByIndex returns full detail including image, variant flag, and variant list
+- Created src/api/srd/client.ts that instantiates GraphQLClient and exports `srdApi` via `getSdk()`
+- Ran `bun run codegen` successfully, generating updated src/generated/graphql.ts
+- All quality checks pass (typecheck, lint, backend ruff, backend pytest)
+- Files changed: frontend/src/api/srd/queries.graphql, frontend/src/api/srd/client.ts, frontend/src/generated/graphql.ts, tasks/phase-srd-graphql/prd.json
+- **Learnings for future iterations:**
+  - `srdApi` is the main entry point for all SRD queries — import from `src/api/srd/client.ts`
+  - SDK methods are PascalCase: `srdApi.SearchEquipment()`, `srdApi.SearchMagicItems()`, `srdApi.GetEquipmentByIndex()`, `srdApi.GetMagicItemByIndex()`
+  - Equipment search query returns union types — use `__typename` to discriminate between Weapon/Armor/Gear/etc in consuming code
+  - The `equipment` singular query returns `AnyEquipment | null` (nullable), while `equipments` returns `AnyEquipment[]`
+---

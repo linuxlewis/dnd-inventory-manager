@@ -2699,20 +2699,214 @@ export type SearchEquipmentQueryVariables = Exact<{
 
 
 export type SearchEquipmentQuery = { __typename?: 'Query', equipments: Array<
-    | { __typename?: 'Ammunition', index: string, name: string }
-    | { __typename?: 'Armor', index: string, name: string }
-    | { __typename?: 'Gear', index: string, name: string }
-    | { __typename?: 'Pack', index: string, name: string }
-    | { __typename?: 'Tool', index: string, name: string }
-    | { __typename?: 'Vehicle', index: string, name: string }
-    | { __typename?: 'Weapon', index: string, name: string }
+    | { __typename?: 'Ammunition', index: string, name: string, weight?: number | null, desc?: Array<string> | null, cost: { __typename?: 'Cost', quantity: number, unit: string } }
+    | { __typename?: 'Armor', index: string, name: string, weight?: number | null, desc?: Array<string> | null, armor_category: string, stealth_disadvantage?: boolean | null, str_minimum?: number | null, cost: { __typename?: 'Cost', quantity: number, unit: string }, armor_class: { __typename?: 'ArmorClass', base: number, dex_bonus: boolean, max_bonus?: number | null } }
+    | { __typename?: 'Gear', index: string, name: string, weight?: number | null, desc?: Array<string> | null, cost: { __typename?: 'Cost', quantity: number, unit: string }, equipment_category: { __typename?: 'EquipmentCategory', name: string } }
+    | { __typename?: 'Pack', index: string, name: string, weight?: number | null, desc?: Array<string> | null, cost: { __typename?: 'Cost', quantity: number, unit: string } }
+    | { __typename?: 'Tool', index: string, name: string, weight?: number | null, desc?: Array<string> | null, cost: { __typename?: 'Cost', quantity: number, unit: string } }
+    | { __typename?: 'Vehicle', index: string, name: string, weight?: number | null, desc?: Array<string> | null, cost: { __typename?: 'Cost', quantity: number, unit: string } }
+    | { __typename?: 'Weapon', index: string, name: string, weight?: number | null, desc?: Array<string> | null, weapon_category: string, category_range: string, cost: { __typename?: 'Cost', quantity: number, unit: string }, damage?: { __typename?: 'Damage', damage_dice: string, damage_type?: { __typename?: 'DamageType', name: string } | null } | null, range?: { __typename?: 'Range', normal: number, long?: number | null } | null, properties?: Array<{ __typename?: 'WeaponProperty', name: string }> | null }
   > };
+
+export type SearchMagicItemsQueryVariables = Exact<{
+  name: Scalars['String']['input'];
+}>;
+
+
+export type SearchMagicItemsQuery = { __typename?: 'Query', magicItems: Array<{ __typename?: 'MagicItem', index: string, name: string, desc: Array<string>, rarity: { __typename?: 'Rarity', name: string }, equipment_category: { __typename?: 'EquipmentCategory', name: string } }> };
+
+export type GetEquipmentByIndexQueryVariables = Exact<{
+  index: Scalars['String']['input'];
+}>;
+
+
+export type GetEquipmentByIndexQuery = { __typename?: 'Query', equipment?:
+    | { __typename?: 'Ammunition', index: string, name: string, weight?: number | null, desc?: Array<string> | null, quantity: number, cost: { __typename?: 'Cost', quantity: number, unit: string } }
+    | { __typename?: 'Armor', index: string, name: string, weight?: number | null, desc?: Array<string> | null, armor_category: string, stealth_disadvantage?: boolean | null, str_minimum?: number | null, cost: { __typename?: 'Cost', quantity: number, unit: string }, armor_class: { __typename?: 'ArmorClass', base: number, dex_bonus: boolean, max_bonus?: number | null } }
+    | { __typename?: 'Gear', index: string, name: string, weight?: number | null, desc?: Array<string> | null, cost: { __typename?: 'Cost', quantity: number, unit: string }, equipment_category: { __typename?: 'EquipmentCategory', name: string }, gear_category?: { __typename?: 'EquipmentCategory', name: string } | null }
+    | { __typename?: 'Pack', index: string, name: string, weight?: number | null, desc?: Array<string> | null, cost: { __typename?: 'Cost', quantity: number, unit: string }, contents?: Array<{ __typename?: 'Content', quantity: number, item?:
+          | { __typename?: 'Ammunition', index: string, name: string }
+          | { __typename?: 'Armor', index: string, name: string }
+          | { __typename?: 'Gear', index: string, name: string }
+          | { __typename?: 'Pack', index: string, name: string }
+          | { __typename?: 'Tool', index: string, name: string }
+          | { __typename?: 'Vehicle', index: string, name: string }
+          | { __typename?: 'Weapon', index: string, name: string }
+         | null }> | null }
+    | { __typename?: 'Tool', index: string, name: string, weight?: number | null, desc?: Array<string> | null, tool_category: string, cost: { __typename?: 'Cost', quantity: number, unit: string } }
+    | { __typename?: 'Vehicle', index: string, name: string, weight?: number | null, desc?: Array<string> | null, vehicle_category: string, capacity?: string | null, cost: { __typename?: 'Cost', quantity: number, unit: string }, speed?: { __typename?: 'Speed', quantity: number, unit: string } | null }
+    | { __typename?: 'Weapon', index: string, name: string, weight?: number | null, desc?: Array<string> | null, weapon_category: string, category_range: string, cost: { __typename?: 'Cost', quantity: number, unit: string }, damage?: { __typename?: 'Damage', damage_dice: string, damage_type?: { __typename?: 'DamageType', name: string } | null } | null, range?: { __typename?: 'Range', normal: number, long?: number | null } | null, two_handed_damage?: { __typename?: 'Damage', damage_dice: string, damage_type?: { __typename?: 'DamageType', name: string } | null } | null, properties?: Array<{ __typename?: 'WeaponProperty', name: string, index: string }> | null }
+   | null };
+
+export type GetMagicItemByIndexQueryVariables = Exact<{
+  index: Scalars['String']['input'];
+}>;
+
+
+export type GetMagicItemByIndexQuery = { __typename?: 'Query', magicItem?: { __typename?: 'MagicItem', index: string, name: string, desc: Array<string>, image?: string | null, variant: boolean, rarity: { __typename?: 'Rarity', name: string }, equipment_category: { __typename?: 'EquipmentCategory', name: string }, variants?: Array<{ __typename?: 'MagicItem', index: string, name: string }> | null } | null };
 
 
 export const SearchEquipmentDocument = gql`
     query SearchEquipment($name: String!) {
   equipments(name: $name) {
     ... on IEquipment {
+      index
+      name
+      cost {
+        quantity
+        unit
+      }
+      weight
+      desc
+    }
+    ... on Weapon {
+      weapon_category
+      category_range
+      damage {
+        damage_dice
+        damage_type {
+          name
+        }
+      }
+      range {
+        normal
+        long
+      }
+      properties {
+        name
+      }
+    }
+    ... on Armor {
+      armor_category
+      armor_class {
+        base
+        dex_bonus
+        max_bonus
+      }
+      stealth_disadvantage
+      str_minimum
+    }
+    ... on Gear {
+      equipment_category {
+        name
+      }
+    }
+  }
+}
+    `;
+export const SearchMagicItemsDocument = gql`
+    query SearchMagicItems($name: String!) {
+  magicItems(name: $name) {
+    index
+    name
+    desc
+    rarity {
+      name
+    }
+    equipment_category {
+      name
+    }
+  }
+}
+    `;
+export const GetEquipmentByIndexDocument = gql`
+    query GetEquipmentByIndex($index: String!) {
+  equipment(index: $index) {
+    ... on IEquipment {
+      index
+      name
+      cost {
+        quantity
+        unit
+      }
+      weight
+      desc
+    }
+    ... on Weapon {
+      weapon_category
+      category_range
+      damage {
+        damage_dice
+        damage_type {
+          name
+        }
+      }
+      range {
+        normal
+        long
+      }
+      two_handed_damage {
+        damage_dice
+        damage_type {
+          name
+        }
+      }
+      properties {
+        name
+        index
+      }
+    }
+    ... on Armor {
+      armor_category
+      armor_class {
+        base
+        dex_bonus
+        max_bonus
+      }
+      stealth_disadvantage
+      str_minimum
+    }
+    ... on Gear {
+      equipment_category {
+        name
+      }
+      gear_category {
+        name
+      }
+    }
+    ... on Tool {
+      tool_category
+    }
+    ... on Vehicle {
+      vehicle_category
+      speed {
+        quantity
+        unit
+      }
+      capacity
+    }
+    ... on Pack {
+      contents {
+        item {
+          ... on IEquipment {
+            index
+            name
+          }
+        }
+        quantity
+      }
+    }
+    ... on Ammunition {
+      quantity
+    }
+  }
+}
+    `;
+export const GetMagicItemByIndexDocument = gql`
+    query GetMagicItemByIndex($index: String!) {
+  magicItem(index: $index) {
+    index
+    name
+    desc
+    rarity {
+      name
+    }
+    equipment_category {
+      name
+    }
+    image
+    variant
+    variants {
       index
       name
     }
@@ -2729,6 +2923,15 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
   return {
     SearchEquipment(variables: SearchEquipmentQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<SearchEquipmentQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<SearchEquipmentQuery>({ document: SearchEquipmentDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'SearchEquipment', 'query', variables);
+    },
+    SearchMagicItems(variables: SearchMagicItemsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<SearchMagicItemsQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<SearchMagicItemsQuery>({ document: SearchMagicItemsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'SearchMagicItems', 'query', variables);
+    },
+    GetEquipmentByIndex(variables: GetEquipmentByIndexQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<GetEquipmentByIndexQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetEquipmentByIndexQuery>({ document: GetEquipmentByIndexDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'GetEquipmentByIndex', 'query', variables);
+    },
+    GetMagicItemByIndex(variables: GetMagicItemByIndexQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<GetMagicItemByIndexQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetMagicItemByIndexQuery>({ document: GetMagicItemByIndexDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'GetMagicItemByIndex', 'query', variables);
     }
   };
 }
