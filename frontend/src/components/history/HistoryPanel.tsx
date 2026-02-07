@@ -1,66 +1,58 @@
-import { History } from 'lucide-react'
+import { useState } from 'react'
+import { History, ChevronRight } from 'lucide-react'
 import { useHistoryPanel } from '../../api/history'
 import { HistoryEntry } from './HistoryEntry'
+import { HistorySidebar } from './HistorySidebar'
 
 interface HistoryPanelProps {
   slug: string
 }
 
 export function HistoryPanel({ slug }: HistoryPanelProps) {
-  const { data, isLoading, error } = useHistoryPanel(slug)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const { data, isLoading } = useHistoryPanel(slug)
+
+  const lastEntry = data?.entries?.[0]
 
   if (isLoading) {
     return (
       <div className="bg-white rounded-lg shadow-md p-4">
-        <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
-          <History className="w-4 h-4" />
-          Activity Log
-        </h3>
-        <div className="animate-pulse space-y-2">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="flex items-start gap-2">
-              <div className="w-6 h-6 bg-gray-200 rounded-full" />
-              <div className="flex-1 space-y-1">
-                <div className="h-3 bg-gray-200 rounded w-3/4" />
-                <div className="h-2 bg-gray-200 rounded w-1/2" />
-              </div>
-            </div>
-          ))}
+        <div className="animate-pulse flex items-center gap-2">
+          <div className="w-6 h-6 bg-gray-200 rounded-full" />
+          <div className="h-3 bg-gray-200 rounded w-32" />
         </div>
       </div>
     )
   }
-
-  if (error) {
-    return (
-      <div className="bg-white rounded-lg shadow-md p-4">
-        <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
-          <History className="w-4 h-4" />
-          Activity Log
-        </h3>
-        <p className="text-gray-500 text-xs">Failed to load activity log</p>
-      </div>
-    )
-  }
-
-  const entries = data?.entries ?? []
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4">
-      <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
-        <History className="w-4 h-4" />
-        Activity Log
-      </h3>
-      
-      {entries.length === 0 ? (
-        <p className="text-gray-500 text-xs">No activity yet</p>
-      ) : (
-        <div className="divide-y divide-gray-100">
-          {entries.map((entry) => (
-            <HistoryEntry key={entry.id} entry={entry} />
-          ))}
+    <>
+      <button
+        onClick={() => setSidebarOpen(true)}
+        className="w-full bg-white rounded-lg shadow-md p-4 hover:bg-gray-50 transition-colors text-left"
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+            <History className="w-4 h-4" />
+            Recent Activity
+          </div>
+          <ChevronRight className="w-4 h-4 text-gray-400" />
         </div>
-      )}
-    </div>
+        
+        {lastEntry ? (
+          <div className="mt-2 pointer-events-none">
+            <HistoryEntry entry={lastEntry} />
+          </div>
+        ) : (
+          <p className="mt-2 text-xs text-gray-500">No activity yet</p>
+        )}
+      </button>
+
+      <HistorySidebar
+        slug={slug}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
+    </>
   )
 }
