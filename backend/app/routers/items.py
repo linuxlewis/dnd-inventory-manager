@@ -18,7 +18,7 @@ from app.models import (
     ItemType,
     ItemUpdate,
 )
-from app.services import compute_changes, log_item_added, log_item_removed, log_item_updated
+from app.services import log_item_added, log_item_removed, log_item_updated
 
 router = APIRouter(prefix="/api/inventories", tags=["items"])
 
@@ -144,11 +144,9 @@ async def update_item(
     await db.commit()
     await db.refresh(item)
 
-    # Compute changes and log history entry after successful commit
+    # Log history entry after successful commit (computes changes internally)
     new_values = item.get_snapshot()
-    changes = compute_changes(old_values, new_values)
-    if changes:
-        await log_item_updated(db, inventory.id, item, changes)
+    await log_item_updated(db, inventory.id, item, old_values, new_values)
 
     return item
 

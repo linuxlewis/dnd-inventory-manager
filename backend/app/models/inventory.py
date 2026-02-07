@@ -48,7 +48,7 @@ class Inventory(InventoryBase, table=True):
         sa_column_kwargs={"onupdate": func.now()},
     )
 
-    def get_currency_snapshot(self) -> dict[str, int]:
+    def get_snapshot(self) -> dict[str, int]:
         """Get a snapshot of currency values for change tracking.
 
         Returns a dict with all currency denominations.

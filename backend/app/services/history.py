@@ -70,19 +70,30 @@ async def log_item_added(session: AsyncSession, inventory_id: UUID, item: Item) 
 
 
 async def log_item_updated(
-    session: AsyncSession, inventory_id: UUID, item: Item, changes: dict[str, Any]
-) -> HistoryEntry:
+    session: AsyncSession,
+    inventory_id: UUID,
+    item: Item,
+    old_values: dict[str, Any],
+    new_values: dict[str, Any],
+) -> HistoryEntry | None:
     """Log an item_updated history entry.
 
     Args:
         session: Database session
         inventory_id: ID of the inventory
         item: The updated item
-        changes: Dict of changes in format { field: { "old": x, "new": y } }
+        old_values: Snapshot of item before update
+        new_values: Snapshot of item after update
 
     Returns:
-        The created HistoryEntry
+        The created HistoryEntry, or None if no changes
     """
+    changes = compute_changes(old_values, new_values)
+
+    # Only log if there were actual changes
+    if not changes:
+        return None
+
     details = {"changes": changes}
 
     entry = HistoryEntry(
