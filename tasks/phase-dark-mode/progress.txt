@@ -22,6 +22,9 @@ Started: 2026-02-07T18:46:20.314Z
 - Dark action icons (history): `bg-{color}-900/40` background, `text-{color}-400` icon color
 - Dark sidebar panel: `bg-gray-800`, backdrop `bg-black/50`, header border `border-gray-700`
 - Dark loading skeletons: `bg-gray-700` (not bg-gray-200)
+- All modal/dialog backdrops use `bg-black/50` consistently
+- Dark dialog confirmation: `bg-gray-800` body, red alert icon in `bg-red-900/30`, cancel `text-gray-300 hover:bg-gray-700`, destructive action `bg-red-600 hover:bg-red-700`
+- NotFound page uses `text-gray-100` for heading, `text-gray-400` for subtext (same as other dark pages)
 
 ---
 
@@ -118,4 +121,17 @@ Started: 2026-02-07T18:46:20.314Z
   - HistorySidebar backdrop uses `bg-black/50` (darker than default bg-black/30) to provide better contrast against the dark page background
   - utils.ts didn't need any changes — it's pure logic/formatting with no styling
   - The HistoryPanel acts as a clickable summary card showing the last entry; HistorySidebar is the full slide-out panel
+---
+
+## 2026-02-07 - FE-027
+- What was implemented: Verified and polished all modals/dialogs for consistent dark styling. Fixed NotFound page (text-gray-900 → text-gray-100, text-gray-600 → text-gray-400). Fixed ItemDetail property labels from text-gray-500 to text-gray-400 for consistency with other labels in the panel. Verified all modal backdrops use bg-black/50 consistently.
+- Files changed:
+  - `frontend/src/pages/NotFound.tsx` — Updated light-mode text colors to dark equivalents
+  - `frontend/src/components/items/ItemDetail.tsx` — Fixed property labels (Damage, Armor Class, Healing, Duration, Spell, Spell Level) from text-gray-500 to text-gray-400 for consistency
+- **Learnings for future iterations:**
+  - Most modals were already dark-themed from earlier stories (FE-024, FE-025, FE-026) — this story was mainly a consistency audit
+  - All modal backdrops use `bg-black/50` — this is the standard for dark theme (provides good contrast against bg-gray-900 page)
+  - Property labels in slide-out panels should use `text-gray-400` (not text-gray-500) to match section heading labels
+  - Don't forget non-modal pages like NotFound.tsx when doing dark-mode conversion — they're easy to miss
+  - text-gray-500 is acceptable for intentionally de-emphasized tertiary text (e.g., parenthetical values in CurrencyModal, detail text in HistoryEntry) but should not be used for primary labels
 ---

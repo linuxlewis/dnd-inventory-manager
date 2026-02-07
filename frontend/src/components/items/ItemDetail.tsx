@@ -127,37 +127,37 @@ export function ItemDetail({ item, slug, isOpen, onClose, onEdit }: ItemDetailPr
               <dl className="space-y-2">
                 {item.type === 'equipment' && item.properties.damage ? (
                   <div className="flex justify-between py-2 border-b border-gray-700">
-                    <dt className="text-gray-500">Damage</dt>
+                    <dt className="text-gray-400">Damage</dt>
                     <dd className="font-medium text-gray-100">{formatDamage(item.properties.damage)}</dd>
                   </div>
                 ) : null}
                 {item.type === 'equipment' && item.properties.armor_class ? (
                   <div className="flex justify-between py-2 border-b border-gray-700">
-                    <dt className="text-gray-500">Armor Class</dt>
+                    <dt className="text-gray-400">Armor Class</dt>
                     <dd className="font-medium text-gray-100">{formatArmorClass(item.properties.armor_class)}</dd>
                   </div>
                 ) : null}
                 {item.type === 'potion' && item.properties.healing ? (
                   <div className="flex justify-between py-2 border-b border-gray-700">
-                    <dt className="text-gray-500">Healing</dt>
+                    <dt className="text-gray-400">Healing</dt>
                     <dd className="font-medium text-gray-100">{formatHealing(item.properties.healing)}</dd>
                   </div>
                 ) : null}
                 {item.type === 'potion' && item.properties.duration ? (
                   <div className="flex justify-between py-2 border-b border-gray-700">
-                    <dt className="text-gray-500">Duration</dt>
+                    <dt className="text-gray-400">Duration</dt>
                     <dd className="font-medium text-gray-100">{String(item.properties.duration)}</dd>
                   </div>
                 ) : null}
                 {item.type === 'scroll' && item.properties.spell ? (
                   <div className="flex justify-between py-2 border-b border-gray-700">
-                    <dt className="text-gray-500">Spell</dt>
+                    <dt className="text-gray-400">Spell</dt>
                     <dd className="font-medium text-gray-100">{String(item.properties.spell)}</dd>
                   </div>
                 ) : null}
                 {item.type === 'scroll' && item.properties.spell_level ? (
                   <div className="flex justify-between py-2 border-b border-gray-700">
-                    <dt className="text-gray-500">Spell Level</dt>
+                    <dt className="text-gray-400">Spell Level</dt>
                     <dd className="font-medium text-gray-100">{String(item.properties.spell_level)}</dd>
                   </div>
                 ) : null}
