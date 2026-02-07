@@ -14,7 +14,7 @@ export async function fetchHistory(
   params?: HistoryParams
 ): Promise<HistoryResponse> {
   const response = await apiClient.get<HistoryResponse>(
-    `/api/inventories/${slug}/history`,
+    `/api/v1/inventories/${slug}/history`,
     {
       params: {
         limit: params?.limit,
