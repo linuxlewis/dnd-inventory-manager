@@ -19,6 +19,9 @@ Started: 2026-02-07T18:46:20.314Z
 - Dark dropdown: `bg-gray-700 border-gray-600`, items `hover:bg-gray-600`
 - Dark currency denominations: PP `bg-slate-700/50 text-slate-300`, GP `bg-yellow-900/30 text-yellow-400`, SP `bg-gray-700/50 text-gray-300`, CP `bg-amber-900/30 text-amber-400`
 - Dark warning alert: `bg-amber-900/30 border-amber-500 text-amber-400`
+- Dark action icons (history): `bg-{color}-900/40` background, `text-{color}-400` icon color
+- Dark sidebar panel: `bg-gray-800`, backdrop `bg-black/50`, header border `border-gray-700`
+- Dark loading skeletons: `bg-gray-700` (not bg-gray-200)
 
 ---
 
@@ -102,4 +105,17 @@ Started: 2026-02-07T18:46:20.314Z
   - Preview section uses `bg-gray-700/50` (slightly lighter than modal body bg-gray-800) to create visual distinction
   - Dark preview text: labels `text-gray-400`, values `text-gray-200`, totals `text-gray-300`
   - The mutating overlay uses `bg-gray-800/70` instead of `bg-white/70` to match the dark card background
+---
+
+## 2026-02-07 - FE-026
+- What was implemented: Dark history components — HistoryPanel card/button (bg-gray-800 with border-gray-700, hover:bg-gray-700), HistorySidebar (bg-gray-800 panel, border-gray-700 header, dark loading skeletons, divide-gray-700 entry separators), HistoryEntry action icon backgrounds updated from light (bg-green-100) to dark (bg-green-900/40) variants with matching text colors (text-green-400), entry text updated to text-gray-100
+- Files changed:
+  - `frontend/src/components/history/HistoryPanel.tsx` — Dark card bg, dark loading skeleton, dark text colors
+  - `frontend/src/components/history/HistorySidebar.tsx` — Dark sidebar panel (bg-gray-800), dark header with border-gray-700, dark close button hover, dark loading skeletons (bg-gray-700), dark empty state text, dark dividers (divide-gray-700), darker backdrop (bg-black/50)
+  - `frontend/src/components/history/HistoryEntry.tsx` — Dark action icon backgrounds (bg-{color}-900/40 with text-{color}-400), dark entry title text (text-gray-100)
+- **Learnings for future iterations:**
+  - History action icon dark pattern: `bg-{color}-900/40` for icon background, `text-{color}-400` for icon color (green for added, blue for updated, red for removed, amber for currency)
+  - HistorySidebar backdrop uses `bg-black/50` (darker than default bg-black/30) to provide better contrast against the dark page background
+  - utils.ts didn't need any changes — it's pure logic/formatting with no styling
+  - The HistoryPanel acts as a clickable summary card showing the last entry; HistorySidebar is the full slide-out panel
 ---
