@@ -17,6 +17,8 @@ Started: 2026-02-07T18:46:20.314Z
 - Dark rarity colors: `bg-{color}-900/30` for card bg, `bg-{color}-900/40 text-{color}-300` for badges, `text-{color}-400` for icons
 - Dark modal: `bg-gray-800` body, `border-gray-700` separators, `bg-gray-900` footer, cancel button `text-gray-300 hover:bg-gray-700`
 - Dark dropdown: `bg-gray-700 border-gray-600`, items `hover:bg-gray-600`
+- Dark currency denominations: PP `bg-slate-700/50 text-slate-300`, GP `bg-yellow-900/30 text-yellow-400`, SP `bg-gray-700/50 text-gray-300`, CP `bg-amber-900/30 text-amber-400`
+- Dark warning alert: `bg-amber-900/30 border-amber-500 text-amber-400`
 
 ---
 
@@ -87,4 +89,17 @@ Started: 2026-02-07T18:46:20.314Z
   - Notes section uses yellow-900/20 bg with yellow-700 border and yellow-200 text for dark theme
   - The delete confirmation dialog inside ItemDetail is also styled — FE-027 may need to verify this is consistent with other modals
   - `focus:ring-offset-gray-900` for items on the bg-gray-900 page; `focus:ring-offset-gray-800` for items inside bg-gray-800 cards/modals
+---
+
+## 2026-02-07 - FE-025
+- What was implemented: Dark currency components — TreasuryWidget with dark card (bg-gray-800), dark denomination tiles using colored transparent backgrounds (slate-700/50 for PP, yellow-900/30 for GP, gray-700/50 for SP, amber-900/30 for CP), dark loading/mutating overlays. CurrencyModal with dark modal body (bg-gray-800), dark header/footer borders (border-gray-700), dark footer (bg-gray-900), dark inputs, dark preview section (bg-gray-700/50), dark error/warning alerts.
+- Files changed:
+  - `frontend/src/components/currency/TreasuryWidget.tsx` — Dark card, dark denomination tiles with colored transparent backgrounds, dark text colors, dark loading overlay
+  - `frontend/src/components/currency/CurrencyModal.tsx` — Dark modal (bg-gray-800), dark inputs (bg-gray-700), dark preview section (bg-gray-700/50), dark footer (bg-gray-900), dark error/warning alerts, dark labels
+- **Learnings for future iterations:**
+  - Currency denomination tiles use `bg-{color}-900/30` for gold/copper (warm colors) and `bg-{color}-700/50` for platinum/silver (cool/neutral), matching the thematic color of each denomination
+  - Dark warning alert pattern: `bg-amber-900/30 border-amber-500 text-amber-400` (matching the error alert pattern but with amber)
+  - Preview section uses `bg-gray-700/50` (slightly lighter than modal body bg-gray-800) to create visual distinction
+  - Dark preview text: labels `text-gray-400`, values `text-gray-200`, totals `text-gray-300`
+  - The mutating overlay uses `bg-gray-800/70` instead of `bg-white/70` to match the dark card background
 ---
