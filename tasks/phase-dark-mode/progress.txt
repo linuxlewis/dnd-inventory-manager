@@ -9,6 +9,11 @@ Started: 2026-02-07T18:46:20.314Z
 - Tailwind config is in `frontend/tailwind.config.js` (standard, no dark mode toggle — we're going all-dark)
 - Header uses bg-gray-800 with border-b border-gray-700 for subtle separation; logo uses text-indigo-400 for brand accent
 - No RecentInventorySelector component exists — the PRD mentions it but the header is just a simple Link
+- Dark input: `bg-gray-700 text-gray-100 placeholder-gray-400 border-gray-600` (error: `border-red-500`)
+- Dark card: `bg-gray-800 border border-gray-700 rounded-lg shadow-md`
+- Dark label: `text-gray-300`, dark heading: `text-gray-100`, dark subtext: `text-gray-400`
+- Dark error alert: `bg-red-900/30 border-red-500 text-red-400`
+- Buttons on dark cards need `focus:ring-offset-gray-800`
 
 ---
 
@@ -33,4 +38,18 @@ Started: 2026-02-07T18:46:20.314Z
   - For dark headers, bg-gray-800 with border-b border-gray-700 provides subtle separation from bg-gray-900 body
   - Using text-indigo-400 for brand accent on dark backgrounds maintains readable contrast
   - Home page (`pages/Home.tsx`) still has many light-mode classes (bg-white, text-gray-900, etc.) — needs FE-022
+---
+
+## 2026-02-07 - FE-022
+- What was implemented: Dark Home page — cards use bg-gray-800 with border-gray-700, inputs use bg-gray-700 with border-gray-600 and placeholder-gray-400, labels use text-gray-300, headings use text-gray-100, error alerts use bg-red-900/30 with text-red-400, buttons get focus:ring-offset-gray-800
+- Files changed:
+  - `frontend/src/pages/Home.tsx` — Updated all light-mode classes to dark equivalents
+- **Learnings for future iterations:**
+  - Dark mode input pattern: `bg-gray-700 text-gray-100 placeholder-gray-400 border-gray-600` (error state: `border-red-500`)
+  - Dark mode card pattern: `bg-gray-800 border border-gray-700 rounded-lg shadow-md`
+  - Dark mode label pattern: `text-gray-300` (was text-gray-700)
+  - Dark mode error alert pattern: `bg-red-900/30 border-red-500 text-red-400`
+  - For buttons on dark cards, add `focus:ring-offset-gray-800` so the focus ring offset matches the card background
+  - Eye icon toggle button: `text-gray-400 hover:text-gray-200` for dark backgrounds
+  - No "Recent Inventories list" component exists on the Home page (PRD acceptance criterion mentions it but it's not implemented)
 ---
