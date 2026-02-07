@@ -12,8 +12,8 @@ export const apiClient = axios.create({
 
 // Request interceptor to add passphrase header
 apiClient.interceptors.request.use((config) => {
-  // Extract slug from URL if present (e.g., /api/inventories/{slug})
-  const urlMatch = config.url?.match(/\/api\/inventories\/([^/]+)/)
+  // Extract slug from URL if present (e.g., /api/inventories/{slug} or /api/v1/inventories/{slug})
+  const urlMatch = config.url?.match(/\/api(?:\/v1)?\/inventories\/([^/]+)/)
   if (urlMatch) {
     const slug = urlMatch[1]
     // Skip auth header for the auth endpoint itself
@@ -34,7 +34,7 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       console.warn('Unauthorized - invalid or missing passphrase')
       // Could clear the session here if desired
-      const urlMatch = error.config?.url?.match(/\/api\/inventories\/([^/]+)/)
+      const urlMatch = error.config?.url?.match(/\/api(?:\/v1)?\/inventories\/([^/]+)/)
       if (urlMatch) {
         const slug = urlMatch[1]
         useAuthStore.getState().clearSession(slug)
