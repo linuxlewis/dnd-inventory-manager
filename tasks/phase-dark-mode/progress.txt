@@ -14,6 +14,9 @@ Started: 2026-02-07T18:46:20.314Z
 - Dark label: `text-gray-300`, dark heading: `text-gray-100`, dark subtext: `text-gray-400`
 - Dark error alert: `bg-red-900/30 border-red-500 text-red-400`
 - Buttons on dark cards need `focus:ring-offset-gray-800`
+- Dark rarity colors: `bg-{color}-900/30` for card bg, `bg-{color}-900/40 text-{color}-300` for badges, `text-{color}-400` for icons
+- Dark modal: `bg-gray-800` body, `border-gray-700` separators, `bg-gray-900` footer, cancel button `text-gray-300 hover:bg-gray-700`
+- Dark dropdown: `bg-gray-700 border-gray-600`, items `hover:bg-gray-600`
 
 ---
 
@@ -65,4 +68,23 @@ Started: 2026-02-07T18:46:20.314Z
   - Error state uses bg-red-900/30 with text-red-400 and border-red-500 — consistent with Home page
   - "Back to Home" link uses text-indigo-400 hover:text-indigo-300 on dark backgrounds (not indigo-600)
   - focus:ring-offset-gray-800 needed on buttons inside bg-gray-800 cards
+---
+
+## 2026-02-07 - FE-024
+- What was implemented: Dark item components — updated RARITY_COLORS in utils.ts for dark backgrounds, dark ItemCard with gray-700 thumbnails, dark ItemsList with dark tabs/search/empty state, dark ItemDetail slide-out panel with dark footer and delete confirmation, dark AddItemModal with dark SRD dropdown and form fields, dark EditItemModal with matching form styling
+- Files changed:
+  - `frontend/src/components/items/utils.ts` — Updated all rarity colors from light (bg-gray-100, bg-green-50, etc.) to dark variants (bg-gray-800, bg-green-900/30, etc.)
+  - `frontend/src/components/items/ItemCard.tsx` — Dark thumbnail bg, dark text colors, dark quantity badge
+  - `frontend/src/components/items/ItemsList.tsx` — Dark search input, dark tabs (bg-gray-800 container, bg-gray-700 active), dark empty state
+  - `frontend/src/components/items/ItemDetail.tsx` — Dark slide-out panel (bg-gray-800), dark footer (bg-gray-900), dark delete confirmation dialog, dark notes section (bg-yellow-900/20)
+  - `frontend/src/components/items/AddItemModal.tsx` — Dark modal (bg-gray-800), dark SRD dropdown (bg-gray-700), dark form inputs, dark footer (bg-gray-900)
+  - `frontend/src/components/items/EditItemModal.tsx` — Dark modal matching AddItemModal patterns
+- **Learnings for future iterations:**
+  - Rarity colors for dark: use `bg-{color}-900/30` for card backgrounds (transparent overlay on dark bg) and `bg-{color}-900/40 text-{color}-300` for badges
+  - Dark modal pattern: `bg-gray-800` body, `border-gray-700` header/footer borders, `bg-gray-900` footer
+  - Dark cancel button pattern: `text-gray-300 hover:bg-gray-700` (not text-gray-700 which is invisible on dark)
+  - SRD search dropdown: `bg-gray-700 border-gray-600`, items use `hover:bg-gray-600`
+  - Notes section uses yellow-900/20 bg with yellow-700 border and yellow-200 text for dark theme
+  - The delete confirmation dialog inside ItemDetail is also styled — FE-027 may need to verify this is consistent with other modals
+  - `focus:ring-offset-gray-900` for items on the bg-gray-900 page; `focus:ring-offset-gray-800` for items inside bg-gray-800 cards/modals
 ---
