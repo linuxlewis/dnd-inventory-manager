@@ -1,9 +1,9 @@
+import { Link } from 'react-router-dom'
 import { X } from 'lucide-react'
 import type { RecentInventory } from '../hooks/useRecentInventories'
 
 interface RecentInventoriesListProps {
   inventories: RecentInventory[]
-  onSelect: (slug: string) => void
   onRemove: (slug: string) => void
 }
 
@@ -21,7 +21,6 @@ function formatRelativeTime(timestamp: number): string {
 
 export function RecentInventoriesList({
   inventories,
-  onSelect,
   onRemove,
 }: RecentInventoriesListProps) {
   if (inventories.length === 0) return null
@@ -29,28 +28,25 @@ export function RecentInventoriesList({
   return (
     <ul className="space-y-2">
       {inventories.map((inv) => (
-        <li key={inv.slug}>
+        <li
+          key={inv.slug}
+          className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:border-indigo-300 hover:shadow-sm transition-all text-left group"
+        >
+          <Link to={`/i/${inv.slug}`} className="flex-1 min-w-0">
+            <p className="font-medium text-gray-900 truncate group-hover:text-indigo-600 transition-colors">
+              {inv.name}
+            </p>
+            <p className="text-sm text-gray-500">
+              {formatRelativeTime(inv.lastAccessed)}
+            </p>
+          </Link>
           <button
-            onClick={() => onSelect(inv.slug)}
-            className="w-full flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:border-indigo-300 hover:shadow-sm transition-all text-left group"
+            type="button"
+            onClick={() => onRemove(inv.slug)}
+            className="flex-shrink-0 ml-3 p-1 text-gray-400 hover:text-red-500 rounded hover:bg-red-50 transition-colors"
+            aria-label={`Remove ${inv.name} from recents`}
           >
-            <div className="min-w-0">
-              <p className="font-medium text-gray-900 truncate">{inv.name}</p>
-              <p className="text-sm text-gray-500">
-                {formatRelativeTime(inv.lastAccessed)}
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation()
-                onRemove(inv.slug)
-              }}
-              className="flex-shrink-0 ml-3 p-1 text-gray-400 hover:text-red-500 rounded hover:bg-red-50 transition-colors"
-              aria-label={`Remove ${inv.name} from recents`}
-            >
-              <X className="w-4 h-4" />
-            </button>
+            <X className="w-4 h-4" />
           </button>
         </li>
       ))}

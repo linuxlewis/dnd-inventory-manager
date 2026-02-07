@@ -265,7 +265,6 @@ export function Home() {
           </h2>
           <RecentInventoriesList
             inventories={recentInventories}
-            onSelect={(slug) => navigate(`/${slug}`)}
             onRemove={removeRecent}
           />
         </section>
