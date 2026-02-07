@@ -43,7 +43,7 @@ export function TreasuryWidget({
           <button
             onClick={onAddFunds}
             disabled={isMutating}
-            className="flex items-center gap-1 px-3 py-1.5 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+            className="flex items-center gap-1 px-3 py-1.5 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-colors disabled:opacity-50"
           >
             <Plus className="w-4 h-4" />
             Add Funds
@@ -51,7 +51,7 @@ export function TreasuryWidget({
           <button
             onClick={onSpend}
             disabled={isMutating}
-            className="flex items-center gap-1 px-3 py-1.5 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+            className="flex items-center gap-1 px-3 py-1.5 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-colors disabled:opacity-50"
           >
             <Minus className="w-4 h-4" />
             Spend

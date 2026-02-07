@@ -187,7 +187,7 @@ export function Home() {
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+              className={`w-full px-3 py-2 border rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800 ${
                 errors.name ? 'border-red-500' : 'border-gray-600'
               }`}
               placeholder="The Mighty Nein"
@@ -209,7 +209,7 @@ export function Home() {
               id="passphrase"
               value={passphrase}
               onChange={(e) => setPassphrase(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+              className={`w-full px-3 py-2 border rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800 ${
                 errors.passphrase ? 'border-red-500' : 'border-gray-600'
               }`}
               placeholder="Min 6 characters"
@@ -231,7 +231,7 @@ export function Home() {
               id="confirmPassphrase"
               value={confirmPassphrase}
               onChange={(e) => setConfirmPassphrase(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+              className={`w-full px-3 py-2 border rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800 ${
                 errors.confirmPassphrase ? 'border-red-500' : 'border-gray-600'
               }`}
               placeholder="Confirm your passphrase"
@@ -255,7 +255,7 @@ export function Home() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800"
               placeholder="Campaign notes, party details, etc."
             />
           </div>
@@ -295,7 +295,7 @@ export function Home() {
               id="accessSlug"
               value={accessSlug}
               onChange={(e) => setAccessSlug(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+              className={`w-full px-3 py-2 border rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800 ${
                 accessErrors.slug ? 'border-red-500' : 'border-gray-600'
               }`}
               placeholder="the-mighty-nein"
@@ -318,7 +318,7 @@ export function Home() {
                 id="accessPassphrase"
                 value={accessPassphrase}
                 onChange={(e) => setAccessPassphrase(e.target.value)}
-                className={`w-full px-3 py-2 pr-10 border rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                className={`w-full px-3 py-2 pr-10 border rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800 ${
                   accessErrors.passphrase ? 'border-red-500' : 'border-gray-600'
                 }`}
                 placeholder="Enter passphrase"
@@ -326,7 +326,7 @@ export function Home() {
               <button
                 type="button"
                 onClick={() => setShowAccessPassphrase(!showAccessPassphrase)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-200 focus:outline-none"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded"
                 aria-label={showAccessPassphrase ? 'Hide passphrase' : 'Show passphrase'}
               >
                 {showAccessPassphrase ? (

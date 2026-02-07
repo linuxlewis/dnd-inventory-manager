@@ -53,7 +53,7 @@ export function HistorySidebar({ slug, isOpen, onClose }: HistorySidebarProps) {
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-700 rounded-full transition-colors"
+            className="p-2 text-gray-400 hover:bg-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
           >
             <X className="w-5 h-5 text-gray-400" />
           </button>

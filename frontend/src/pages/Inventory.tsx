@@ -130,14 +130,14 @@ export function Inventory() {
                   id="passphrase"
                   value={passphrase}
                   onChange={(e) => setPassphrase(e.target.value)}
-                  className="w-full px-3 py-2 pr-10 bg-gray-700 text-gray-100 placeholder-gray-400 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="w-full px-3 py-2 pr-10 bg-gray-700 text-gray-100 placeholder-gray-400 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800"
                   placeholder="Enter passphrase"
                   autoFocus
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassphrase(!showPassphrase)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-200 focus:outline-none"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded"
                   aria-label={showPassphrase ? 'Hide passphrase' : 'Show passphrase'}
                 >
                   {showPassphrase ? (

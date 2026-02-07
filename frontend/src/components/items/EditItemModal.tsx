@@ -248,14 +248,14 @@ function EditItemForm({ item, slug, onClose }: EditItemFormProps) {
         <button
           type="button"
           onClick={onClose}
-          className="px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors"
+          className="px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors"
         >
           Cancel
         </button>
         <button
           onClick={handleSubmit}
           disabled={updateItem.isPending}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:opacity-50 transition-colors"
         >
           {updateItem.isPending ? 'Saving...' : 'Save Changes'}
         </button>

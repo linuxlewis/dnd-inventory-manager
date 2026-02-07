@@ -25,6 +25,9 @@ Started: 2026-02-07T18:46:20.314Z
 - All modal/dialog backdrops use `bg-black/50` consistently
 - Dark dialog confirmation: `bg-gray-800` body, red alert icon in `bg-red-900/30`, cancel `text-gray-300 hover:bg-gray-700`, destructive action `bg-red-600 hover:bg-red-700`
 - NotFound page uses `text-gray-100` for heading, `text-gray-400` for subtext (same as other dark pages)
+- All buttons need visible focus rings: `focus:outline-none focus:ring-2 focus:ring-{color}-500 focus:ring-offset-2 focus:ring-offset-gray-{800|900}` (offset matches parent bg)
+- Eye toggle buttons (password show/hide): use `focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded` for compact focus ring
+- Cancel buttons in modal footers: `focus:ring-gray-500` for neutral focus ring color
 
 ---
 
@@ -134,4 +137,28 @@ Started: 2026-02-07T18:46:20.314Z
   - Property labels in slide-out panels should use `text-gray-400` (not text-gray-500) to match section heading labels
   - Don't forget non-modal pages like NotFound.tsx when doing dark-mode conversion — they're easy to miss
   - text-gray-500 is acceptable for intentionally de-emphasized tertiary text (e.g., parenthetical values in CurrencyModal, detail text in HistoryEntry) but should not be used for primary labels
+---
+
+## 2026-02-07 - FE-028
+- What was implemented: Final polish and accessibility audit — added visible focus rings (`focus:ring-2 focus:ring-{color}-500 focus:ring-offset-2 focus:ring-offset-gray-{800|900}`) to all interactive buttons missing them across the entire app. Fixed eye toggle buttons (password show/hide) with compact focus rings. Added focus rings to cancel buttons in all modal footers. Fixed `focus:border-indigo-500` remnant from light mode on Inventory auth input (replaced with proper `focus:ring-offset-gray-800`). Added `focus:ring-offset-gray-800` to all Home page form inputs. Verified all loading skeletons use `bg-gray-700`. Verified all error messages use consistent dark patterns. Typecheck and lint pass.
+- Files changed:
+  - `frontend/src/pages/NotFound.tsx` — Added focus ring to "Go Home" link
+  - `frontend/src/pages/Home.tsx` — Added focus:ring-offset-gray-800 to all form inputs, added focus ring to eye toggle button
+  - `frontend/src/pages/Inventory.tsx` — Fixed focus:border-indigo-500 to focus:ring-offset-gray-800, added focus ring to eye toggle button
+  - `frontend/src/components/items/ItemsList.tsx` — Added focus rings to "Add Item" buttons (header and empty state), fixed search input focus:ring-offset
+  - `frontend/src/components/items/ItemDetail.tsx` — Added focus rings to Edit, Delete, Cancel, and confirm Delete buttons
+  - `frontend/src/components/items/AddItemModal.tsx` — Added focus rings to "Add Item" submit and Cancel buttons
+  - `frontend/src/components/items/EditItemModal.tsx` — Added focus rings to "Save Changes" submit and Cancel buttons
+  - `frontend/src/components/currency/TreasuryWidget.tsx` — Added focus rings to "Add Funds" and "Spend" buttons
+  - `frontend/src/components/currency/CurrencyModal.tsx` — Added focus rings to submit (Add Funds/Spend) and Cancel buttons
+  - `frontend/src/components/history/HistorySidebar.tsx` — Added focus ring to close button
+- **Learnings for future iterations:**
+  - Every interactive button needs `focus:outline-none focus:ring-2 focus:ring-{color}-500 focus:ring-offset-2 focus:ring-offset-gray-{800|900}` — the offset color must match the parent background
+  - Buttons on bg-gray-900 backgrounds (page-level, modal footers) use `focus:ring-offset-gray-900`
+  - Buttons on bg-gray-800 backgrounds (cards, modal bodies) use `focus:ring-offset-gray-800`
+  - Cancel buttons use `focus:ring-gray-500` for neutral appearance
+  - Compact interactive elements (icon-only buttons like eye toggles, close buttons) just need `focus:ring-2 focus:ring-indigo-500 rounded` without offset
+  - `focus:border-indigo-500` is a light-mode pattern — on dark theme it creates a jarring border color change; use `focus:ring-offset` instead
+  - Loading skeletons were all already correct (bg-gray-700) from earlier stories
+  - Error messages were all already correct (bg-red-900/30 border-red-500 text-red-400) from earlier stories
 ---
