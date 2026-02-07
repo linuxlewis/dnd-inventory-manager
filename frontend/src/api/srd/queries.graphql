@@ -1,0 +1,8 @@
+query SearchEquipment($name: String!) {
+  equipments(name: $name) {
+    ... on IEquipment {
+      index
+      name
+    }
+  }
+}
