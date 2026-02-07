@@ -5,6 +5,7 @@ import { Eye, EyeOff } from 'lucide-react'
 import { apiClient } from '../api/client'
 import { useCurrency, useUpdateCurrency } from '../api/currency'
 import { useAuth } from '../hooks/useAuth'
+import { useRecentInventories } from '../hooks/useRecentInventories'
 import { useAuthenticateInventory } from '../api/inventories'
 import type { InventoryResponse, Item } from '../api/types'
 import { ItemsList, ItemDetail, AddItemModal, EditItemModal } from '../components/items'
@@ -32,6 +33,8 @@ export function Inventory() {
   const [showAddFundsModal, setShowAddFundsModal] = useState(false)
   const [showSpendModal, setShowSpendModal] = useState(false)
 
+  const { addRecent } = useRecentInventories()
+
   const isAuthenticated = slug ? hasSession(slug) : false
 
   // Currency data and mutations
@@ -58,6 +61,13 @@ export function Inventory() {
       navigate('/')
     }
   }, [slug, navigate])
+
+  // Track recently accessed inventory
+  useEffect(() => {
+    if (isAuthenticated && inventory && slug) {
+      addRecent(slug, inventory.name)
+    }
+  }, [isAuthenticated, inventory, slug, addRecent])
 
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

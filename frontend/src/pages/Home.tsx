@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
 import { useCreateInventory, useAuthenticateInventory } from '../api/inventories'
 import { useAuth } from '../hooks/useAuth'
+import { useRecentInventories } from '../hooks/useRecentInventories'
+import { RecentInventoriesList } from '../components/RecentInventoriesList'
 import { AxiosError } from 'axios'
 
 interface FormErrors {
@@ -23,6 +25,7 @@ export function Home() {
   const { setSession } = useAuth()
   const createInventory = useCreateInventory()
   const authenticateInventory = useAuthenticateInventory()
+  const { recentInventories, removeRecent } = useRecentInventories()
 
   // Create form state
   const [name, setName] = useState('')
@@ -145,6 +148,19 @@ export function Home() {
           fellow adventurers using a simple passphrase.
         </p>
       </section>
+
+      {/* Recent Inventories Section */}
+      {recentInventories.length > 0 && (
+        <section className="mb-8">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+            Recent Inventories
+          </h2>
+          <RecentInventoriesList
+            inventories={recentInventories}
+            onRemove={removeRecent}
+          />
+        </section>
+      )}
 
       {/* Create New Inventory Section */}
       <section className="bg-white rounded-lg shadow-md p-6 mb-8">
