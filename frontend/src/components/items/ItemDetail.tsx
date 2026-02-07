@@ -205,9 +205,9 @@ export function ItemDetail({ item, slug, isOpen, onClose, onEdit }: ItemDetailPr
 
       {/* Delete Confirmation Dialog */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
-          <div className="fixed inset-0 bg-black/50" onClick={() => setShowDeleteConfirm(false)} />
-          <div className="relative bg-white rounded-lg shadow-xl max-w-sm w-full p-6">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/50 z-[60]" onClick={() => setShowDeleteConfirm(false)} />
+          <div className="relative z-[70] bg-white rounded-lg shadow-xl max-w-sm w-full p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
                 <AlertTriangle className="w-5 h-5 text-red-600" />
