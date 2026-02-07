@@ -32,7 +32,7 @@ export function RecentInventoriesList({
           key={inv.slug}
           className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:border-indigo-300 hover:shadow-sm transition-all text-left group"
         >
-          <Link to={`/i/${inv.slug}`} className="flex-1 min-w-0">
+          <Link to={`/${inv.slug}`} className="flex-1 min-w-0">
             <p className="font-medium text-gray-900 truncate group-hover:text-indigo-600 transition-colors">
               {inv.name}
             </p>
