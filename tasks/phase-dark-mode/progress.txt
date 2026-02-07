@@ -53,3 +53,16 @@ Started: 2026-02-07T18:46:20.314Z
   - Eye icon toggle button: `text-gray-400 hover:text-gray-200` for dark backgrounds
   - No "Recent Inventories list" component exists on the Home page (PRD acceptance criterion mentions it but it's not implemented)
 ---
+
+## 2026-02-07 - FE-023
+- What was implemented: Dark Inventory page — auth/passphrase prompt card uses bg-gray-800 with border-gray-700, dark inputs/labels/errors matching established patterns, inventory header card and items section card both dark, loading/error states updated with dark text colors
+- Files changed:
+  - `frontend/src/pages/Inventory.tsx` — Updated auth prompt, inventory header, items section, loading state, and error state from light to dark theme
+- **Learnings for future iterations:**
+  - The Inventory page renders TreasuryWidget and HistoryPanel as child components — those are separate stories (FE-025, FE-026) and still have light-mode styling
+  - Auth prompt pattern: same dark card/input/error patterns as Home page (bg-gray-800 card, bg-gray-700 inputs, bg-red-900/30 errors)
+  - Loading spinner uses border-indigo-600 which works fine on dark bg-gray-900
+  - Error state uses bg-red-900/30 with text-red-400 and border-red-500 — consistent with Home page
+  - "Back to Home" link uses text-indigo-400 hover:text-indigo-300 on dark backgrounds (not indigo-600)
+  - focus:ring-offset-gray-800 needed on buttons inside bg-gray-800 cards
+---
