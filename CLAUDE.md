@@ -312,12 +312,26 @@ async def test_update_item_success(
     assert db_item.name == "Updated Name"
 ```
 
-## Quality Checks
+## Quality Checks (REQUIRED)
 
-Before committing, run:
+**At the end of every turn, run the CI checks before committing:**
 
 ```bash
-# Backend
+# Backend (from backend/ directory)
+uv run ruff check app/ tests/
+uv run pytest tests/ -v
+
+# Frontend (from frontend/ directory)
+bun run typecheck
+bun run lint
+```
+
+These same checks run in GitHub Actions CI on every PR. **Do not commit if any check fails.**
+
+### Full Commands (if needed)
+
+```bash
+# Backend - also format
 cd backend
 uv run ruff check .
 uv run ruff format .
