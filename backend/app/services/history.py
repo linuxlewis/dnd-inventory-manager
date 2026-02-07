@@ -52,6 +52,8 @@ async def log_item_added(session: AsyncSession, inventory_id: UUID, item: Item) 
         "quantity": item.quantity,
         "type": item.type.value if item.type else None,
         "rarity": item.rarity.value if item.rarity else None,
+        "weight": item.weight,
+        "estimated_value": item.estimated_value,
     }
 
     entry = HistoryEntry(
@@ -126,6 +128,8 @@ async def log_item_removed(session: AsyncSession, inventory_id: UUID, item: Item
         "name": item.name,
         "quantity": item.quantity,
         "reason": "deleted",
+        "weight": item.weight,
+        "estimated_value": item.estimated_value,
     }
 
     entry = HistoryEntry(
