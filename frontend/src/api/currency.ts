@@ -38,6 +38,9 @@ export function useUpdateCurrency(slug: string | undefined) {
           platinum: data.platinum,
         }
       })
+      // Invalidate history queries to show the new activity
+      queryClient.invalidateQueries({ queryKey: ['history', slug] })
+      queryClient.invalidateQueries({ queryKey: ['history-panel', slug] })
     },
   })
 }

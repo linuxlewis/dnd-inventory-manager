@@ -10,6 +10,7 @@ import type { InventoryResponse, Item } from '../api/types'
 import { ItemsList, ItemDetail, AddItemModal, EditItemModal } from '../components/items'
 import { TreasuryWidget } from '../components/currency/TreasuryWidget'
 import { CurrencyModal } from '../components/currency/CurrencyModal'
+import { HistoryPanel } from '../components/history'
 import { AxiosError } from 'axios'
 
 export function Inventory() {
@@ -232,6 +233,13 @@ export function Inventory() {
         onAddFunds={() => setShowAddFundsModal(true)}
         onSpend={() => setShowSpendModal(true)}
       />
+
+      {/* Activity Log */}
+      {slug && (
+        <div className="mt-6 mb-6">
+          <HistoryPanel slug={slug} />
+        </div>
+      )}
 
       {/* Items Section */}
       <div className="bg-white rounded-lg shadow-md p-6">

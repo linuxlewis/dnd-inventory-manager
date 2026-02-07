@@ -49,6 +49,8 @@ export function useCreateItem(slug: string | undefined) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['items', slug] })
+      queryClient.invalidateQueries({ queryKey: ['history', slug] })
+      queryClient.invalidateQueries({ queryKey: ['history-panel', slug] })
     },
   })
 }
@@ -64,6 +66,8 @@ export function useUpdateItem(slug: string | undefined, itemId: string | undefin
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['items', slug] })
       queryClient.invalidateQueries({ queryKey: ['item', slug, itemId] })
+      queryClient.invalidateQueries({ queryKey: ['history', slug] })
+      queryClient.invalidateQueries({ queryKey: ['history-panel', slug] })
     },
   })
 }
@@ -77,6 +81,8 @@ export function useDeleteItem(slug: string | undefined, itemId: string | undefin
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['items', slug] })
+      queryClient.invalidateQueries({ queryKey: ['history', slug] })
+      queryClient.invalidateQueries({ queryKey: ['history-panel', slug] })
     },
   })
 }
