@@ -136,7 +136,7 @@ class TestUpdateCurrency:
         inventory_factory,
         test_db: AsyncSession,
     ) -> None:
-        """Test spending currency decreases balance."""
+        """Test spending currency decreases balance with make-change optimization."""
         inventory, passphrase = await inventory_factory(
             slug="spender-party",
             gold=100,
@@ -150,11 +150,15 @@ class TestUpdateCurrency:
 
         assert response.status_code == 200
         data = response.json()
-        assert data["gold"] == 70
+        # Make-change optimizes: 100 GP - 30 GP = 70 GP = 7 PP (optimal)
+        assert data["platinum"] == 7
+        assert data["gold"] == 0
+        assert data["total_gp"] == 70.0
 
         # Verify persistence
         await test_db.refresh(inventory)
-        assert inventory.gold == 70
+        assert inventory.platinum == 7
+        assert inventory.gold == 0
 
     @pytest.mark.asyncio
     async def test_insufficient_funds(
@@ -191,232 +195,55 @@ class TestUpdateCurrency:
         assert response.status_code == 401
 
 
-class TestConvertCurrency:
-    """Tests for POST /api/inventories/{slug}/currency/convert."""
+class TestMakeChange:
+    """Tests for make-change behavior when spending currency."""
 
     @pytest.mark.asyncio
-    async def test_convert_gold_to_silver(
+    async def test_spend_makes_change_from_higher_denom(
         self,
         client: AsyncClient,
         inventory_factory,
     ) -> None:
-        """Test converting gold to silver (down-conversion)."""
+        """Test spending more than available in one denom uses higher denoms."""
         inventory, passphrase = await inventory_factory(
-            slug="convert-party",
-            gold=10,
-        )
+            slug="makechange-party",
+            platinum=1,  # 10 GP worth
+            gold=5,      # 5 GP
+        )  # Total: 15 GP
 
+        # Spend 12 GP - requires breaking the platinum
         response = await client.post(
-            f"/api/inventories/{inventory.slug}/currency/convert",
-            json={
-                "from_denomination": "gold",
-                "to_denomination": "silver",
-                "amount": 5,
-            },
+            f"/api/inventories/{inventory.slug}/currency",
+            json={"gold": -12},
             headers={"X-Passphrase": passphrase},
         )
 
         assert response.status_code == 200
         data = response.json()
-        assert data["gold"] == 5  # 10 - 5
-        assert data["silver"] == 50  # 5 * 10
+        # 15 GP - 12 GP = 3 GP remaining (optimal: 0 PP, 3 GP)
+        assert data["total_gp"] == 3.0
 
     @pytest.mark.asyncio
-    async def test_convert_copper_to_gold(
+    async def test_spend_across_multiple_denoms(
         self,
         client: AsyncClient,
         inventory_factory,
     ) -> None:
-        """Test converting copper to gold (up-conversion).
-
-        250 CP -> 2 GP + 50 CP remainder. Only 200 CP is consumed.
-        """
+        """Test spending specified in multiple denominations."""
         inventory, passphrase = await inventory_factory(
-            slug="copper-party",
-            copper=250,
-        )
+            slug="multi-spend-party",
+            gold=100,
+            silver=50,
+        )  # Total: 105 GP
 
+        # Spend 10 GP and 30 SP (10 + 3 = 13 GP)
         response = await client.post(
-            f"/api/inventories/{inventory.slug}/currency/convert",
-            json={
-                "from_denomination": "copper",
-                "to_denomination": "gold",
-                "amount": 250,
-            },
+            f"/api/inventories/{inventory.slug}/currency",
+            json={"gold": -10, "silver": -30},
             headers={"X-Passphrase": passphrase},
         )
 
         assert response.status_code == 200
         data = response.json()
-        # 250 CP requested, but only 200 CP needed for 2 GP
-        # 50 CP remains (250 - 200 = 50)
-        assert data["copper"] == 50  # Remainder preserved
-        assert data["gold"] == 2  # 200 CP / 100 = 2 GP
-
-    @pytest.mark.asyncio
-    async def test_convert_silver_to_platinum(
-        self,
-        client: AsyncClient,
-        inventory_factory,
-    ) -> None:
-        """Test converting silver to platinum (skipping gold).
-
-        150 SP requested, but only 100 SP needed for 1 PP.
-        50 SP remains (preserved in source denomination).
-        """
-        inventory, passphrase = await inventory_factory(
-            slug="silver-party",
-            silver=150,
-        )
-
-        response = await client.post(
-            f"/api/inventories/{inventory.slug}/currency/convert",
-            json={
-                "from_denomination": "silver",
-                "to_denomination": "platinum",
-                "amount": 150,
-            },
-            headers={"X-Passphrase": passphrase},
-        )
-
-        assert response.status_code == 200
-        data = response.json()
-        # 150 SP = 1500 CP, 1 PP = 1000 CP
-        # Only 100 SP (1000 CP) used for 1 PP
-        # 50 SP remains in source denomination
-        assert data["silver"] == 50  # 150 - 100 = 50
-        assert data["platinum"] == 1
-        assert data["copper"] == 0  # No copper remainder when source preserved
-
-    @pytest.mark.asyncio
-    async def test_convert_insufficient_funds(
-        self,
-        client: AsyncClient,
-        test_inventory: tuple[Inventory, str],
-    ) -> None:
-        """Test conversion with insufficient funds returns 400."""
-        inventory, passphrase = test_inventory
-
-        response = await client.post(
-            f"/api/inventories/{inventory.slug}/currency/convert",
-            json={
-                "from_denomination": "gold",
-                "to_denomination": "silver",
-                "amount": 100,  # Has 0 gold
-            },
-            headers={"X-Passphrase": passphrase},
-        )
-
-        assert response.status_code == 400
-        assert "Insufficient" in response.json()["detail"]
-
-    @pytest.mark.asyncio
-    async def test_convert_same_denomination(
-        self,
-        client: AsyncClient,
-        inventory_factory,
-    ) -> None:
-        """Test converting to same denomination returns 400."""
-        inventory, passphrase = await inventory_factory(
-            slug="same-party",
-            gold=10,
-        )
-
-        response = await client.post(
-            f"/api/inventories/{inventory.slug}/currency/convert",
-            json={
-                "from_denomination": "gold",
-                "to_denomination": "gold",
-                "amount": 5,
-            },
-            headers={"X-Passphrase": passphrase},
-        )
-
-        assert response.status_code == 400
-        assert "same denomination" in response.json()["detail"]
-
-    @pytest.mark.asyncio
-    async def test_convert_amount_too_small(
-        self,
-        client: AsyncClient,
-        inventory_factory,
-    ) -> None:
-        """Test converting too small amount returns 400."""
-        inventory, passphrase = await inventory_factory(
-            slug="small-party",
-            copper=5,
-        )
-
-        response = await client.post(
-            f"/api/inventories/{inventory.slug}/currency/convert",
-            json={
-                "from_denomination": "copper",
-                "to_denomination": "gold",
-                "amount": 5,  # 5 CP < 100 CP (1 GP)
-            },
-            headers={"X-Passphrase": passphrase},
-        )
-
-        assert response.status_code == 400
-        assert "too small" in response.json()["detail"]
-
-    @pytest.mark.asyncio
-    async def test_convert_requires_auth(
-        self,
-        client: AsyncClient,
-        test_inventory: tuple[Inventory, str],
-    ) -> None:
-        """Test conversion requires authentication."""
-        inventory, _ = test_inventory
-
-        response = await client.post(
-            f"/api/inventories/{inventory.slug}/currency/convert",
-            json={
-                "from_denomination": "gold",
-                "to_denomination": "silver",
-                "amount": 5,
-            },
-        )
-
-        assert response.status_code == 401
-
-    @pytest.mark.asyncio
-    async def test_convert_all_denomination_pairs(
-        self,
-        client: AsyncClient,
-        inventory_factory,
-    ) -> None:
-        """Test conversion works for various denomination pairs."""
-        test_cases = [
-            # (from, to, initial, amount, expected_from, expected_to, expected_copper)
-            ("copper", "silver", {"copper": 100}, 100, 0, 10, 0),
-            ("silver", "gold", {"silver": 100}, 100, 0, 10, 0),
-            ("gold", "platinum", {"gold": 100}, 100, 0, 10, 0),
-            ("platinum", "gold", {"platinum": 10}, 10, 0, 100, 0),
-            ("gold", "silver", {"gold": 10}, 10, 0, 100, 0),
-            ("silver", "copper", {"silver": 10}, 10, 0, 100, 100),
-        ]
-
-        for i, (from_d, to_d, initial, amount, exp_from, exp_to, exp_cp) in enumerate(
-            test_cases
-        ):
-            inventory, passphrase = await inventory_factory(
-                slug=f"pair-test-{i}",
-                **initial,
-            )
-
-            response = await client.post(
-                f"/api/inventories/{inventory.slug}/currency/convert",
-                json={
-                    "from_denomination": from_d,
-                    "to_denomination": to_d,
-                    "amount": amount,
-                },
-                headers={"X-Passphrase": passphrase},
-            )
-
-            assert response.status_code == 200, f"Failed for {from_d} -> {to_d}"
-            data = response.json()
-            assert data[from_d] == exp_from, f"Wrong {from_d} for {from_d} -> {to_d}"
-            assert data[to_d] == exp_to, f"Wrong {to_d} for {from_d} -> {to_d}"
-            assert data["copper"] == exp_cp, f"Wrong copper for {from_d} -> {to_d}"
+        # 105 GP - 13 GP = 92 GP remaining
+        assert data["total_gp"] == 92.0
