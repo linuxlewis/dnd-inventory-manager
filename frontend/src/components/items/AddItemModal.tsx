@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { X, Search, Loader2 } from 'lucide-react'
 import { useCreateItem } from '../../api/items'
-import { useSrdSearch } from '../../api/srd'
-import type { ItemType, ItemRarity, SrdItem, ItemCreate } from '../../api/types'
+import { useSrdSearch, type SrdSearchResult } from '../../api/srd/hooks'
+import type { ItemType, ItemRarity, ItemCreate } from '../../api/types'
 import { ITEM_TYPES, ITEM_RARITIES, TYPE_LABELS, RARITY_LABELS } from './utils'
 import { useDebounce } from '../../hooks/useDebounce'
 
@@ -30,13 +30,22 @@ function srdToRarity(srdRarity?: { name: string }): ItemRarity {
   return 'common'
 }
 
-function srdToType(srdItem: SrdItem): ItemType {
-  const category = srdItem.equipment_category?.name?.toLowerCase() || ''
-  if (category.includes('weapon') || category.includes('armor') || srdItem.weapon_category || srdItem.armor_category) {
-    return 'equipment'
+function srdToType(item: SrdSearchResult): ItemType {
+  if (item.source === 'magic-item') {
+    const category = item.equipment_category.name.toLowerCase()
+    if (category.includes('potion')) return 'potion'
+    if (category.includes('scroll')) return 'scroll'
+    return 'misc'
   }
-  if (category.includes('potion')) return 'potion'
-  if (category.includes('scroll')) return 'scroll'
+  // Equipment union types
+  const typename = item.__typename
+  if (typename === 'Weapon' || typename === 'Armor') return 'equipment'
+  if ('equipment_category' in item) {
+    const category = (item as { equipment_category: { name: string } }).equipment_category.name.toLowerCase()
+    if (category.includes('weapon') || category.includes('armor')) return 'equipment'
+    if (category.includes('potion')) return 'potion'
+    if (category.includes('scroll')) return 'scroll'
+  }
   return 'misc'
 }
 
@@ -95,19 +104,34 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
     onClose()
   }
 
-  const handleSrdSelect = (srdItem: SrdItem) => {
-    setName(srdItem.name)
-    setType(srdToType(srdItem))
-    setCategory(srdItem.equipment_category?.name || '')
-    setRarity(srdToRarity(srdItem.rarity))
-    setDescription(srdItem.desc?.join('\n') || '')
-    if (srdItem.weight) setWeight(srdItem.weight)
-    if (srdItem.cost) {
-      // Convert to gold pieces using conversion rates
-      const rate = CURRENCY_TO_GP[srdItem.cost.unit] ?? 0
-      const costInGp = srdItem.cost.quantity * rate
-      setEstimatedValue(costInGp)
+  const handleSrdSelect = (item: SrdSearchResult) => {
+    setName(item.name)
+    setType(srdToType(item))
+    setDescription(item.desc?.join('\n') || '')
+
+    if (item.source === 'magic-item') {
+      setCategory(item.equipment_category.name)
+      setRarity(srdToRarity(item.rarity))
+    } else {
+      // Equipment: extract category from __typename or equipment_category
+      if ('equipment_category' in item) {
+        setCategory((item as { equipment_category: { name: string } }).equipment_category.name)
+      } else if (item.__typename === 'Weapon') {
+        setCategory('Weapon')
+      } else if (item.__typename === 'Armor') {
+        setCategory('Armor')
+      } else {
+        setCategory(item.__typename ?? '')
+      }
+      setRarity('common')
+      if (item.weight) setWeight(item.weight)
+      if (item.cost) {
+        const rate = CURRENCY_TO_GP[item.cost.unit] ?? 0
+        const costInGp = item.cost.quantity * rate
+        setEstimatedValue(costInGp)
+      }
     }
+
     setSearchQuery('')
     setShowDropdown(false)
   }
@@ -199,17 +223,31 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
                 <div className="absolute z-10 mt-1 w-full bg-gray-700 border border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                   {srdResults.map((item) => (
                     <button
-                      key={item.index}
+                      key={`${item.source}-${item.index}`}
                       type="button"
                       onClick={() => handleSrdSelect(item)}
                       className="w-full text-left px-4 py-2 hover:bg-gray-600 border-b border-gray-600 last:border-b-0"
                     >
-                      <div className="font-medium text-gray-100">{item.name}</div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-gray-100">{item.name}</span>
+                        {item.source === 'magic-item' && (
+                          <span className="text-xs px-1.5 py-0.5 bg-purple-800 text-purple-200 rounded">Magic</span>
+                        )}
+                      </div>
                       <div className="text-sm text-gray-400">
-                        {item.equipment_category?.name}
+                        {item.source === 'magic-item'
+                          ? item.equipment_category.name
+                          : ('equipment_category' in item
+                              ? (item as { equipment_category: { name: string } }).equipment_category.name
+                              : item.__typename)}
                       </div>
                     </button>
                   ))}
+                </div>
+              )}
+              {showDropdown && !srdLoading && debouncedQuery.length >= 2 && srdResults.length === 0 && (
+                <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg px-4 py-3 text-sm text-gray-500">
+                  No items found
                 </div>
               )}
             </div>

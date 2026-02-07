@@ -11,6 +11,8 @@ Started: 2026-02-07T18:53:59.768Z
 - Equipment search results include `__typename` to discriminate union types (Weapon, Armor, Gear, Tool, Vehicle, Pack, Ammunition).
 - SRD React Query hooks are in `src/api/srd/hooks.ts`. `useSrdSearch(query)` combines equipment + magic items with a `source` discriminator field. `useSrdEquipment(index)` and `useSrdMagicItem(index)` fetch single items.
 - Exported types: `SrdSearchResult` (tagged union with `source: 'equipment' | 'magic-item'`), `SrdEquipmentResult`, `SrdMagicItemResult` from `src/api/srd/hooks.ts`.
+- When consuming `SrdSearchResult` in UI components, use `item.source` to discriminate equipment vs magic items. Equipment has `cost`, `weight`, `__typename`; magic items have `rarity`, `equipment_category` (non-optional). Use `'equipment_category' in item` to check for Gear-type equipment which also has `equipment_category`.
+- The old `SrdItem` type from `src/api/types.ts` and old `useSrdSearch` from `src/api/srd.ts` are now unused — they will be cleaned up in FE-034.
 
 ## 2026-02-07 - FE-030
 - Installed graphql + graphql-request as dependencies
@@ -58,4 +60,21 @@ Started: 2026-02-07T18:53:59.768Z
   - The `SrdSearchResult` type is a tagged union — use `result.source === 'equipment'` or `result.source === 'magic-item'` to discriminate, and `result.__typename` for further equipment subtype discrimination (Weapon, Armor, etc.)
   - `useSrdSearch` replaces the old `useSrdSearch` from `src/api/srd.ts` (which called the backend REST API). The old hooks file still exists and will be removed in FE-034.
   - Both equipment and magic item detail hooks return `null` (not throw) when the item is not found, since the GraphQL queries return nullable types.
+---
+
+## 2026-02-07 - FE-033
+- Updated `AddItemModal.tsx` to use `useSrdSearch` from `src/api/srd/hooks` instead of old REST-based `src/api/srd`
+- Changed import from old `SrdItem` type to new `SrdSearchResult` tagged union type
+- Updated `srdToType()` to handle both equipment (using `__typename` for Weapon/Armor discrimination) and magic items (using `source === 'magic-item'`)
+- Updated `handleSrdSelect()` to handle both sources: equipment items populate cost/weight from GraphQL data, magic items populate rarity from their rarity field
+- Updated dropdown rendering: unique keys use `${source}-${index}`, magic items show a purple "Magic" badge, category display adapts per source type
+- Added empty state: shows "No items found" when search returns 0 results and query >= 2 chars
+- Search results now include BOTH equipment AND magic items from the live 5e SRD GraphQL API (no longer goes through local backend)
+- All quality checks pass (typecheck, lint, ruff, 66 backend tests)
+- Files changed: frontend/src/components/items/AddItemModal.tsx, tasks/phase-srd-graphql/prd.json, tasks/phase-srd-graphql/progress.txt
+- **Learnings for future iterations:**
+  - Equipment search results are a union type — only some subtypes have `equipment_category` (Gear), while others have `weapon_category` (Weapon) or `armor_category` (Armor). Use `'equipment_category' in item` to safely check.
+  - Magic items always have `equipment_category` and `rarity` as non-optional fields, while equipment never has `rarity` in search results.
+  - The `SrdItem` type in `src/api/types.ts` is now dead code — no components import it. It should be removed in FE-034.
+  - The old `src/api/srd.ts` REST hooks file is also dead code now — AddItemModal was its only consumer.
 ---
