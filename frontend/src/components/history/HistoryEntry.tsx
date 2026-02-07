@@ -27,18 +27,18 @@ export function HistoryEntry({ entry }: HistoryEntryProps) {
   }
 
   return (
-    <div className="flex items-start gap-3 py-3">
-      <div className={`w-8 h-8 rounded-full ${bg} flex items-center justify-center flex-shrink-0`}>
-        <Icon className={`w-4 h-4 ${color}`} />
+    <div className="flex items-start gap-2 py-2">
+      <div className={`w-6 h-6 rounded-full ${bg} flex items-center justify-center flex-shrink-0`}>
+        <Icon className={`w-3 h-3 ${color}`} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-gray-900">
+        <p className="text-xs font-medium text-gray-900">
           {formatActionDescription(entry.action, entry.entity_name)}
         </p>
         {detailText && (
-          <p className="text-xs text-gray-500 mt-0.5">{detailText}</p>
+          <p className="text-[11px] text-gray-500 mt-0.5">{detailText}</p>
         )}
-        <p className="text-xs text-gray-400 mt-0.5">
+        <p className="text-[10px] text-gray-400 mt-0.5">
           {formatRelativeTime(entry.created_at)}
         </p>
       </div>
