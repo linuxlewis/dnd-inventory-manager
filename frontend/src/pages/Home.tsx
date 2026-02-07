@@ -140,10 +140,10 @@ export function Home() {
     <div className="max-w-2xl mx-auto">
       {/* Hero Section */}
       <section className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
+        <h1 className="text-4xl font-bold text-gray-100 mb-4">
           D&D Party Inventory Manager
         </h1>
-        <p className="text-lg text-gray-600">
+        <p className="text-lg text-gray-400">
           Keep track of your party's loot, equipment, and gold. Share with your
           fellow adventurers using a simple passphrase.
         </p>
@@ -163,14 +163,14 @@ export function Home() {
       )}
 
       {/* Create New Inventory Section */}
-      <section className="bg-white rounded-lg shadow-md p-6 mb-8">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+      <section className="bg-gray-800 rounded-lg shadow-md border border-gray-700 p-6 mb-8">
+        <h2 className="text-2xl font-semibold text-gray-100 mb-6">
           Create New Inventory
         </h2>
 
         <form onSubmit={handleCreateSubmit} className="space-y-4">
           {errors.general && (
-            <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+            <div className="p-3 bg-red-900/30 border border-red-500 text-red-400 rounded">
               {errors.general}
             </div>
           )}
@@ -178,7 +178,7 @@ export function Home() {
           <div>
             <label
               htmlFor="name"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-gray-300 mb-1"
             >
               Party Name <span className="text-red-500">*</span>
             </label>
@@ -187,8 +187,8 @@ export function Home() {
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                errors.name ? 'border-red-500' : 'border-gray-300'
+              className={`w-full px-3 py-2 border rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                errors.name ? 'border-red-500' : 'border-gray-600'
               }`}
               placeholder="The Mighty Nein"
             />
@@ -200,7 +200,7 @@ export function Home() {
           <div>
             <label
               htmlFor="passphrase"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-gray-300 mb-1"
             >
               Passphrase <span className="text-red-500">*</span>
             </label>
@@ -209,8 +209,8 @@ export function Home() {
               id="passphrase"
               value={passphrase}
               onChange={(e) => setPassphrase(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                errors.passphrase ? 'border-red-500' : 'border-gray-300'
+              className={`w-full px-3 py-2 border rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                errors.passphrase ? 'border-red-500' : 'border-gray-600'
               }`}
               placeholder="Min 6 characters"
             />
@@ -222,7 +222,7 @@ export function Home() {
           <div>
             <label
               htmlFor="confirmPassphrase"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-gray-300 mb-1"
             >
               Confirm Passphrase <span className="text-red-500">*</span>
             </label>
@@ -231,8 +231,8 @@ export function Home() {
               id="confirmPassphrase"
               value={confirmPassphrase}
               onChange={(e) => setConfirmPassphrase(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                errors.confirmPassphrase ? 'border-red-500' : 'border-gray-300'
+              className={`w-full px-3 py-2 border rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                errors.confirmPassphrase ? 'border-red-500' : 'border-gray-600'
               }`}
               placeholder="Confirm your passphrase"
             />
@@ -246,7 +246,7 @@ export function Home() {
           <div>
             <label
               htmlFor="description"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-gray-300 mb-1"
             >
               Description
             </label>
@@ -255,7 +255,7 @@ export function Home() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               placeholder="Campaign notes, party details, etc."
             />
           </div>
@@ -263,7 +263,7 @@ export function Home() {
           <button
             type="submit"
             disabled={createInventory.isPending}
-            className="w-full py-3 px-4 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="w-full py-3 px-4 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {createInventory.isPending ? 'Creating...' : 'Create Inventory'}
           </button>
@@ -271,14 +271,14 @@ export function Home() {
       </section>
 
       {/* Access Existing Inventory Section */}
-      <section className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+      <section className="bg-gray-800 rounded-lg shadow-md border border-gray-700 p-6">
+        <h2 className="text-2xl font-semibold text-gray-100 mb-6">
           Access Existing Inventory
         </h2>
 
         <form onSubmit={handleAccessSubmit} className="space-y-4">
           {accessErrors.general && (
-            <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+            <div className="p-3 bg-red-900/30 border border-red-500 text-red-400 rounded">
               {accessErrors.general}
             </div>
           )}
@@ -286,7 +286,7 @@ export function Home() {
           <div>
             <label
               htmlFor="accessSlug"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-gray-300 mb-1"
             >
               Inventory Slug <span className="text-red-500">*</span>
             </label>
@@ -295,8 +295,8 @@ export function Home() {
               id="accessSlug"
               value={accessSlug}
               onChange={(e) => setAccessSlug(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                accessErrors.slug ? 'border-red-500' : 'border-gray-300'
+              className={`w-full px-3 py-2 border rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                accessErrors.slug ? 'border-red-500' : 'border-gray-600'
               }`}
               placeholder="the-mighty-nein"
             />
@@ -308,7 +308,7 @@ export function Home() {
           <div>
             <label
               htmlFor="accessPassphrase"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-gray-300 mb-1"
             >
               Passphrase <span className="text-red-500">*</span>
             </label>
@@ -318,15 +318,15 @@ export function Home() {
                 id="accessPassphrase"
                 value={accessPassphrase}
                 onChange={(e) => setAccessPassphrase(e.target.value)}
-                className={`w-full px-3 py-2 pr-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                  accessErrors.passphrase ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-3 py-2 pr-10 border rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                  accessErrors.passphrase ? 'border-red-500' : 'border-gray-600'
                 }`}
                 placeholder="Enter passphrase"
               />
               <button
                 type="button"
                 onClick={() => setShowAccessPassphrase(!showAccessPassphrase)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-700 focus:outline-none"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-200 focus:outline-none"
                 aria-label={showAccessPassphrase ? 'Hide passphrase' : 'Show passphrase'}
               >
                 {showAccessPassphrase ? (
@@ -344,7 +344,7 @@ export function Home() {
           <button
             type="submit"
             disabled={authenticateInventory.isPending}
-            className="w-full py-3 px-4 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="w-full py-3 px-4 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {authenticateInventory.isPending ? 'Accessing...' : 'Access Inventory'}
           </button>
