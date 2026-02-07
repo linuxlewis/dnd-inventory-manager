@@ -9,6 +9,8 @@ Started: 2026-02-07T18:53:59.768Z
 - Backend dev dependencies (ruff, pytest, httpx, pytest-asyncio) are in `[dependency-groups] dev` in pyproject.toml.
 - Import `srdApi` from `src/api/srd/client.ts` for all SRD GraphQL queries. Methods: `SearchEquipment({name})`, `SearchMagicItems({name})`, `GetEquipmentByIndex({index})`, `GetMagicItemByIndex({index})`.
 - Equipment search results include `__typename` to discriminate union types (Weapon, Armor, Gear, Tool, Vehicle, Pack, Ammunition).
+- SRD React Query hooks are in `src/api/srd/hooks.ts`. `useSrdSearch(query)` combines equipment + magic items with a `source` discriminator field. `useSrdEquipment(index)` and `useSrdMagicItem(index)` fetch single items.
+- Exported types: `SrdSearchResult` (tagged union with `source: 'equipment' | 'magic-item'`), `SrdEquipmentResult`, `SrdMagicItemResult` from `src/api/srd/hooks.ts`.
 
 ## 2026-02-07 - FE-030
 - Installed graphql + graphql-request as dependencies
@@ -42,4 +44,18 @@ Started: 2026-02-07T18:53:59.768Z
   - SDK methods are PascalCase: `srdApi.SearchEquipment()`, `srdApi.SearchMagicItems()`, `srdApi.GetEquipmentByIndex()`, `srdApi.GetMagicItemByIndex()`
   - Equipment search query returns union types — use `__typename` to discriminate between Weapon/Armor/Gear/etc in consuming code
   - The `equipment` singular query returns `AnyEquipment | null` (nullable), while `equipments` returns `AnyEquipment[]`
+---
+
+## 2026-02-07 - FE-032
+- Created `src/api/srd/hooks.ts` with three React Query hooks:
+  - `useSrdSearch(query)` — Fires both `SearchEquipment` and `SearchMagicItems` in parallel via `Promise.all`, combines results with a `source` discriminator field (`'equipment'` or `'magic-item'`). Enabled only when query >= 2 chars. staleTime: 5 minutes.
+  - `useSrdEquipment(index)` — Fetches a single equipment item by index. Enabled only when index is truthy. staleTime: 30 minutes.
+  - `useSrdMagicItem(index)` — Fetches a single magic item by index. Enabled only when index is truthy. staleTime: 30 minutes.
+- Exported helper types: `SrdSearchResult`, `SrdEquipmentResult`, `SrdMagicItemResult` derived from generated GraphQL types.
+- All quality checks pass (typecheck, lint, backend ruff, backend pytest — 66 tests)
+- Files changed: frontend/src/api/srd/hooks.ts, tasks/phase-srd-graphql/prd.json, tasks/phase-srd-graphql/progress.txt
+- **Learnings for future iterations:**
+  - The `SrdSearchResult` type is a tagged union — use `result.source === 'equipment'` or `result.source === 'magic-item'` to discriminate, and `result.__typename` for further equipment subtype discrimination (Weapon, Armor, etc.)
+  - `useSrdSearch` replaces the old `useSrdSearch` from `src/api/srd.ts` (which called the backend REST API). The old hooks file still exists and will be removed in FE-034.
+  - Both equipment and magic item detail hooks return `null` (not throw) when the item is not found, since the GraphQL queries return nullable types.
 ---
