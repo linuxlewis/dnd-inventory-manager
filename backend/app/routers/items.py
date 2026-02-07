@@ -18,6 +18,7 @@ from app.models import (
     ItemType,
     ItemUpdate,
 )
+from app.services import log_item_added, log_item_removed, log_item_updated
 
 router = APIRouter(prefix="/api/inventories", tags=["items"])
 
@@ -39,6 +40,9 @@ async def create_item(
     db.add(item)
     await db.commit()
     await db.refresh(item)
+
+    # Log history entry after successful commit
+    await log_item_added(db, inventory.id, item)
 
     return item
 
@@ -125,6 +129,9 @@ async def update_item(
     if item is None:
         raise HTTPException(status_code=404, detail="Item not found")
 
+    # Capture old values for change tracking
+    old_values = item.get_snapshot()
+
     # Apply updates
     update_data = data.model_dump(exclude_unset=True)
     for key, value in update_data.items():
@@ -136,6 +143,10 @@ async def update_item(
     db.add(item)
     await db.commit()
     await db.refresh(item)
+
+    # Log history entry after successful commit (computes changes internally)
+    new_values = item.get_snapshot()
+    await log_item_updated(db, inventory.id, item, old_values, new_values)
 
     return item
 
@@ -158,5 +169,11 @@ async def delete_item(
     if item is None:
         raise HTTPException(status_code=404, detail="Item not found")
 
+    # Capture item data before deletion for history
+    item_snapshot = item.model_copy()
+
     await db.delete(item)
     await db.commit()
+
+    # Log history entry after successful commit
+    await log_item_removed(db, inventory.id, item_snapshot)

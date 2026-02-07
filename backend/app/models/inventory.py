@@ -48,6 +48,18 @@ class Inventory(InventoryBase, table=True):
         sa_column_kwargs={"onupdate": func.now()},
     )
 
+    def get_snapshot(self) -> dict[str, int]:
+        """Get a snapshot of currency values for change tracking.
+
+        Returns a dict with all currency denominations.
+        """
+        return {
+            "copper": self.copper,
+            "silver": self.silver,
+            "gold": self.gold,
+            "platinum": self.platinum,
+        }
+
 
 class InventoryCreate(SQLModel):
     """Schema for creating a new inventory."""
