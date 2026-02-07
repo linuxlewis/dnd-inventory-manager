@@ -1,2 +1,3 @@
 export { ActivityWidget } from './ActivityWidget'
-export { formatRelativeTime, formatActionDescription } from './utils'
+export { HistoryEntry } from './HistoryEntry'
+export { formatRelativeTime, formatActionDescription, formatCurrencyChanges, formatFieldChanges } from './utils'

@@ -29,3 +29,39 @@ export function formatActionDescription(action: HistoryAction, entityName: strin
   if (action === 'currency_updated') return verb
   return entityName ? `${verb} ${entityName}` : verb
 }
+
+const CURRENCY_LABELS: Record<string, string> = {
+  copper: 'CP',
+  silver: 'SP',
+  gold: 'GP',
+  platinum: 'PP',
+}
+
+export function formatCurrencyChanges(details: Record<string, unknown> | null): string | null {
+  if (!details) return null
+  const changes: string[] = []
+  for (const [key, value] of Object.entries(details)) {
+    const label = CURRENCY_LABELS[key]
+    if (!label || typeof value !== 'number') continue
+    const sign = value >= 0 ? '+' : ''
+    changes.push(`${sign}${value} ${label}`)
+  }
+  return changes.length > 0 ? changes.join(', ') : null
+}
+
+export function formatFieldChanges(details: Record<string, unknown> | null): string | null {
+  if (!details) return null
+  const changes: string[] = []
+  for (const [key, value] of Object.entries(details)) {
+    if (
+      value != null &&
+      typeof value === 'object' &&
+      'old' in (value as Record<string, unknown>) &&
+      'new' in (value as Record<string, unknown>)
+    ) {
+      const change = value as { old: unknown; new: unknown }
+      changes.push(`${key}: ${String(change.old)} → ${String(change.new)}`)
+    }
+  }
+  return changes.length > 0 ? changes.join(', ') : null
+}
