@@ -1,8 +1,8 @@
-import { useState, useCallback, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { X, History, Loader2 } from 'lucide-react'
-import type { HistoryEntry as HistoryEntryType, HistoryResponse } from '../../api/types'
+import type { HistoryEntry as HistoryEntryType } from '../../api/types'
 import { fetchHistory } from '../../api/history'
-import { useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 import { HistoryEntry } from './HistoryEntry'
 
 interface HistoryPanelProps {
@@ -38,54 +38,35 @@ function groupEntriesByDay(entries: HistoryEntryType[]): [string, HistoryEntryTy
   return Array.from(groups.entries())
 }
 
-/**
- * Fetches all pages up to the given pageCount and returns merged entries + total.
- * Each "Load More" increases pageCount, triggering a re-fetch that includes all pages.
- */
-async function fetchAllPages(
-  slug: string,
-  pageCount: number
-): Promise<{ entries: HistoryEntryType[]; total: number }> {
-  const pages: Promise<HistoryResponse>[] = []
-  for (let i = 0; i < pageCount; i++) {
-    pages.push(fetchHistory(slug, { limit: PAGE_SIZE, offset: i * PAGE_SIZE }))
-  }
-  const results = await Promise.all(pages)
-  const seenIds = new Set<string>()
-  const entries: HistoryEntryType[] = []
-  for (const result of results) {
-    for (const entry of result.entries) {
-      if (!seenIds.has(entry.id)) {
-        seenIds.add(entry.id)
-        entries.push(entry)
-      }
-    }
-  }
-  const total = results[0]?.total ?? 0
-  return { entries, total }
-}
-
 export function HistoryPanel({ slug, isOpen, onClose }: HistoryPanelProps) {
-  const [pageCount, setPageCount] = useState(1)
-
-  const { data, isLoading, isFetching } = useQuery({
-    queryKey: ['history-panel', slug, pageCount],
-    queryFn: () => fetchAllPages(slug, pageCount),
+  const {
+    data,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery({
+    queryKey: ['history-panel', slug],
+    queryFn: ({ pageParam = 0 }) => fetchHistory(slug, { limit: PAGE_SIZE, offset: pageParam * PAGE_SIZE }),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, pages) => {
+      const currentCount = pages.reduce((acc, page) => acc + page.entries.length, 0)
+      return currentCount < lastPage.total ? pages.length : undefined
+    },
     enabled: isOpen,
   })
 
-  const loadedEntries = useMemo(() => data?.entries ?? [], [data])
-  const total = data?.total ?? 0
-  const hasMore = loadedEntries.length < total
+  const loadedEntries = useMemo(() => data?.pages.flatMap(page => page.entries) ?? [], [data])
 
   const grouped = useMemo(() => groupEntriesByDay(loadedEntries), [loadedEntries])
 
   const handleLoadMore = useCallback(() => {
-    setPageCount((prev) => prev + 1)
-  }, [])
+    if (hasNextPage) {
+      fetchNextPage()
+    }
+  }, [hasNextPage, fetchNextPage])
 
   const handleClose = useCallback(() => {
-    setPageCount(1)
     onClose()
   }, [onClose])
 
@@ -106,6 +87,7 @@ export function HistoryPanel({ slug, isOpen, onClose }: HistoryPanelProps) {
           </div>
           <button
             onClick={handleClose}
+            aria-label="Close activity log"
             className="p-1 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
           >
             <X className="w-6 h-6" />
@@ -140,14 +122,14 @@ export function HistoryPanel({ slug, isOpen, onClose }: HistoryPanelProps) {
                 </div>
               ))}
 
-              {hasMore && (
+              {hasNextPage && (
                 <div className="pt-2 pb-4">
                   <button
                     onClick={handleLoadMore}
-                    disabled={isFetching}
+                    disabled={isFetchingNextPage}
                     className="w-full py-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 rounded-lg transition-colors disabled:opacity-50"
                   >
-                    {isFetching ? (
+                    {isFetchingNextPage ? (
                       <span className="flex items-center justify-center gap-2">
                         <Loader2 className="w-4 h-4 animate-spin" />
                         Loading...

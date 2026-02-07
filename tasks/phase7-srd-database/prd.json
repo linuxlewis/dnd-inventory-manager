@@ -1,0 +1,114 @@
+{
+  "project": "dnd-helper",
+  "branchName": "feat/srd-database",
+  "description": "Move SRD data from JSON files into database with ingestion pipeline",
+  "userStories": [
+    {
+      "id": "BE-034",
+      "title": "SrdItem Database Model",
+      "description": "Create SrdItem SQLModel table for storing SRD reference data",
+      "acceptanceCriteria": [
+        "Create SrdItem class in backend/app/models/srd.py with table=True",
+        "Fields: id (str PK), name (indexed), type (indexed), category (indexed), subcategory, description, weight, value_gp, rarity, source_file, properties (JSON)",
+        "Add SrdItem to backend/app/models/__init__.py exports",
+        "Table auto-creates on app startup (SQLModel.metadata.create_all)",
+        "Ruff check passes: uv run ruff check app/",
+        "Pytest passes: uv run pytest tests/ -v"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "BE-035",
+      "title": "SRD Ingestion CLI Script",
+      "description": "Create CLI script to load JSON files into srd_items table",
+      "acceptanceCriteria": [
+        "Create backend/app/cli/__init__.py",
+        "Create backend/app/cli/ingest_srd.py with async ingest_srd() function",
+        "Load armor.json, weapons.json, gear.json, potions.json from app/data/",
+        "Normalize items: convert cost to value_gp, extract properties (damage_dice, ac_base, etc.)",
+        "Clear existing srd_items before inserting (idempotent)",
+        "Print count of ingested items on completion",
+        "Can run via: cd backend && uv run python -m app.cli.ingest_srd",
+        "Running ingestion loads ~129 items into database",
+        "Ruff check passes: uv run ruff check app/",
+        "Pytest passes: uv run pytest tests/ -v"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "BE-036",
+      "title": "Update Search Service to Query Database",
+      "description": "Replace JSON file search with database queries",
+      "acceptanceCriteria": [
+        "Update backend/app/services/srd.py to query SrdItem table",
+        "Remove JSON file loading and caching code",
+        "search_srd takes AsyncSession, uses select().where(name.ilike())",
+        "Type and category filters use .where() clauses",
+        "Update backend/app/routers/srd.py to pass db session to service",
+        "GET /api/srd/search?q=sword returns results from database",
+        "Ruff check passes: uv run ruff check app/",
+        "Pytest passes: uv run pytest tests/ -v"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "BE-037",
+      "title": "Add GET /api/srd/items/{item_id} Endpoint",
+      "description": "Single item lookup endpoint",
+      "acceptanceCriteria": [
+        "Add GET /api/srd/items/{item_id} route to backend/app/routers/srd.py",
+        "Query SrdItem by id (primary key)",
+        "Return 404 if item not found",
+        "Response includes all fields including properties JSON",
+        "Ruff check passes: uv run ruff check app/",
+        "Pytest passes: uv run pytest tests/ -v"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "BE-038",
+      "title": "SRD Integration Tests",
+      "description": "Tests for ingestion and API endpoints",
+      "acceptanceCriteria": [
+        "Update backend/tests/test_srd.py with new tests",
+        "Test: ingestion loads items into database",
+        "Test: search returns matching items",
+        "Test: type filter works",
+        "Test: category filter works",
+        "Test: GET /api/srd/items/{id} returns item",
+        "Test: GET /api/srd/items/{unknown} returns 404",
+        "All tests pass: uv run pytest tests/test_srd.py -v",
+        "Ruff check passes: uv run ruff check app/ tests/"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "FE-014",
+      "title": "Update Frontend SrdItem Type and AddItemModal",
+      "description": "Align frontend types with new backend response schema",
+      "acceptanceCriteria": [
+        "Update SrdItem interface in frontend/src/api/types.ts",
+        "New fields: id, value_gp, subcategory, source_file, properties object",
+        "Properties object has: damage_dice, damage_type, range, weapon_properties, ac_base, ac_dex_bonus, stealth_disadvantage, effect, duration",
+        "Update AddItemModal.tsx handleSrdSelect to use new field names",
+        "Use item.value_gp directly instead of cost calculation",
+        "Use item.properties?.damage_dice instead of item.damage?.damage_dice",
+        "Typecheck passes: bun run typecheck",
+        "Lint passes: bun run lint"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

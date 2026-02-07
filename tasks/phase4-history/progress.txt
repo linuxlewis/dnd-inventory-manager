@@ -1,0 +1,80 @@
+# Ralph Progress Log
+Started: 2026-02-07T16:50:55.582Z
+---
+
+## Codebase Patterns
+- Frontend API uses `/api/inventories/${slug}/...` pattern (not `/api/v1/`)
+- React Query hooks use `enabled: !!slug` to guard against undefined slugs
+- Types go in `api/types.ts`, client functions + hooks go in `api/<feature>.ts`
+- Fetch functions are separate from hooks for reusability
+- apiClient interceptor auto-injects X-Passphrase header for inventory routes
+- Widget cards use `bg-white rounded-lg shadow-md p-4 mb-6` base styling
+- Loading skeletons use `bg-gray-200 animate-pulse rounded` pattern
+- Slide-out panels use `fixed inset-y-0 right-0 z-50` with `fixed inset-0 z-40 bg-black/50` backdrop
+- ESLint forbids `setState` in effects (`react-hooks/set-state-in-effect`) and ref access during render (`react-hooks/refs`)
+- For paginated "Load More" patterns, use `fetchAllPages` approach: queryFn fetches all pages up to `pageCount`, state only tracks `pageCount`
+- Wrap `data?.entries ?? []` in `useMemo` to stabilize array reference for downstream memo deps
+- Inventory page layout order: header → widgets (Treasury, Activity) → items list → modals/panels
+- Guard data-fetching hooks with `isAuthenticated ? slug : undefined` to prevent pre-auth requests
+
+---
+
+## 2026-02-07 - FE-001
+- Added HistoryAction, HistoryEntityType, HistoryEntry, HistoryResponse types to api/types.ts
+- Created api/history.ts with fetchHistory function and useHistory React Query hook
+- **Files changed:** frontend/src/api/types.ts, frontend/src/api/history.ts
+- **Learnings for future iterations:**
+  - PRD says `/api/v1/` but codebase uses `/api/` — used `/api/` for consistency
+  - Backend history endpoint doesn't exist yet; frontend is being built ahead of it
+  - useHistory hook follows same pattern as useCurrency/useItems with enabled guard
+---
+
+## 2026-02-07 - FE-002
+- Created ActivityWidget component with loading skeleton, empty state, and active state
+- Created utils.ts with formatRelativeTime and formatActionDescription helpers
+- Created index.ts barrel export for history components
+- **Files changed:** frontend/src/components/history/ActivityWidget.tsx, frontend/src/components/history/utils.ts, frontend/src/components/history/index.ts
+- **Learnings for future iterations:**
+  - TreasuryWidget uses `bg-white rounded-lg shadow-md p-6 mb-6` pattern for card styling
+  - Loading skeletons use `bg-gray-200 animate-pulse` pattern
+  - Widget accepts pre-fetched data as props rather than fetching internally (parent fetches via useHistory)
+  - Lucide Clock and History icons are available and used for activity display
+---
+
+## 2026-02-07 - FE-003
+- Created HistoryEntry component with action-specific icons and color coding
+- Added formatCurrencyChanges and formatFieldChanges helpers to utils.ts
+- Updated barrel export in index.ts
+- **Files changed:** frontend/src/components/history/HistoryEntry.tsx, frontend/src/components/history/utils.ts, frontend/src/components/history/index.ts
+- **Learnings for future iterations:**
+  - Action icon mapping: Sword (green) for added, Pencil (blue) for updated, Trash2 (red) for removed, Coins (amber) for currency
+  - Currency details expected as `{ gold: 50, silver: -10 }` format (denomination → delta)
+  - Item update details expected as `{ field: { old: value, new: value } }` format for change tracking
+  - Component uses `HistoryEntry` as type import aliased to `HistoryEntryType` to avoid collision with component name
+---
+
+## 2026-02-07 - FE-004
+- Created HistoryPanel slide-out component with day grouping, pagination, loading/empty states
+- Panel slides in from right using same pattern as ItemDetail (z-40 backdrop + z-50 panel)
+- Entries grouped by day: "Today", "Yesterday", or formatted date (e.g., "Friday, February 7")
+- Pagination via "Load More" button using fetchAllPages pattern (re-fetches all pages to avoid setState-in-effect)
+- Updated barrel export in index.ts
+- **Files changed:** frontend/src/components/history/HistoryPanel.tsx, frontend/src/components/history/index.ts
+- **Learnings for future iterations:**
+  - ESLint `react-hooks/set-state-in-effect` rule forbids calling setState inside useEffect — use derived state or query-based patterns instead
+  - ESLint `react-hooks/refs` rule forbids reading/writing ref.current during render (including inside useMemo) — refs only in event handlers/effects
+  - For "Load More" pagination: use a `pageCount` state + queryFn that fetches all pages via Promise.all, avoids state accumulation issues
+  - `data?.entries ?? []` creates unstable reference — wrap in useMemo to prevent downstream re-renders
+  - Map preserves insertion order, so `groupEntriesByDay` returns groups in chronological order of first entry seen
+---
+
+## 2026-02-07 - FE-005
+- Wired up ActivityWidget and HistoryPanel into the Inventory page
+- Added `showHistoryPanel` state, `useHistory` hook (limit: 1 for widget), ActivityWidget between TreasuryWidget and Items, HistoryPanel after Currency Modals
+- **Files changed:** frontend/src/pages/Inventory.tsx
+- **Learnings for future iterations:**
+  - Inventory.tsx follows pattern: header → widgets → items → modals/panels (order matters for layout)
+  - useHistory with `{ limit: 1 }` is efficient for fetching only the latest entry for the widget
+  - Guard history hook with `isAuthenticated ? slug : undefined` to prevent fetching before auth (same pattern as useCurrency)
+  - HistoryPanel manages its own data fetching internally, only needs slug, isOpen, onClose props
+---

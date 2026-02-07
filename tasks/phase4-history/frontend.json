@@ -1,0 +1,141 @@
+{
+  "phase": "Phase 4: History Frontend",
+  "description": "Activity history widget and panel for the inventory page",
+  "tasks": [
+    {
+      "id": "FE-001",
+      "title": "API Types & Client",
+      "description": "Add history types and create API client with React Query hook",
+      "status": "pending",
+      "files": [
+        "frontend/src/api/types.ts",
+        "frontend/src/api/history.ts"
+      ],
+      "subtasks": [
+        "Add HistoryAction, HistoryEntityType, HistoryEntry, HistoryResponse types to api/types.ts",
+        "Create api/history.ts with fetchHistory function",
+        "Create useHistory React Query hook with pagination support",
+        "Export from api/history.ts"
+      ],
+      "tests": [
+        "Hook returns loading state initially",
+        "Hook returns data on success",
+        "Hook respects enabled flag when slug is undefined",
+        "Pagination params passed correctly to API"
+      ]
+    },
+    {
+      "id": "FE-002",
+      "title": "ActivityWidget Component",
+      "description": "Summary widget showing last activity for the inventory page",
+      "status": "pending",
+      "files": [
+        "frontend/src/components/history/ActivityWidget.tsx",
+        "frontend/src/components/history/index.ts",
+        "frontend/src/components/history/utils.ts"
+      ],
+      "subtasks": [
+        "Create utils.ts with formatRelativeTime helper",
+        "Create ActivityWidget component with loading skeleton state",
+        "Add empty state (No activity yet)",
+        "Add data state showing last update time and summary",
+        "Add onClick prop to open history panel",
+        "Create barrel export in index.ts"
+      ],
+      "acceptance": [
+        "Shows skeleton while loading",
+        "Shows 'No activity yet' when history is empty",
+        "Shows relative time (e.g., '2 hours ago') for last entry",
+        "Shows brief description of last action",
+        "Entire widget is clickable"
+      ]
+    },
+    {
+      "id": "FE-003",
+      "title": "HistoryEntry Component",
+      "description": "Single history entry with icon, time, and details",
+      "status": "pending",
+      "files": [
+        "frontend/src/components/history/HistoryEntry.tsx",
+        "frontend/src/components/history/utils.ts"
+      ],
+      "subtasks": [
+        "Create HistoryEntry component",
+        "Add icon selection logic based on action type (Sword, Edit, Trash, Coins)",
+        "Format timestamp as relative or absolute time",
+        "Format details based on action type",
+        "For item_updated: show key changes (field: old → new)",
+        "For currency_updated: show net change summary",
+        "Update barrel export"
+      ],
+      "acceptance": [
+        "Correct icon for each action type",
+        "Time displayed appropriately",
+        "Item actions show entity name",
+        "Update actions show what changed",
+        "Currency actions show amount changes"
+      ]
+    },
+    {
+      "id": "FE-004",
+      "title": "HistoryPanel Component",
+      "description": "Slide-out panel with full activity log",
+      "status": "pending",
+      "files": [
+        "frontend/src/components/history/HistoryPanel.tsx"
+      ],
+      "subtasks": [
+        "Create HistoryPanel as slide-out from right (similar to ItemDetail)",
+        "Add header with title and close button",
+        "Group entries by day (Today, Yesterday, specific dates)",
+        "Render HistoryEntry for each item",
+        "Add 'Load More' button for pagination",
+        "Handle loading state for initial load and pagination",
+        "Handle empty state",
+        "Update barrel export"
+      ],
+      "acceptance": [
+        "Panel slides in from right",
+        "Close button works",
+        "Clicking backdrop closes panel",
+        "Entries grouped by day with headers",
+        "Load More fetches next page",
+        "Loading spinner shown during fetch",
+        "Empty state shown when no history"
+      ]
+    },
+    {
+      "id": "FE-005",
+      "title": "Integration & Polish",
+      "description": "Wire up components to Inventory page and polish UX",
+      "status": "pending",
+      "files": [
+        "frontend/src/pages/Inventory.tsx"
+      ],
+      "subtasks": [
+        "Add showHistoryPanel state to Inventory page",
+        "Import and add ActivityWidget below TreasuryWidget",
+        "Import and add HistoryPanel with open/close handlers",
+        "Pass slug to both components",
+        "Test full flow: view widget → open panel → paginate → close",
+        "Verify mobile responsiveness",
+        "Run typecheck and lint"
+      ],
+      "acceptance": [
+        "ActivityWidget visible on inventory page",
+        "Clicking widget opens HistoryPanel",
+        "Panel can be closed via X button or backdrop",
+        "Data loads correctly",
+        "No TypeScript errors",
+        "No lint errors",
+        "Works on mobile viewport"
+      ]
+    }
+  ],
+  "dependencies": {
+    "FE-002": ["FE-001"],
+    "FE-003": ["FE-001"],
+    "FE-004": ["FE-002", "FE-003"],
+    "FE-005": ["FE-004"]
+  }
+}

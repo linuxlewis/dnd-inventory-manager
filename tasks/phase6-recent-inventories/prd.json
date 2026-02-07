@@ -1,0 +1,83 @@
+{
+  "project": "dnd-helper",
+  "branchName": "feat/recent-inventories",
+  "description": "Cache recently accessed inventories in localStorage for quick access from home page",
+  "userStories": [
+    {
+      "id": "FE-010",
+      "title": "useRecentInventories Hook",
+      "description": "Create a React hook that manages recently accessed inventories in localStorage",
+      "acceptanceCriteria": [
+        "Create frontend/src/hooks/useRecentInventories.ts",
+        "RecentInventory type: { slug: string, name: string, lastAccessed: number }",
+        "Hook returns: recentInventories array, addRecent fn, removeRecent fn, clearAll fn",
+        "addRecent(slug, name) adds/updates entry and moves to front of list",
+        "List capped at 10 items (oldest removed when exceeding)",
+        "removeRecent(slug) removes single entry",
+        "clearAll() clears entire list",
+        "Data persisted to localStorage key 'dnd-inventory-recent'",
+        "SSR safe: check typeof window !== 'undefined'",
+        "Typecheck passes: bun run typecheck",
+        "Lint passes: bun run lint"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "FE-011",
+      "title": "RecentInventoriesList Component",
+      "description": "Component to display list of recent inventories with click to navigate and remove button",
+      "acceptanceCriteria": [
+        "Create frontend/src/components/RecentInventoriesList.tsx",
+        "Props: inventories, onSelect, onRemove",
+        "Each item shows: inventory name, relative time (e.g. '2 hours ago'), X remove button",
+        "Clicking item calls onSelect(slug)",
+        "X button calls onRemove(slug) with event.stopPropagation()",
+        "If inventories array is empty, render null (don't show section)",
+        "Styled with Tailwind matching existing card/list patterns",
+        "Hover states on items",
+        "Typecheck passes: bun run typecheck",
+        "Lint passes: bun run lint"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "FE-012",
+      "title": "Integrate with Home Page",
+      "description": "Add RecentInventoriesList to Home page above the slug input",
+      "acceptanceCriteria": [
+        "Import useRecentInventories and RecentInventoriesList in Home.tsx",
+        "Show RecentInventoriesList above the 'Access an inventory' section",
+        "Add 'Recent Inventories' heading when list is non-empty",
+        "onSelect navigates to /i/{slug}",
+        "onRemove calls removeRecent from hook",
+        "Section hidden when no recent inventories (clean for new users)",
+        "Typecheck passes: bun run typecheck",
+        "Lint passes: bun run lint"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "FE-013",
+      "title": "Track Access in Inventory Page",
+      "description": "Call addRecent when user successfully accesses an inventory",
+      "acceptanceCriteria": [
+        "Import useRecentInventories in Inventory.tsx",
+        "Call addRecent(slug, inventory.name) when inventory data loads successfully",
+        "Only call when isAuthenticated and inventory data exists",
+        "Use useEffect to trigger on inventory load",
+        "Test: access inventory → go home → see it in recents → click → returns to inventory",
+        "Typecheck passes: bun run typecheck",
+        "Lint passes: bun run lint"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}
