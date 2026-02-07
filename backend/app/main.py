@@ -17,7 +17,6 @@ from app.routers import (
     history_router,
     inventories_router,
     items_router,
-    srd_router,
 )
 
 
@@ -46,7 +45,6 @@ app.add_middleware(
 # Register routers
 app.include_router(inventories_router)
 app.include_router(items_router)
-app.include_router(srd_router)
 app.include_router(currency_router)
 app.include_router(history_router)
 

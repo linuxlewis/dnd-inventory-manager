@@ -78,3 +78,26 @@ Started: 2026-02-07T18:53:59.768Z
   - The `SrdItem` type in `src/api/types.ts` is now dead code — no components import it. It should be removed in FE-034.
   - The old `src/api/srd.ts` REST hooks file is also dead code now — AddItemModal was its only consumer.
 ---
+
+## 2026-02-07 - FE-034
+- Removed all static SRD data and backend endpoints, completing the migration to live GraphQL queries
+- **Deleted files:**
+  - `backend/app/data/armor.json`, `gear.json`, `potions.json`, `srd_index.json`, `weapons.json` (5 SRD JSON files)
+  - `backend/app/data/` directory (empty after JSON removal)
+  - `backend/app/routers/srd.py` (SRD search API endpoint)
+  - `backend/app/services/srd.py` (SRD JSON loading/search service)
+  - `backend/app/models/srd.py` (SrdItemRead Pydantic schema)
+  - `backend/tests/test_srd.py` (5 SRD endpoint tests)
+  - `frontend/src/api/srd.ts` (old REST-based SRD hooks)
+- **Modified files:**
+  - `backend/app/routers/__init__.py` — removed `srd_router` import and export
+  - `backend/app/main.py` — removed `srd_router` import and `app.include_router(srd_router)`
+  - `backend/app/models/__init__.py` — removed `SrdItemRead` import and export
+  - `frontend/src/api/types.ts` — removed dead `SrdItem` interface
+  - `tasks/phase-srd-graphql/prd.json` — marked FE-034 as passing
+- All quality checks pass: ruff lint, typecheck, eslint, 61 backend tests (down from 66 after removing 5 SRD tests)
+- **Learnings for future iterations:**
+  - When removing a backend module, check all 4 layers: router, service, model, and tests — plus their `__init__.py` re-exports
+  - The `backend/app/services/__init__.py` did NOT re-export SRD service, but `models/__init__.py` and `routers/__init__.py` did — always check both
+  - Frontend `types.ts` can accumulate dead types when modules are replaced — grep for usage before keeping
+---
