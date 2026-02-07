@@ -3,7 +3,7 @@ import { RecentInventorySelector } from './RecentInventorySelector'
 
 export function AppLayout() {
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-900 text-gray-100">
       <header className="bg-indigo-600 text-white shadow-md">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/" className="text-xl md:text-2xl font-bold hover:text-indigo-200 transition-colors">
