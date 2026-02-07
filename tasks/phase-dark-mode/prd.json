@@ -1,100 +1,138 @@
 {
-  "name": "Dark Mode Theme",
+  "project": "DnD Helper",
+  "branchName": "feat/dark-mode",
   "description": "Convert the D&D Inventory Manager to a dark color scheme",
-  "stories": [
+  "userStories": [
     {
       "id": "FE-020",
       "title": "Update Global Styles",
       "description": "Update index.css with dark background on body/html. Set bg-gray-900 as default page background.",
-      "acceptance": [
+      "acceptanceCriteria": [
         "Body background is gray-900",
         "Default text color is gray-100",
-        "No white flash on page load"
-      ]
+        "No white flash on page load",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": ""
     },
     {
       "id": "FE-021",
       "title": "Update AppLayout Header",
       "description": "Dark header with gray-800 or indigo-900 background. Update RecentInventorySelector dropdown for dark theme.",
-      "acceptance": [
+      "acceptanceCriteria": [
         "Header uses dark background",
         "Logo/text visible and readable",
-        "Dropdown menu has dark styling"
-      ]
+        "Dropdown menu has dark styling",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": true,
+      "notes": ""
     },
     {
       "id": "FE-022",
       "title": "Update Home Page",
       "description": "Dark cards (bg-gray-800), dark inputs (bg-gray-700), visible borders (border-gray-600), adjusted button colors.",
-      "acceptance": [
+      "acceptanceCriteria": [
         "Create Inventory form is dark",
         "Access Inventory form is dark",
         "Recent Inventories list is dark",
-        "All inputs clearly visible"
-      ]
+        "All inputs clearly visible",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
     },
     {
       "id": "FE-023",
       "title": "Update Inventory Page",
       "description": "Dark inventory header, treasury widget, and activity log panel. Update auth prompt screen.",
-      "acceptance": [
+      "acceptanceCriteria": [
         "Inventory header card is dark",
         "Treasury widget is dark",
         "Activity log card is dark",
-        "Auth/passphrase prompt is dark"
-      ]
+        "Auth/passphrase prompt is dark",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
     },
     {
       "id": "FE-024",
       "title": "Update Item Components",
       "description": "Dark ItemCard, ItemDetail slide-out, AddItemModal, EditItemModal. Adjust rarity colors for dark backgrounds.",
-      "acceptance": [
+      "acceptanceCriteria": [
         "ItemCard has dark background",
         "ItemDetail panel is dark",
         "Add/Edit modals are dark",
-        "Rarity colors visible on dark"
-      ]
+        "Rarity colors visible on dark",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
     },
     {
       "id": "FE-025",
       "title": "Update Currency Components",
       "description": "Dark TreasuryWidget and CurrencyModal styling.",
-      "acceptance": [
+      "acceptanceCriteria": [
         "Treasury widget dark with visible denominations",
         "Add/Spend modals are dark",
-        "Currency inputs clearly visible"
-      ]
+        "Currency inputs clearly visible",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
     },
     {
       "id": "FE-026",
       "title": "Update History Components",
       "description": "Dark HistoryPanel, HistorySidebar, and HistoryEntry. Adjust action icon backgrounds for dark theme.",
-      "acceptance": [
+      "acceptanceCriteria": [
         "Activity log card is dark",
         "History sidebar is dark",
-        "Action icons visible with appropriate backgrounds"
-      ]
+        "Action icons visible with appropriate backgrounds",
+        "Typecheck passes"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
     },
     {
       "id": "FE-027",
       "title": "Update Modals and Dialogs",
       "description": "Dark delete confirmation dialog and any other modal/dialog components.",
-      "acceptance": [
+      "acceptanceCriteria": [
         "Delete confirmation is dark",
         "Modal backdrops appropriate opacity",
-        "All dialogs consistent styling"
-      ]
+        "All dialogs consistent styling",
+        "Typecheck passes"
+      ],
+      "priority": 8,
+      "passes": false,
+      "notes": ""
     },
     {
       "id": "FE-028",
       "title": "Final Polish and Accessibility",
       "description": "Review all hover/focus states, loading skeletons, error messages. Verify WCAG AA contrast ratios.",
-      "acceptance": [
+      "acceptanceCriteria": [
         "All hover states work on dark",
         "Focus rings visible",
         "Error messages readable",
-        "Loading skeletons appropriate for dark"
-      ]
+        "Loading skeletons appropriate for dark",
+        "Typecheck passes",
+        "Lint passes"
+      ],
+      "priority": 9,
+      "passes": false,
+      "notes": ""
     }
   ]
 }

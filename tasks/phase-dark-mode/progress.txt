@@ -1,0 +1,36 @@
+# Ralph Progress Log
+Started: 2026-02-07T18:46:20.314Z
+---
+
+## Codebase Patterns
+- AppLayout in `frontend/src/components/layout/AppLayout.tsx` wraps all pages with min-h-screen container
+- Global CSS in `frontend/src/index.css` uses Tailwind `@layer base` for body defaults
+- To prevent white flash on load, set `class="bg-gray-900"` directly on `<html>` in `index.html`
+- Tailwind config is in `frontend/tailwind.config.js` (standard, no dark mode toggle — we're going all-dark)
+- Header uses bg-gray-800 with border-b border-gray-700 for subtle separation; logo uses text-indigo-400 for brand accent
+- No RecentInventorySelector component exists — the PRD mentions it but the header is just a simple Link
+
+---
+
+## 2026-02-07 - FE-020
+- What was implemented: Dark global styles — bg-gray-900 on body/html, text-gray-100 as default text color, white flash prevention via inline class on `<html>` tag
+- Files changed:
+  - `frontend/src/index.css` — Added `@layer base` with bg-gray-900 and text-gray-100
+  - `frontend/index.html` — Added `class="bg-gray-900"` to `<html>` element
+  - `frontend/src/components/layout/AppLayout.tsx` — Changed bg-gray-100 to bg-gray-900, added text-gray-100
+- **Learnings for future iterations:**
+  - The AppLayout currently uses `bg-indigo-600` for the header — this will need updating in FE-021
+  - All page content flows through AppLayout's `<Outlet />` so child components inherit text-gray-100
+  - `bun install` must be run first if node_modules is missing (e.g., fresh worktree)
+---
+
+## 2026-02-07 - FE-021
+- What was implemented: Dark header — changed bg-indigo-600 to bg-gray-800 with border-gray-700 bottom border, logo text changed to indigo-400 with indigo-300 hover
+- Files changed:
+  - `frontend/src/components/layout/AppLayout.tsx` — Updated header background, border, and link colors
+- **Learnings for future iterations:**
+  - No RecentInventorySelector dropdown component exists in the codebase — the PRD referenced it but it's not implemented
+  - For dark headers, bg-gray-800 with border-b border-gray-700 provides subtle separation from bg-gray-900 body
+  - Using text-indigo-400 for brand accent on dark backgrounds maintains readable contrast
+  - Home page (`pages/Home.tsx`) still has many light-mode classes (bg-white, text-gray-900, etc.) — needs FE-022
+---
