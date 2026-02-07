@@ -1,10 +1,21 @@
 """Tests for item API endpoints."""
 
+from uuid import UUID
+
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlmodel import select
 
-from app.models import Inventory, Item, ItemRarity, ItemType
+from app.models import (
+    HistoryAction,
+    HistoryEntityType,
+    HistoryEntry,
+    Inventory,
+    Item,
+    ItemRarity,
+    ItemType,
+)
 from app.routers.inventories import hash_passphrase
 
 
@@ -421,3 +432,146 @@ class TestDeleteItem:
             f"/api/inventories/{inventory.slug}/items/{item.id}",
         )
         assert response.status_code == 401
+
+
+class TestItemHistoryLogging:
+    """Tests for history logging on item operations."""
+
+    @pytest.fixture
+    async def inventory_for_history(self, test_db: AsyncSession) -> tuple[Inventory, str]:
+        """Create a sample inventory for history testing."""
+        passphrase = "test-history-pass"
+        inventory = Inventory(
+            slug="test-item-history-party",
+            name="Test Item History Party",
+            description="An inventory for testing item history",
+            passphrase_hash=hash_passphrase(passphrase),
+        )
+        test_db.add(inventory)
+        await test_db.commit()
+        await test_db.refresh(inventory)
+        return inventory, passphrase
+
+    async def test_create_item_adds_history_entry(
+        self,
+        client: AsyncClient,
+        inventory_for_history: tuple[Inventory, str],
+        test_db: AsyncSession,
+    ) -> None:
+        """Test that creating an item logs a history entry."""
+        inventory, passphrase = inventory_for_history
+
+        # Create an item
+        response = await client.post(
+            f"/api/inventories/{inventory.slug}/items",
+            json={"name": "Magic Sword", "type": "equipment", "rarity": "rare", "quantity": 2},
+            headers={"X-Passphrase": passphrase},
+        )
+        assert response.status_code == 200
+        item_data = response.json()
+        item_id = UUID(item_data["id"])
+
+        # Verify history entry was created
+        result = await test_db.execute(
+            select(HistoryEntry).where(
+                HistoryEntry.inventory_id == inventory.id,
+                HistoryEntry.action == HistoryAction.item_added,
+            )
+        )
+        entry = result.scalar_one_or_none()
+        assert entry is not None
+        assert entry.entity_type == HistoryEntityType.item
+        assert entry.entity_id == item_id
+        assert entry.entity_name == "Magic Sword"
+        assert entry.details["name"] == "Magic Sword"
+        assert entry.details["quantity"] == 2
+        assert entry.details["type"] == "equipment"
+        assert entry.details["rarity"] == "rare"
+
+    async def test_update_item_adds_history_entry_with_changes(
+        self,
+        client: AsyncClient,
+        inventory_for_history: tuple[Inventory, str],
+        test_db: AsyncSession,
+    ) -> None:
+        """Test that updating an item logs a history entry with changes."""
+        inventory, passphrase = inventory_for_history
+
+        # Create an item first
+        create_response = await client.post(
+            f"/api/inventories/{inventory.slug}/items",
+            json={"name": "Healing Potion", "type": "potion", "quantity": 3},
+            headers={"X-Passphrase": passphrase},
+        )
+        assert create_response.status_code == 200
+        item_data = create_response.json()
+        item_id = UUID(item_data["id"])
+
+        # Update the item
+        update_response = await client.patch(
+            f"/api/inventories/{inventory.slug}/items/{item_id}",
+            json={"quantity": 5, "notes": "Found in dungeon"},
+            headers={"X-Passphrase": passphrase},
+        )
+        assert update_response.status_code == 200
+
+        # Verify history entry was created with changes
+        result = await test_db.execute(
+            select(HistoryEntry).where(
+                HistoryEntry.inventory_id == inventory.id,
+                HistoryEntry.action == HistoryAction.item_updated,
+            )
+        )
+        entry = result.scalar_one_or_none()
+        assert entry is not None
+        assert entry.entity_type == HistoryEntityType.item
+        assert entry.entity_id == item_id
+        assert entry.entity_name == "Healing Potion"
+        assert "changes" in entry.details
+        changes = entry.details["changes"]
+        assert changes["quantity"]["old"] == 3
+        assert changes["quantity"]["new"] == 5
+        assert changes["notes"]["old"] is None
+        assert changes["notes"]["new"] == "Found in dungeon"
+
+    async def test_delete_item_adds_history_entry(
+        self,
+        client: AsyncClient,
+        inventory_for_history: tuple[Inventory, str],
+        test_db: AsyncSession,
+    ) -> None:
+        """Test that deleting an item logs a history entry."""
+        inventory, passphrase = inventory_for_history
+
+        # Create an item first
+        create_response = await client.post(
+            f"/api/inventories/{inventory.slug}/items",
+            json={"name": "Scroll of Fireball", "type": "scroll", "quantity": 1},
+            headers={"X-Passphrase": passphrase},
+        )
+        assert create_response.status_code == 200
+        item_data = create_response.json()
+        item_id = UUID(item_data["id"])
+
+        # Delete the item
+        delete_response = await client.delete(
+            f"/api/inventories/{inventory.slug}/items/{item_id}",
+            headers={"X-Passphrase": passphrase},
+        )
+        assert delete_response.status_code == 204
+
+        # Verify history entry was created
+        result = await test_db.execute(
+            select(HistoryEntry).where(
+                HistoryEntry.inventory_id == inventory.id,
+                HistoryEntry.action == HistoryAction.item_removed,
+            )
+        )
+        entry = result.scalar_one_or_none()
+        assert entry is not None
+        assert entry.entity_type == HistoryEntityType.item
+        assert entry.entity_id == item_id
+        assert entry.entity_name == "Scroll of Fireball"
+        assert entry.details["name"] == "Scroll of Fireball"
+        assert entry.details["quantity"] == 1
+        assert entry.details["reason"] == "deleted"

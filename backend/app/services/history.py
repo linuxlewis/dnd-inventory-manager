@@ -14,7 +14,6 @@ from app.models import (
     HistoryEntityType,
     HistoryEntry,
     HistoryListResponse,
-    Inventory,
     Item,
 )
 
@@ -175,16 +174,6 @@ async def log_currency_updated(
     await session.commit()
     await session.refresh(entry)
     return entry
-
-
-def get_currency_snapshot(inventory: Inventory) -> dict[str, int]:
-    """Get a snapshot of current currency values from an inventory."""
-    return {
-        "copper": inventory.copper,
-        "silver": inventory.silver,
-        "gold": inventory.gold,
-        "platinum": inventory.platinum,
-    }
 
 
 async def get_history(

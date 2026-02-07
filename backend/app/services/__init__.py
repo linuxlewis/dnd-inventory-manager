@@ -5,7 +5,6 @@ from app.services.currency import (
 )
 from app.services.history import (
     compute_changes,
-    get_currency_snapshot,
     get_history,
     log_currency_updated,
     log_item_added,
@@ -17,7 +16,6 @@ __all__ = [
     "CONVERSION_RATES",
     "apply_currency_delta",
     "compute_changes",
-    "get_currency_snapshot",
     "get_history",
     "log_currency_updated",
     "log_item_added",

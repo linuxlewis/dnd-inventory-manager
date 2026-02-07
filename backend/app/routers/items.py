@@ -1,7 +1,6 @@
 """Item API endpoints using SQLModel."""
 
 from datetime import UTC, datetime
-from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query
@@ -111,23 +110,6 @@ async def get_item(
     return item
 
 
-def _get_item_snapshot(item: Item) -> dict[str, Any]:
-    """Get a snapshot of item fields for change tracking."""
-    return {
-        "name": item.name,
-        "type": item.type.value if item.type else None,
-        "category": item.category,
-        "rarity": item.rarity.value if item.rarity else None,
-        "description": item.description,
-        "quantity": item.quantity,
-        "weight": item.weight,
-        "estimated_value": item.estimated_value,
-        "notes": item.notes,
-        "thumbnail_url": item.thumbnail_url,
-        "properties": item.properties,
-    }
-
-
 @router.patch("/{slug}/items/{item_id}", response_model=ItemRead)
 async def update_item(
     slug: str,
@@ -148,7 +130,7 @@ async def update_item(
         raise HTTPException(status_code=404, detail="Item not found")
 
     # Capture old values for change tracking
-    old_values = _get_item_snapshot(item)
+    old_values = item.get_snapshot()
 
     # Apply updates
     update_data = data.model_dump(exclude_unset=True)
@@ -163,7 +145,7 @@ async def update_item(
     await db.refresh(item)
 
     # Compute changes and log history entry after successful commit
-    new_values = _get_item_snapshot(item)
+    new_values = item.get_snapshot()
     changes = compute_changes(old_values, new_values)
     if changes:
         await log_item_updated(db, inventory.id, item, changes)
@@ -190,14 +172,7 @@ async def delete_item(
         raise HTTPException(status_code=404, detail="Item not found")
 
     # Capture item data before deletion for history
-    item_snapshot = Item(
-        id=item.id,
-        inventory_id=item.inventory_id,
-        name=item.name,
-        quantity=item.quantity,
-        type=item.type,
-        rarity=item.rarity,
-    )
+    item_snapshot = item.model_copy()
 
     await db.delete(item)
     await db.commit()

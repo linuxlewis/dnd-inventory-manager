@@ -69,6 +69,23 @@ class Item(ItemBase, table=True):
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
+    def get_snapshot(self) -> dict[str, Any]:
+        """Get a snapshot of item fields for change tracking.
+
+        Returns a dict with key fields for history logging.
+        """
+        return {
+            "name": self.name,
+            "type": self.type.value,
+            "category": self.category,
+            "rarity": self.rarity.value,
+            "description": self.description,
+            "quantity": self.quantity,
+            "weight": self.weight,
+            "estimated_value": self.estimated_value,
+            "notes": self.notes,
+        }
+
 
 class ItemCreate(ItemBase):
     """Schema for creating a new item."""

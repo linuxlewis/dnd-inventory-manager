@@ -1,0 +1,116 @@
+{
+  "project": "D&D Party Inventory Manager",
+  "branchName": "feat/srd-search",
+  "description": "SRD search system with SQLite ingestion and FTS5 search",
+  "userStories": [
+    {
+      "id": "SRD-001",
+      "title": "SRD SQLModel and table schema",
+      "description": "As a developer, I need a SQLModel for SRD items with all necessary fields.",
+      "acceptanceCriteria": [
+        "Create backend/app/models/srd_item.py",
+        "SRDItem SQLModel with fields: id, name, slug, type, category, rarity, cost_gp, weight_lbs, description",
+        "Weapon fields: damage_dice, damage_type, weapon_properties (JSON), weapon_range",
+        "Armor fields: ac_base, ac_bonus, armor_type, strength_required, stealth_disadvantage",
+        "Magic item fields: attunement_required, attunement_requirements, magical_bonus",
+        "Consumable fields: effect",
+        "search_text field for FTS content",
+        "source field defaults to 'SRD 5.1'",
+        "slug field has unique constraint",
+        "ruff check passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Use SQLModel for ORM. weapon_properties stored as JSON string."
+    },
+    {
+      "id": "SRD-002",
+      "title": "SRD FTS5 virtual table",
+      "description": "As a developer, I need a full-text search virtual table for fast SRD searches.",
+      "acceptanceCriteria": [
+        "Create Alembic migration for srd_items_fts virtual table",
+        "FTS5 table indexes: name, description, search_text",
+        "content='srd_items' and content_rowid='id' for external content table",
+        "Migration runs without errors",
+        "ruff check passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": "SQLite FTS5 for fast prefix and full-text matching. Run alembic upgrade head to apply."
+    },
+    {
+      "id": "SRD-003",
+      "title": "SRD data ingestion script",
+      "description": "As a developer, I need a script to load SRD JSON data into the database.",
+      "acceptanceCriteria": [
+        "Create backend/scripts/ingest_srd.py",
+        "Reads from backend/data/srd_items.json by default",
+        "Accepts --source argument for custom JSON path",
+        "Clears existing srd_items before import (idempotent)",
+        "Generates slug from name (lowercase, hyphenated)",
+        "Builds search_text from name + description + category",
+        "Rebuilds FTS index after import",
+        "Prints progress and final count",
+        "ruff check passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": "Run with: cd backend && uv run python scripts/ingest_srd.py"
+    },
+    {
+      "id": "SRD-004",
+      "title": "SRD search service",
+      "description": "As a developer, I need a service layer for searching SRD items.",
+      "acceptanceCriteria": [
+        "Create backend/app/services/srd_search.py",
+        "search_srd(query, type_filter, limit) function using FTS5",
+        "get_srd_item_by_slug(slug) function",
+        "FTS5 MATCH query with bm25 ranking",
+        "Prefix matching supported (query*)",
+        "Returns list of SRDItem models",
+        "ruff check passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": "Use SQLModel select with FTS5 join for relevance ranking."
+    },
+    {
+      "id": "SRD-005",
+      "title": "SRD search API endpoints",
+      "description": "As a user, I want to search for SRD items via API.",
+      "acceptanceCriteria": [
+        "Create backend/app/routers/srd_search.py",
+        "GET /api/srd/search with query params: q (required), type (optional), limit (optional, default 20, max 100)",
+        "GET /api/srd/items/{slug} returns single item or 404",
+        "Response includes results array and total count",
+        "Pydantic response models for SRDItem and SRDSearchResponse",
+        "Register router in main.py",
+        "No authentication required (public endpoints)",
+        "ruff check passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": "Public endpoints - no X-Passphrase needed for SRD lookups."
+    },
+    {
+      "id": "SRD-006",
+      "title": "SRD search tests",
+      "description": "As a developer, I need tests for the SRD search functionality.",
+      "acceptanceCriteria": [
+        "Create backend/tests/test_srd_search.py",
+        "Test search returns matching items",
+        "Test search with type filter",
+        "Test search limit parameter",
+        "Test prefix matching works",
+        "Test get item by slug returns correct item",
+        "Test get item by slug returns 404 for unknown slug",
+        "Test empty search returns empty results",
+        "All tests pass with pytest",
+        "ruff check passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": "Use test fixtures with sample SRD data."
+    }
+  ]
+}

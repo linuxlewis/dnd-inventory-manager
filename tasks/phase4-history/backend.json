@@ -1,0 +1,118 @@
+{
+  "project": "D&D Party Inventory Manager",
+  "branchName": "feat/history-backend",
+  "description": "Backend activity log for tracking inventory changes",
+  "userStories": [
+    {
+      "id": "BE-024",
+      "title": "HistoryEntry model and schemas",
+      "description": "As a developer, I need a database model to store history entries.",
+      "acceptanceCriteria": [
+        "Create backend/app/models/history.py",
+        "HistoryAction enum: item_added, item_updated, item_removed, currency_updated",
+        "HistoryEntityType enum: item, currency",
+        "HistoryEntry SQLModel with table=True",
+        "Fields: id (UUID PK), inventory_id (FK), action, entity_type, entity_id (nullable), entity_name (nullable), details (JSON), created_at",
+        "HistoryEntryRead Pydantic schema for API responses",
+        "HistoryListResponse schema with entries, total, limit, offset",
+        "Export from models/__init__.py",
+        "Ruff check passes"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "Use SQLModel JSON column for details field"
+    },
+    {
+      "id": "BE-025",
+      "title": "History service layer",
+      "description": "As a developer, I need service functions to log history entries.",
+      "acceptanceCriteria": [
+        "Create backend/app/services/history.py",
+        "log_item_added(session, inventory_id, item) function",
+        "log_item_updated(session, inventory_id, item, changes: dict) function",
+        "log_item_removed(session, inventory_id, item) function",
+        "log_currency_updated(session, inventory_id, old_currency, new_currency, note) function",
+        "get_history(session, inventory_id, limit, offset, action_filter, entity_filter) function",
+        "Helper to compute changes dict from old/new values",
+        "Export from services/__init__.py",
+        "Ruff check passes"
+      ],
+      "priority": 2,
+      "passes": true,
+      "notes": "Changes dict format: { field: { old: x, new: y } }"
+    },
+    {
+      "id": "BE-026",
+      "title": "Integrate history logging into item operations",
+      "description": "As a user, I want item changes automatically logged to history.",
+      "acceptanceCriteria": [
+        "Update item router POST (create) to call log_item_added",
+        "Update item router PATCH (update) to call log_item_updated with changes",
+        "Update item router DELETE to call log_item_removed",
+        "Logging happens after successful DB commit",
+        "Failed operations do not create history entries",
+        "Ruff check passes"
+      ],
+      "priority": 3,
+      "passes": true,
+      "notes": "Compute changes by comparing old vs new item fields"
+    },
+    {
+      "id": "BE-027",
+      "title": "Integrate history logging into currency operations",
+      "description": "As a user, I want currency changes automatically logged to history.",
+      "acceptanceCriteria": [
+        "Update currency router POST (update) to call log_currency_updated",
+        "Update currency router POST convert to call log_currency_updated",
+        "Include note field from request in history details",
+        "Only log fields that actually changed",
+        "Logging happens after successful DB commit",
+        "Ruff check passes"
+      ],
+      "priority": 4,
+      "passes": true,
+      "notes": ""
+    },
+    {
+      "id": "BE-028",
+      "title": "History GET endpoint",
+      "description": "As a user, I want to fetch the activity log for my inventory.",
+      "acceptanceCriteria": [
+        "Create backend/app/routers/history.py",
+        "GET /api/v1/inventories/{slug}/history endpoint",
+        "Requires X-Passphrase header auth",
+        "Query params: limit (default 20, max 100), offset (default 0)",
+        "Query params: action (optional filter), entity_type (optional filter)",
+        "Returns HistoryListResponse with entries, total, limit, offset",
+        "Entries ordered by created_at DESC (newest first)",
+        "Register router in main.py",
+        "Ruff check passes"
+      ],
+      "priority": 5,
+      "passes": true,
+      "notes": ""
+    },
+    {
+      "id": "BE-029",
+      "title": "History endpoint tests",
+      "description": "As a developer, I need tests to verify history functionality.",
+      "acceptanceCriteria": [
+        "Create backend/tests/test_history.py",
+        "Test: creating item adds history entry",
+        "Test: updating item adds history entry with changes",
+        "Test: deleting item adds history entry",
+        "Test: updating currency adds history entry",
+        "Test: converting currency adds history entry",
+        "Test: GET history returns entries in DESC order",
+        "Test: GET history pagination works",
+        "Test: GET history action filter works",
+        "Test: GET history requires auth",
+        "All tests assert database persistence, not just API response",
+        "Ruff check passes"
+      ],
+      "priority": 6,
+      "passes": true,
+      "notes": "Use inventory_factory fixture from conftest.py"
+    }
+  ]
+}

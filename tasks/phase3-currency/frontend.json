@@ -1,0 +1,143 @@
+{
+  "project": "D&D Party Inventory Manager",
+  "branchName": "feat/currency-frontend",
+  "description": "Frontend UI for currency management with treasury display, add/spend, and conversion",
+  "userStories": [
+    {
+      "id": "FE-013",
+      "title": "Currency TypeScript types",
+      "description": "As a developer, I need TypeScript types for currency data and API responses.",
+      "acceptanceCriteria": [
+        "Add to frontend/src/types/index.ts or create frontend/src/types/currency.ts",
+        "CurrencyDenomination type: 'copper' | 'silver' | 'gold' | 'platinum'",
+        "Currency interface: { copper: number, silver: number, gold: number, platinum: number, total_gp: number }",
+        "CurrencyUpdateRequest interface: { copper?: number, silver?: number, gold?: number, platinum?: number, note?: string }",
+        "CurrencyConvertRequest interface: { from_denomination: CurrencyDenomination, to_denomination: CurrencyDenomination, amount: number }",
+        "bun run typecheck passes",
+        "bun run lint passes"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "Added types to frontend/src/api/types.ts"
+    },
+    {
+      "id": "FE-014",
+      "title": "Currency API client",
+      "description": "As a developer, I need API functions to interact with currency endpoints.",
+      "acceptanceCriteria": [
+        "Create frontend/src/api/currency.ts",
+        "getCurrency(slug: string) -> Promise<Currency> function",
+        "updateCurrency(slug: string, data: CurrencyUpdateRequest) -> Promise<Currency> function",
+        "convertCurrency(slug: string, data: CurrencyConvertRequest) -> Promise<Currency> function",
+        "All functions use authenticated axios client with X-Passphrase header",
+        "Proper error handling for API errors",
+        "bun run typecheck passes",
+        "bun run lint passes"
+      ],
+      "priority": 2,
+      "passes": true,
+      "notes": "Created TanStack Query hooks: useCurrency, useUpdateCurrency, useConvertCurrency"
+    },
+    {
+      "id": "FE-015",
+      "title": "Treasury widget component",
+      "description": "As a user, I want to see my party's currency at a glance on the inventory page.",
+      "acceptanceCriteria": [
+        "Create frontend/src/components/currency/TreasuryWidget.tsx",
+        "Display all 4 denominations: PP, GP, SP, CP with values",
+        "Show total value in GP equivalent (formatted to 2 decimal places)",
+        "Currency icons or styled abbreviations for each denomination",
+        "Desktop: horizontal row layout",
+        "Mobile: 2x2 grid layout (Tailwind responsive classes)",
+        "Action buttons: Add Funds, Spend, Convert",
+        "Loading state while fetching currency",
+        "bun run typecheck passes",
+        "bun run lint passes"
+      ],
+      "priority": 3,
+      "passes": true,
+      "notes": "Uses grid-cols-2 md:grid-cols-4 for responsive layout"
+    },
+    {
+      "id": "FE-016",
+      "title": "Add/Spend currency modal",
+      "description": "As a user, I want to add or spend currency from my treasury.",
+      "acceptanceCriteria": [
+        "Create frontend/src/components/currency/CurrencyModal.tsx",
+        "Modal with mode prop: 'add' | 'spend'",
+        "Title changes based on mode: 'Add Funds' or 'Spend Currency'",
+        "Input fields for each denomination (number inputs, min=0)",
+        "Optional note text field",
+        "Preview section showing current -> new totals",
+        "For spend mode: validation that values don't exceed available",
+        "For spend mode: visual warning if exceeding available funds",
+        "Submit and Cancel buttons",
+        "Calls updateCurrency API on submit (negative values for spend mode)",
+        "Closes modal and refreshes treasury on success",
+        "Error toast on failure",
+        "bun run typecheck passes",
+        "bun run lint passes"
+      ],
+      "priority": 4,
+      "passes": true,
+      "notes": "Supports both add/spend modes with validation and preview"
+    },
+    {
+      "id": "FE-017",
+      "title": "Currency conversion modal",
+      "description": "As a user, I want to convert currency between denominations.",
+      "acceptanceCriteria": [
+        "Create frontend/src/components/currency/ConvertModal.tsx",
+        "From denomination dropdown (copper, silver, gold, platinum)",
+        "To denomination dropdown (copper, silver, gold, platinum)",
+        "Amount input (number, min=1)",
+        "Conversion preview showing result (e.g., '100 CP -> 10 SP')",
+        "Validation: cannot convert to same denomination",
+        "Validation: amount cannot exceed source balance",
+        "Submit and Cancel buttons",
+        "Calls convertCurrency API on submit",
+        "Closes modal and refreshes treasury on success",
+        "Error toast on failure",
+        "bun run typecheck passes",
+        "bun run lint passes"
+      ],
+      "priority": 5,
+      "passes": true,
+      "notes": "Shows live conversion preview with remainder calculation"
+    },
+    {
+      "id": "FE-018",
+      "title": "Currency SSE integration",
+      "description": "As a user, I want my treasury display to update in real-time when others make changes.",
+      "acceptanceCriteria": [
+        "Update useSSE hook (or create useCurrencySSE) to handle 'currency_updated' event",
+        "On currency_updated event, update TanStack Query cache for currency data",
+        "Treasury widget reflects changes without manual refresh",
+        "Optional: show toast notification when currency changes externally",
+        "bun run typecheck passes",
+        "bun run lint passes"
+      ],
+      "priority": 6,
+      "passes": true,
+      "notes": "Created useSSE and useCurrencySSE hooks in frontend/src/hooks/useSSE.ts"
+    },
+    {
+      "id": "FE-019",
+      "title": "Integrate treasury into inventory page",
+      "description": "As a user, I want to see and manage my treasury from the main inventory page.",
+      "acceptanceCriteria": [
+        "Add TreasuryWidget to Inventory.tsx page (above items list)",
+        "Wire up useCurrency TanStack Query hook for data fetching",
+        "Add modal state management for Add/Spend/Convert modals",
+        "Connect action buttons to open respective modals",
+        "Pass current currency to modals for validation",
+        "Invalidate currency query on successful modal actions",
+        "bun run typecheck passes",
+        "bun run lint passes"
+      ],
+      "priority": 7,
+      "passes": true,
+      "notes": "All components integrated into Inventory.tsx"
+    }
+  ]
+}

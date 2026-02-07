@@ -5,7 +5,8 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
-from app.models import Inventory
+from app.models import HistoryAction, HistoryEntityType, HistoryEntry, Inventory
+from app.routers.inventories import hash_passphrase
 
 
 class TestGetCurrency:
@@ -247,3 +248,62 @@ class TestMakeChange:
         data = response.json()
         # 105 GP - 13 GP = 92 GP remaining
         assert data["total_gp"] == 92.0
+
+
+class TestCurrencyHistoryLogging:
+    """Tests for history logging on currency operations."""
+
+    @pytest.fixture
+    async def inventory_for_currency_history(self, test_db: AsyncSession) -> tuple[Inventory, str]:
+        """Create a sample inventory for currency history testing."""
+        passphrase = "test-currency-history-pass"
+        inventory = Inventory(
+            slug="test-currency-history-party",
+            name="Test Currency History Party",
+            description="An inventory for testing currency history",
+            passphrase_hash=hash_passphrase(passphrase),
+            copper=100,
+            silver=50,
+            gold=25,
+            platinum=10,
+        )
+        test_db.add(inventory)
+        await test_db.commit()
+        await test_db.refresh(inventory)
+        return inventory, passphrase
+
+    @pytest.mark.asyncio
+    async def test_update_currency_adds_history_entry(
+        self,
+        client: AsyncClient,
+        inventory_for_currency_history: tuple[Inventory, str],
+        test_db: AsyncSession,
+    ) -> None:
+        """Test that updating currency logs a history entry."""
+        inventory, passphrase = inventory_for_currency_history
+
+        # Update currency
+        response = await client.post(
+            f"/api/inventories/{inventory.slug}/currency",
+            json={"gold": 50, "note": "Sold gems"},
+            headers={"X-Passphrase": passphrase},
+        )
+        assert response.status_code == 200
+
+        # Verify history entry was created
+        result = await test_db.execute(
+            select(HistoryEntry).where(
+                HistoryEntry.inventory_id == inventory.id,
+                HistoryEntry.action == HistoryAction.currency_updated,
+            )
+        )
+        entry = result.scalar_one_or_none()
+        assert entry is not None
+        assert entry.entity_type == HistoryEntityType.currency
+        assert entry.entity_id is None
+        assert entry.entity_name is None
+        assert "changes" in entry.details
+        changes = entry.details["changes"]
+        assert changes["gold"]["old"] == 25
+        assert changes["gold"]["new"] == 75
+        assert entry.details["note"] == "Sold gems"
