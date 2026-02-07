@@ -104,3 +104,24 @@ export interface CurrencyConvertRequest {
   to_denomination: CurrencyDenomination
   amount: number
 }
+
+// History types
+export type HistoryAction = 'item_added' | 'item_updated' | 'item_removed' | 'currency_updated'
+export type HistoryEntityType = 'item' | 'currency'
+
+export interface HistoryEntry {
+  id: string
+  action: HistoryAction
+  entity_type: HistoryEntityType
+  entity_id: string | null
+  entity_name: string | null
+  details: Record<string, unknown> | null
+  created_at: string
+}
+
+export interface HistoryResponse {
+  entries: HistoryEntry[]
+  total: number
+  limit: number
+  offset: number
+}
