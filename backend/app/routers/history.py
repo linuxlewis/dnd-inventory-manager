@@ -8,7 +8,7 @@ from app.database import get_db
 from app.models import HistoryAction, HistoryEntityType, HistoryListResponse
 from app.services import get_history
 
-router = APIRouter(prefix="/api/v1/inventories", tags=["history"])
+router = APIRouter(prefix="/api/inventories", tags=["history"])
 
 
 @router.get("/{slug}/history", response_model=HistoryListResponse)

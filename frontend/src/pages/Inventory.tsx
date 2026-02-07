@@ -235,7 +235,11 @@ export function Inventory() {
       />
 
       {/* Activity Log */}
-      {slug && <HistoryPanel slug={slug} />}
+      {slug && (
+        <div className="mt-6 mb-6">
+          <HistoryPanel slug={slug} />
+        </div>
+      )}
 
       {/* Items Section */}
       <div className="bg-white rounded-lg shadow-md p-6">

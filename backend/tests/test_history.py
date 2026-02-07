@@ -14,7 +14,7 @@ from app.routers.inventories import hash_passphrase
 
 
 class TestHistoryEndpoint:
-    """Tests for GET /api/v1/inventories/{slug}/history endpoint."""
+    """Tests for GET /api/inventories/{slug}/history endpoint."""
 
     @pytest.fixture
     async def inventory_with_multiple_history(
@@ -71,7 +71,7 @@ class TestHistoryEndpoint:
         inventory, passphrase, _ = inventory_with_multiple_history
 
         response = await client.get(
-            f"/api/v1/inventories/{inventory.slug}/history",
+            f"/api/inventories/{inventory.slug}/history",
             headers={"X-Passphrase": passphrase},
         )
         assert response.status_code == 200
@@ -98,7 +98,7 @@ class TestHistoryEndpoint:
 
         # Get first page
         response1 = await client.get(
-            f"/api/v1/inventories/{inventory.slug}/history",
+            f"/api/inventories/{inventory.slug}/history",
             params={"limit": 10, "offset": 0},
             headers={"X-Passphrase": passphrase},
         )
@@ -109,7 +109,7 @@ class TestHistoryEndpoint:
 
         # Get second page
         response2 = await client.get(
-            f"/api/v1/inventories/{inventory.slug}/history",
+            f"/api/inventories/{inventory.slug}/history",
             params={"limit": 10, "offset": 10},
             headers={"X-Passphrase": passphrase},
         )
@@ -133,7 +133,7 @@ class TestHistoryEndpoint:
         inventory, passphrase, _ = inventory_with_multiple_history
 
         response = await client.get(
-            f"/api/v1/inventories/{inventory.slug}/history",
+            f"/api/inventories/{inventory.slug}/history",
             params={"action": "item_added", "limit": 100},
             headers={"X-Passphrase": passphrase},
         )
@@ -157,7 +157,7 @@ class TestHistoryEndpoint:
         inventory, passphrase, _ = inventory_with_multiple_history
 
         response = await client.get(
-            f"/api/v1/inventories/{inventory.slug}/history",
+            f"/api/inventories/{inventory.slug}/history",
             params={"entity_type": "currency", "limit": 100},
             headers={"X-Passphrase": passphrase},
         )
@@ -181,13 +181,13 @@ class TestHistoryEndpoint:
 
         # No passphrase
         response = await client.get(
-            f"/api/v1/inventories/{inventory.slug}/history",
+            f"/api/inventories/{inventory.slug}/history",
         )
         assert response.status_code == 401
 
         # Wrong passphrase
         response = await client.get(
-            f"/api/v1/inventories/{inventory.slug}/history",
+            f"/api/inventories/{inventory.slug}/history",
             headers={"X-Passphrase": "wrong-passphrase"},
         )
         assert response.status_code == 401
@@ -197,7 +197,7 @@ class TestHistoryEndpoint:
     ) -> None:
         """Test that requesting history for nonexistent inventory returns 404."""
         response = await client.get(
-            "/api/v1/inventories/nonexistent-slug/history",
+            "/api/inventories/nonexistent-slug/history",
             headers={"X-Passphrase": "any-pass"},
         )
         assert response.status_code == 404
