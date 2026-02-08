@@ -132,7 +132,35 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
   const handleSrdSelect = (item: SrdSearchResult) => {
     setName(item.name)
     setType(srdToType(item))
-    setDescription(cleanSrdDescription(item.desc) || '')
+    // Build description from structured data + raw desc
+    let desc = cleanSrdDescription(item.desc)
+    if (item.source === 'equipment') {
+      const parts: string[] = []
+      if (item.__typename === 'Weapon') {
+        if (item.weapon_category) parts.push(`${item.weapon_category} Weapon`)
+        if (item.damage) {
+          const dmgStr = item.damage.damage_type
+            ? `${item.damage.damage_dice} ${item.damage.damage_type.name}`
+            : item.damage.damage_dice
+          parts.push(`Damage: ${dmgStr}`)
+        }
+        if (item.properties?.length) {
+          parts.push(`Properties: ${item.properties.map(p => p.name).join(', ')}`)
+        }
+      } else if (item.__typename === 'Armor') {
+        if (item.armor_category) parts.push(`${item.armor_category} Armor`)
+        if (item.armor_class) {
+          const acStr = item.armor_class.dex_bonus
+            ? `AC ${item.armor_class.base} + Dex modifier`
+            : `AC ${item.armor_class.base}`
+          parts.push(acStr)
+        }
+      }
+      if (parts.length) {
+        desc = desc ? `${parts.join(' · ')}\n\n${desc}` : parts.join(' · ')
+      }
+    }
+    setDescription(desc)
 
     if (item.source === 'magic-item') {
       setCategory(item.equipment_category.name)
