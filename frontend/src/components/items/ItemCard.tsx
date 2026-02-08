@@ -22,11 +22,11 @@ export function ItemCard({ item, onClick }: ItemCardProps) {
   return (
     <button
       onClick={onClick}
-      className={`w-full text-left p-4 rounded-lg border-2 ${rarityColors.border} ${rarityColors.bg} hover:shadow-md transition-shadow focus:outline-none focus:ring-2 focus:ring-indigo-500`}
+      className={`w-full text-left p-4 rounded-lg border-2 ${rarityColors.border} ${rarityColors.bg} hover:shadow-md hover:shadow-black/20 transition-shadow focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-900`}
     >
       <div className="flex items-start gap-3">
         {/* Thumbnail */}
-        <div className="flex-shrink-0 w-12 h-12 rounded bg-white border border-gray-200 flex items-center justify-center overflow-hidden">
+        <div className="flex-shrink-0 w-12 h-12 rounded bg-gray-700 border border-gray-600 flex items-center justify-center overflow-hidden">
           {item.thumbnail_url ? (
             <img
               src={item.thumbnail_url}
@@ -41,9 +41,9 @@ export function ItemCard({ item, onClick }: ItemCardProps) {
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-gray-900 truncate">{item.name}</h3>
+            <h3 className="font-semibold text-gray-100 truncate">{item.name}</h3>
             {item.quantity > 1 && (
-              <span className="flex-shrink-0 px-2 py-0.5 text-xs font-medium bg-indigo-100 text-indigo-700 rounded-full">
+              <span className="flex-shrink-0 px-2 py-0.5 text-xs font-medium bg-indigo-900/40 text-indigo-300 rounded-full">
                 ×{item.quantity}
               </span>
             )}
@@ -53,12 +53,12 @@ export function ItemCard({ item, onClick }: ItemCardProps) {
             <span className={`text-xs px-2 py-0.5 rounded ${rarityColors.badge}`}>
               {formatRarity(item.rarity)}
             </span>
-            <span className="text-xs text-gray-500 capitalize">{item.type}</span>
+            <span className="text-xs text-gray-400 capitalize">{item.type}</span>
           </div>
 
           {/* Key stats preview */}
           {item.properties && (
-            <div className="mt-2 text-sm text-gray-600">
+            <div className="mt-2 text-sm text-gray-400">
               {item.type === 'equipment' && item.properties.damage ? (
                 <span>Damage: {formatDamage(item.properties.damage)}</span>
               ) : null}

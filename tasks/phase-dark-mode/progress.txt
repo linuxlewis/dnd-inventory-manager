@@ -1,0 +1,164 @@
+# Ralph Progress Log
+Started: 2026-02-07T18:46:20.314Z
+---
+
+## Codebase Patterns
+- AppLayout in `frontend/src/components/layout/AppLayout.tsx` wraps all pages with min-h-screen container
+- Global CSS in `frontend/src/index.css` uses Tailwind `@layer base` for body defaults
+- To prevent white flash on load, set `class="bg-gray-900"` directly on `<html>` in `index.html`
+- Tailwind config is in `frontend/tailwind.config.js` (standard, no dark mode toggle — we're going all-dark)
+- Header uses bg-gray-800 with border-b border-gray-700 for subtle separation; logo uses text-indigo-400 for brand accent
+- No RecentInventorySelector component exists — the PRD mentions it but the header is just a simple Link
+- Dark input: `bg-gray-700 text-gray-100 placeholder-gray-400 border-gray-600` (error: `border-red-500`)
+- Dark card: `bg-gray-800 border border-gray-700 rounded-lg shadow-md`
+- Dark label: `text-gray-300`, dark heading: `text-gray-100`, dark subtext: `text-gray-400`
+- Dark error alert: `bg-red-900/30 border-red-500 text-red-400`
+- Buttons on dark cards need `focus:ring-offset-gray-800`
+- Dark rarity colors: `bg-{color}-900/30` for card bg, `bg-{color}-900/40 text-{color}-300` for badges, `text-{color}-400` for icons
+- Dark modal: `bg-gray-800` body, `border-gray-700` separators, `bg-gray-900` footer, cancel button `text-gray-300 hover:bg-gray-700`
+- Dark dropdown: `bg-gray-700 border-gray-600`, items `hover:bg-gray-600`
+- Dark currency denominations: PP `bg-slate-700/50 text-slate-300`, GP `bg-yellow-900/30 text-yellow-400`, SP `bg-gray-700/50 text-gray-300`, CP `bg-amber-900/30 text-amber-400`
+- Dark warning alert: `bg-amber-900/30 border-amber-500 text-amber-400`
+- Dark action icons (history): `bg-{color}-900/40` background, `text-{color}-400` icon color
+- Dark sidebar panel: `bg-gray-800`, backdrop `bg-black/50`, header border `border-gray-700`
+- Dark loading skeletons: `bg-gray-700` (not bg-gray-200)
+- All modal/dialog backdrops use `bg-black/50` consistently
+- Dark dialog confirmation: `bg-gray-800` body, red alert icon in `bg-red-900/30`, cancel `text-gray-300 hover:bg-gray-700`, destructive action `bg-red-600 hover:bg-red-700`
+- NotFound page uses `text-gray-100` for heading, `text-gray-400` for subtext (same as other dark pages)
+- All buttons need visible focus rings: `focus:outline-none focus:ring-2 focus:ring-{color}-500 focus:ring-offset-2 focus:ring-offset-gray-{800|900}` (offset matches parent bg)
+- Eye toggle buttons (password show/hide): use `focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded` for compact focus ring
+- Cancel buttons in modal footers: `focus:ring-gray-500` for neutral focus ring color
+
+---
+
+## 2026-02-07 - FE-020
+- What was implemented: Dark global styles — bg-gray-900 on body/html, text-gray-100 as default text color, white flash prevention via inline class on `<html>` tag
+- Files changed:
+  - `frontend/src/index.css` — Added `@layer base` with bg-gray-900 and text-gray-100
+  - `frontend/index.html` — Added `class="bg-gray-900"` to `<html>` element
+  - `frontend/src/components/layout/AppLayout.tsx` — Changed bg-gray-100 to bg-gray-900, added text-gray-100
+- **Learnings for future iterations:**
+  - The AppLayout currently uses `bg-indigo-600` for the header — this will need updating in FE-021
+  - All page content flows through AppLayout's `<Outlet />` so child components inherit text-gray-100
+  - `bun install` must be run first if node_modules is missing (e.g., fresh worktree)
+---
+
+## 2026-02-07 - FE-021
+- What was implemented: Dark header — changed bg-indigo-600 to bg-gray-800 with border-gray-700 bottom border, logo text changed to indigo-400 with indigo-300 hover
+- Files changed:
+  - `frontend/src/components/layout/AppLayout.tsx` — Updated header background, border, and link colors
+- **Learnings for future iterations:**
+  - No RecentInventorySelector dropdown component exists in the codebase — the PRD referenced it but it's not implemented
+  - For dark headers, bg-gray-800 with border-b border-gray-700 provides subtle separation from bg-gray-900 body
+  - Using text-indigo-400 for brand accent on dark backgrounds maintains readable contrast
+  - Home page (`pages/Home.tsx`) still has many light-mode classes (bg-white, text-gray-900, etc.) — needs FE-022
+---
+
+## 2026-02-07 - FE-022
+- What was implemented: Dark Home page — cards use bg-gray-800 with border-gray-700, inputs use bg-gray-700 with border-gray-600 and placeholder-gray-400, labels use text-gray-300, headings use text-gray-100, error alerts use bg-red-900/30 with text-red-400, buttons get focus:ring-offset-gray-800
+- Files changed:
+  - `frontend/src/pages/Home.tsx` — Updated all light-mode classes to dark equivalents
+- **Learnings for future iterations:**
+  - Dark mode input pattern: `bg-gray-700 text-gray-100 placeholder-gray-400 border-gray-600` (error state: `border-red-500`)
+  - Dark mode card pattern: `bg-gray-800 border border-gray-700 rounded-lg shadow-md`
+  - Dark mode label pattern: `text-gray-300` (was text-gray-700)
+  - Dark mode error alert pattern: `bg-red-900/30 border-red-500 text-red-400`
+  - For buttons on dark cards, add `focus:ring-offset-gray-800` so the focus ring offset matches the card background
+  - Eye icon toggle button: `text-gray-400 hover:text-gray-200` for dark backgrounds
+  - No "Recent Inventories list" component exists on the Home page (PRD acceptance criterion mentions it but it's not implemented)
+---
+
+## 2026-02-07 - FE-023
+- What was implemented: Dark Inventory page — auth/passphrase prompt card uses bg-gray-800 with border-gray-700, dark inputs/labels/errors matching established patterns, inventory header card and items section card both dark, loading/error states updated with dark text colors
+- Files changed:
+  - `frontend/src/pages/Inventory.tsx` — Updated auth prompt, inventory header, items section, loading state, and error state from light to dark theme
+- **Learnings for future iterations:**
+  - The Inventory page renders TreasuryWidget and HistoryPanel as child components — those are separate stories (FE-025, FE-026) and still have light-mode styling
+  - Auth prompt pattern: same dark card/input/error patterns as Home page (bg-gray-800 card, bg-gray-700 inputs, bg-red-900/30 errors)
+  - Loading spinner uses border-indigo-600 which works fine on dark bg-gray-900
+  - Error state uses bg-red-900/30 with text-red-400 and border-red-500 — consistent with Home page
+  - "Back to Home" link uses text-indigo-400 hover:text-indigo-300 on dark backgrounds (not indigo-600)
+  - focus:ring-offset-gray-800 needed on buttons inside bg-gray-800 cards
+---
+
+## 2026-02-07 - FE-024
+- What was implemented: Dark item components — updated RARITY_COLORS in utils.ts for dark backgrounds, dark ItemCard with gray-700 thumbnails, dark ItemsList with dark tabs/search/empty state, dark ItemDetail slide-out panel with dark footer and delete confirmation, dark AddItemModal with dark SRD dropdown and form fields, dark EditItemModal with matching form styling
+- Files changed:
+  - `frontend/src/components/items/utils.ts` — Updated all rarity colors from light (bg-gray-100, bg-green-50, etc.) to dark variants (bg-gray-800, bg-green-900/30, etc.)
+  - `frontend/src/components/items/ItemCard.tsx` — Dark thumbnail bg, dark text colors, dark quantity badge
+  - `frontend/src/components/items/ItemsList.tsx` — Dark search input, dark tabs (bg-gray-800 container, bg-gray-700 active), dark empty state
+  - `frontend/src/components/items/ItemDetail.tsx` — Dark slide-out panel (bg-gray-800), dark footer (bg-gray-900), dark delete confirmation dialog, dark notes section (bg-yellow-900/20)
+  - `frontend/src/components/items/AddItemModal.tsx` — Dark modal (bg-gray-800), dark SRD dropdown (bg-gray-700), dark form inputs, dark footer (bg-gray-900)
+  - `frontend/src/components/items/EditItemModal.tsx` — Dark modal matching AddItemModal patterns
+- **Learnings for future iterations:**
+  - Rarity colors for dark: use `bg-{color}-900/30` for card backgrounds (transparent overlay on dark bg) and `bg-{color}-900/40 text-{color}-300` for badges
+  - Dark modal pattern: `bg-gray-800` body, `border-gray-700` header/footer borders, `bg-gray-900` footer
+  - Dark cancel button pattern: `text-gray-300 hover:bg-gray-700` (not text-gray-700 which is invisible on dark)
+  - SRD search dropdown: `bg-gray-700 border-gray-600`, items use `hover:bg-gray-600`
+  - Notes section uses yellow-900/20 bg with yellow-700 border and yellow-200 text for dark theme
+  - The delete confirmation dialog inside ItemDetail is also styled — FE-027 may need to verify this is consistent with other modals
+  - `focus:ring-offset-gray-900` for items on the bg-gray-900 page; `focus:ring-offset-gray-800` for items inside bg-gray-800 cards/modals
+---
+
+## 2026-02-07 - FE-025
+- What was implemented: Dark currency components — TreasuryWidget with dark card (bg-gray-800), dark denomination tiles using colored transparent backgrounds (slate-700/50 for PP, yellow-900/30 for GP, gray-700/50 for SP, amber-900/30 for CP), dark loading/mutating overlays. CurrencyModal with dark modal body (bg-gray-800), dark header/footer borders (border-gray-700), dark footer (bg-gray-900), dark inputs, dark preview section (bg-gray-700/50), dark error/warning alerts.
+- Files changed:
+  - `frontend/src/components/currency/TreasuryWidget.tsx` — Dark card, dark denomination tiles with colored transparent backgrounds, dark text colors, dark loading overlay
+  - `frontend/src/components/currency/CurrencyModal.tsx` — Dark modal (bg-gray-800), dark inputs (bg-gray-700), dark preview section (bg-gray-700/50), dark footer (bg-gray-900), dark error/warning alerts, dark labels
+- **Learnings for future iterations:**
+  - Currency denomination tiles use `bg-{color}-900/30` for gold/copper (warm colors) and `bg-{color}-700/50` for platinum/silver (cool/neutral), matching the thematic color of each denomination
+  - Dark warning alert pattern: `bg-amber-900/30 border-amber-500 text-amber-400` (matching the error alert pattern but with amber)
+  - Preview section uses `bg-gray-700/50` (slightly lighter than modal body bg-gray-800) to create visual distinction
+  - Dark preview text: labels `text-gray-400`, values `text-gray-200`, totals `text-gray-300`
+  - The mutating overlay uses `bg-gray-800/70` instead of `bg-white/70` to match the dark card background
+---
+
+## 2026-02-07 - FE-026
+- What was implemented: Dark history components — HistoryPanel card/button (bg-gray-800 with border-gray-700, hover:bg-gray-700), HistorySidebar (bg-gray-800 panel, border-gray-700 header, dark loading skeletons, divide-gray-700 entry separators), HistoryEntry action icon backgrounds updated from light (bg-green-100) to dark (bg-green-900/40) variants with matching text colors (text-green-400), entry text updated to text-gray-100
+- Files changed:
+  - `frontend/src/components/history/HistoryPanel.tsx` — Dark card bg, dark loading skeleton, dark text colors
+  - `frontend/src/components/history/HistorySidebar.tsx` — Dark sidebar panel (bg-gray-800), dark header with border-gray-700, dark close button hover, dark loading skeletons (bg-gray-700), dark empty state text, dark dividers (divide-gray-700), darker backdrop (bg-black/50)
+  - `frontend/src/components/history/HistoryEntry.tsx` — Dark action icon backgrounds (bg-{color}-900/40 with text-{color}-400), dark entry title text (text-gray-100)
+- **Learnings for future iterations:**
+  - History action icon dark pattern: `bg-{color}-900/40` for icon background, `text-{color}-400` for icon color (green for added, blue for updated, red for removed, amber for currency)
+  - HistorySidebar backdrop uses `bg-black/50` (darker than default bg-black/30) to provide better contrast against the dark page background
+  - utils.ts didn't need any changes — it's pure logic/formatting with no styling
+  - The HistoryPanel acts as a clickable summary card showing the last entry; HistorySidebar is the full slide-out panel
+---
+
+## 2026-02-07 - FE-027
+- What was implemented: Verified and polished all modals/dialogs for consistent dark styling. Fixed NotFound page (text-gray-900 → text-gray-100, text-gray-600 → text-gray-400). Fixed ItemDetail property labels from text-gray-500 to text-gray-400 for consistency with other labels in the panel. Verified all modal backdrops use bg-black/50 consistently.
+- Files changed:
+  - `frontend/src/pages/NotFound.tsx` — Updated light-mode text colors to dark equivalents
+  - `frontend/src/components/items/ItemDetail.tsx` — Fixed property labels (Damage, Armor Class, Healing, Duration, Spell, Spell Level) from text-gray-500 to text-gray-400 for consistency
+- **Learnings for future iterations:**
+  - Most modals were already dark-themed from earlier stories (FE-024, FE-025, FE-026) — this story was mainly a consistency audit
+  - All modal backdrops use `bg-black/50` — this is the standard for dark theme (provides good contrast against bg-gray-900 page)
+  - Property labels in slide-out panels should use `text-gray-400` (not text-gray-500) to match section heading labels
+  - Don't forget non-modal pages like NotFound.tsx when doing dark-mode conversion — they're easy to miss
+  - text-gray-500 is acceptable for intentionally de-emphasized tertiary text (e.g., parenthetical values in CurrencyModal, detail text in HistoryEntry) but should not be used for primary labels
+---
+
+## 2026-02-07 - FE-028
+- What was implemented: Final polish and accessibility audit — added visible focus rings (`focus:ring-2 focus:ring-{color}-500 focus:ring-offset-2 focus:ring-offset-gray-{800|900}`) to all interactive buttons missing them across the entire app. Fixed eye toggle buttons (password show/hide) with compact focus rings. Added focus rings to cancel buttons in all modal footers. Fixed `focus:border-indigo-500` remnant from light mode on Inventory auth input (replaced with proper `focus:ring-offset-gray-800`). Added `focus:ring-offset-gray-800` to all Home page form inputs. Verified all loading skeletons use `bg-gray-700`. Verified all error messages use consistent dark patterns. Typecheck and lint pass.
+- Files changed:
+  - `frontend/src/pages/NotFound.tsx` — Added focus ring to "Go Home" link
+  - `frontend/src/pages/Home.tsx` — Added focus:ring-offset-gray-800 to all form inputs, added focus ring to eye toggle button
+  - `frontend/src/pages/Inventory.tsx` — Fixed focus:border-indigo-500 to focus:ring-offset-gray-800, added focus ring to eye toggle button
+  - `frontend/src/components/items/ItemsList.tsx` — Added focus rings to "Add Item" buttons (header and empty state), fixed search input focus:ring-offset
+  - `frontend/src/components/items/ItemDetail.tsx` — Added focus rings to Edit, Delete, Cancel, and confirm Delete buttons
+  - `frontend/src/components/items/AddItemModal.tsx` — Added focus rings to "Add Item" submit and Cancel buttons
+  - `frontend/src/components/items/EditItemModal.tsx` — Added focus rings to "Save Changes" submit and Cancel buttons
+  - `frontend/src/components/currency/TreasuryWidget.tsx` — Added focus rings to "Add Funds" and "Spend" buttons
+  - `frontend/src/components/currency/CurrencyModal.tsx` — Added focus rings to submit (Add Funds/Spend) and Cancel buttons
+  - `frontend/src/components/history/HistorySidebar.tsx` — Added focus ring to close button
+- **Learnings for future iterations:**
+  - Every interactive button needs `focus:outline-none focus:ring-2 focus:ring-{color}-500 focus:ring-offset-2 focus:ring-offset-gray-{800|900}` — the offset color must match the parent background
+  - Buttons on bg-gray-900 backgrounds (page-level, modal footers) use `focus:ring-offset-gray-900`
+  - Buttons on bg-gray-800 backgrounds (cards, modal bodies) use `focus:ring-offset-gray-800`
+  - Cancel buttons use `focus:ring-gray-500` for neutral appearance
+  - Compact interactive elements (icon-only buttons like eye toggles, close buttons) just need `focus:ring-2 focus:ring-indigo-500 rounded` without offset
+  - `focus:border-indigo-500` is a light-mode pattern — on dark theme it creates a jarring border color change; use `focus:ring-offset` instead
+  - Loading skeletons were all already correct (bg-gray-700) from earlier stories
+  - Error messages were all already correct (bg-red-900/30 border-red-500 text-red-400) from earlier stories
+---

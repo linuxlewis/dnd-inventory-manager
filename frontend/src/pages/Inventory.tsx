@@ -102,17 +102,17 @@ export function Inventory() {
   if (!isAuthenticated) {
     return (
       <div className="max-w-md mx-auto">
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+        <div className="bg-gray-800 border border-gray-700 rounded-lg shadow-md p-6">
+          <h1 className="text-2xl font-bold text-gray-100 mb-2">
             Access Inventory
           </h1>
-          <p className="text-gray-600 mb-6">
-            Enter the passphrase for <span className="font-mono bg-gray-100 px-2 py-1 rounded">{slug}</span>
+          <p className="text-gray-400 mb-6">
+            Enter the passphrase for <span className="font-mono bg-gray-700 px-2 py-1 rounded">{slug}</span>
           </p>
 
           <form onSubmit={handleAuthSubmit} className="space-y-4">
             {authError && (
-              <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+              <div className="p-3 bg-red-900/30 border border-red-500 text-red-400 rounded">
                 {authError}
               </div>
             )}
@@ -120,7 +120,7 @@ export function Inventory() {
             <div>
               <label
                 htmlFor="passphrase"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-gray-300 mb-1"
               >
                 Passphrase
               </label>
@@ -130,14 +130,14 @@ export function Inventory() {
                   id="passphrase"
                   value={passphrase}
                   onChange={(e) => setPassphrase(e.target.value)}
-                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 pr-10 bg-gray-700 text-gray-100 placeholder-gray-400 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800"
                   placeholder="Enter passphrase"
                   autoFocus
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassphrase(!showPassphrase)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-700 focus:outline-none"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded"
                   aria-label={showPassphrase ? 'Hide passphrase' : 'Show passphrase'}
                 >
                   {showPassphrase ? (
@@ -152,7 +152,7 @@ export function Inventory() {
             <button
               type="submit"
               disabled={authenticateInventory.isPending}
-              className="w-full py-3 px-4 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full py-3 px-4 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {authenticateInventory.isPending ? 'Authenticating...' : 'Access'}
             </button>
@@ -161,7 +161,7 @@ export function Inventory() {
           <div className="mt-4 text-center">
             <button
               onClick={() => navigate('/')}
-              className="text-indigo-600 hover:text-indigo-800 text-sm"
+              className="text-indigo-400 hover:text-indigo-300 text-sm"
             >
               ← Back to Home
             </button>
@@ -176,7 +176,7 @@ export function Inventory() {
     return (
       <div className="text-center py-12">
         <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-600 border-t-transparent"></div>
-        <p className="mt-4 text-gray-600">Loading inventory...</p>
+        <p className="mt-4 text-gray-400">Loading inventory...</p>
       </div>
     )
   }
@@ -189,15 +189,15 @@ export function Inventory() {
 
     return (
       <div className="max-w-md mx-auto">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-          <p className="text-red-700">{errorMessage}</p>
+        <div className="bg-red-900/30 border border-red-500 rounded-lg p-6 text-center">
+          <p className="text-red-400">{errorMessage}</p>
           <button
             onClick={() => {
               if (slug) {
                 clearSession(slug)
               }
             }}
-            className="mt-4 text-indigo-600 hover:text-indigo-800"
+            className="mt-4 text-indigo-400 hover:text-indigo-300"
           >
             Try again
           </button>
@@ -226,12 +226,12 @@ export function Inventory() {
   // Show inventory content
   return (
     <div>
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+      <div className="bg-gray-800 border border-gray-700 rounded-lg shadow-md p-6 mb-6">
+        <h1 className="text-3xl font-bold text-gray-100 mb-2">
           {inventory?.name}
         </h1>
         {inventory?.description && (
-          <p className="text-gray-600">{inventory.description}</p>
+          <p className="text-gray-400">{inventory.description}</p>
         )}
       </div>
 
@@ -252,8 +252,8 @@ export function Inventory() {
       )}
 
       {/* Items Section */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Items</h2>
+      <div className="bg-gray-800 border border-gray-700 rounded-lg shadow-md p-6">
+        <h2 className="text-xl font-semibold text-gray-100 mb-4">Items</h2>
         {slug && (
           <ItemsList
             slug={slug}

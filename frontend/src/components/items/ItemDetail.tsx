@@ -44,11 +44,11 @@ export function ItemDetail({ item, slug, isOpen, onClose, onEdit }: ItemDetailPr
       <div className="fixed inset-0 z-40 bg-black/50" onClick={onClose} />
 
       {/* Slide-over panel */}
-      <div className="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white shadow-xl flex flex-col">
+      <div className="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-gray-800 shadow-xl flex flex-col">
         {/* Header */}
-        <div className={`flex items-start justify-between p-4 border-b ${rarityColors.bg}`}>
+        <div className={`flex items-start justify-between p-4 border-b border-gray-700 ${rarityColors.bg}`}>
           <div className="flex items-center gap-3">
-            <div className={`w-14 h-14 rounded-lg bg-white border-2 ${rarityColors.border} flex items-center justify-center overflow-hidden`}>
+            <div className={`w-14 h-14 rounded-lg bg-gray-700 border-2 ${rarityColors.border} flex items-center justify-center overflow-hidden`}>
               {item.thumbnail_url ? (
                 <img src={item.thumbnail_url} alt={item.name} className="w-full h-full object-cover" />
               ) : (
@@ -56,13 +56,13 @@ export function ItemDetail({ item, slug, isOpen, onClose, onEdit }: ItemDetailPr
               )}
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-900">{item.name}</h2>
+              <h2 className="text-xl font-bold text-gray-100">{item.name}</h2>
               <div className="flex items-center gap-2 mt-1">
                 <span className={`px-2 py-0.5 text-xs font-medium rounded ${rarityColors.badge}`}>
                   {formatRarity(item.rarity)}
                 </span>
                 {item.quantity > 1 && (
-                  <span className="px-2 py-0.5 text-xs font-medium bg-indigo-100 text-indigo-700 rounded">
+                  <span className="px-2 py-0.5 text-xs font-medium bg-indigo-900/40 text-indigo-300 rounded">
                     ×{item.quantity}
                   </span>
                 )}
@@ -71,7 +71,7 @@ export function ItemDetail({ item, slug, isOpen, onClose, onEdit }: ItemDetailPr
           </div>
           <button
             onClick={onClose}
-            className="p-1 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-white/50"
+            className="p-1 text-gray-400 hover:text-gray-200 rounded-lg hover:bg-gray-700/50"
           >
             <X className="w-6 h-6" />
           </button>
@@ -81,28 +81,28 @@ export function ItemDetail({ item, slug, isOpen, onClose, onEdit }: ItemDetailPr
         <div className="flex-1 overflow-y-auto p-4 space-y-6">
           {/* Basic Info */}
           <section>
-            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
               Basic Info
             </h3>
             <dl className="grid grid-cols-2 gap-3">
               <div>
-                <dt className="text-sm text-gray-500">Type</dt>
-                <dd className="font-medium text-gray-900">{formatType(item.type)}</dd>
+                <dt className="text-sm text-gray-400">Type</dt>
+                <dd className="font-medium text-gray-100">{formatType(item.type)}</dd>
               </div>
               <div>
-                <dt className="text-sm text-gray-500">Category</dt>
-                <dd className="font-medium text-gray-900">{item.category}</dd>
+                <dt className="text-sm text-gray-400">Category</dt>
+                <dd className="font-medium text-gray-100">{item.category}</dd>
               </div>
               {item.weight !== undefined && item.weight !== null && (
                 <div>
-                  <dt className="text-sm text-gray-500">Weight</dt>
-                  <dd className="font-medium text-gray-900">{item.weight} lbs</dd>
+                  <dt className="text-sm text-gray-400">Weight</dt>
+                  <dd className="font-medium text-gray-100">{item.weight} lbs</dd>
                 </div>
               )}
               {item.estimated_value !== undefined && item.estimated_value !== null && (
                 <div>
-                  <dt className="text-sm text-gray-500">Est. Value</dt>
-                  <dd className="font-medium text-gray-900">{item.estimated_value} GP</dd>
+                  <dt className="text-sm text-gray-400">Est. Value</dt>
+                  <dd className="font-medium text-gray-100">{item.estimated_value} GP</dd>
                 </div>
               )}
             </dl>
@@ -111,54 +111,54 @@ export function ItemDetail({ item, slug, isOpen, onClose, onEdit }: ItemDetailPr
           {/* Description */}
           {item.description && (
             <section>
-              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
                 Description
               </h3>
-              <p className="text-gray-700 whitespace-pre-wrap">{item.description}</p>
+              <p className="text-gray-300 whitespace-pre-wrap">{item.description}</p>
             </section>
           )}
 
           {/* Type-specific properties */}
           {item.properties && Object.keys(item.properties).length > 0 && (
             <section>
-              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
                 Properties
               </h3>
               <dl className="space-y-2">
                 {item.type === 'equipment' && item.properties.damage ? (
-                  <div className="flex justify-between py-2 border-b border-gray-100">
-                    <dt className="text-gray-500">Damage</dt>
-                    <dd className="font-medium text-gray-900">{formatDamage(item.properties.damage)}</dd>
+                  <div className="flex justify-between py-2 border-b border-gray-700">
+                    <dt className="text-gray-400">Damage</dt>
+                    <dd className="font-medium text-gray-100">{formatDamage(item.properties.damage)}</dd>
                   </div>
                 ) : null}
                 {item.type === 'equipment' && item.properties.armor_class ? (
-                  <div className="flex justify-between py-2 border-b border-gray-100">
-                    <dt className="text-gray-500">Armor Class</dt>
-                    <dd className="font-medium text-gray-900">{formatArmorClass(item.properties.armor_class)}</dd>
+                  <div className="flex justify-between py-2 border-b border-gray-700">
+                    <dt className="text-gray-400">Armor Class</dt>
+                    <dd className="font-medium text-gray-100">{formatArmorClass(item.properties.armor_class)}</dd>
                   </div>
                 ) : null}
                 {item.type === 'potion' && item.properties.healing ? (
-                  <div className="flex justify-between py-2 border-b border-gray-100">
-                    <dt className="text-gray-500">Healing</dt>
-                    <dd className="font-medium text-gray-900">{formatHealing(item.properties.healing)}</dd>
+                  <div className="flex justify-between py-2 border-b border-gray-700">
+                    <dt className="text-gray-400">Healing</dt>
+                    <dd className="font-medium text-gray-100">{formatHealing(item.properties.healing)}</dd>
                   </div>
                 ) : null}
                 {item.type === 'potion' && item.properties.duration ? (
-                  <div className="flex justify-between py-2 border-b border-gray-100">
-                    <dt className="text-gray-500">Duration</dt>
-                    <dd className="font-medium text-gray-900">{String(item.properties.duration)}</dd>
+                  <div className="flex justify-between py-2 border-b border-gray-700">
+                    <dt className="text-gray-400">Duration</dt>
+                    <dd className="font-medium text-gray-100">{String(item.properties.duration)}</dd>
                   </div>
                 ) : null}
                 {item.type === 'scroll' && item.properties.spell ? (
-                  <div className="flex justify-between py-2 border-b border-gray-100">
-                    <dt className="text-gray-500">Spell</dt>
-                    <dd className="font-medium text-gray-900">{String(item.properties.spell)}</dd>
+                  <div className="flex justify-between py-2 border-b border-gray-700">
+                    <dt className="text-gray-400">Spell</dt>
+                    <dd className="font-medium text-gray-100">{String(item.properties.spell)}</dd>
                   </div>
                 ) : null}
                 {item.type === 'scroll' && item.properties.spell_level ? (
-                  <div className="flex justify-between py-2 border-b border-gray-100">
-                    <dt className="text-gray-500">Spell Level</dt>
-                    <dd className="font-medium text-gray-900">{String(item.properties.spell_level)}</dd>
+                  <div className="flex justify-between py-2 border-b border-gray-700">
+                    <dt className="text-gray-400">Spell Level</dt>
+                    <dd className="font-medium text-gray-100">{String(item.properties.spell_level)}</dd>
                   </div>
                 ) : null}
               </dl>
@@ -168,10 +168,10 @@ export function ItemDetail({ item, slug, isOpen, onClose, onEdit }: ItemDetailPr
           {/* Notes */}
           {item.notes && (
             <section>
-              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
                 Notes
               </h3>
-              <p className="text-gray-700 whitespace-pre-wrap bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+              <p className="text-yellow-200 whitespace-pre-wrap bg-yellow-900/20 p-3 rounded-lg border border-yellow-700">
                 {item.notes}
               </p>
             </section>
@@ -185,17 +185,17 @@ export function ItemDetail({ item, slug, isOpen, onClose, onEdit }: ItemDetailPr
         </div>
 
         {/* Footer Actions */}
-        <div className="flex gap-3 p-4 border-t bg-gray-50">
+        <div className="flex gap-3 p-4 border-t border-gray-700 bg-gray-900">
           <button
             onClick={onEdit}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors"
           >
             <Pencil className="w-4 h-4" />
             Edit
           </button>
           <button
             onClick={() => setShowDeleteConfirm(true)}
-            className="flex items-center justify-center gap-2 px-4 py-2 text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition-colors"
+            className="flex items-center justify-center gap-2 px-4 py-2 text-red-400 border border-red-500 rounded-lg hover:bg-red-900/30 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors"
           >
             <Trash2 className="w-4 h-4" />
             Delete
@@ -207,27 +207,27 @@ export function ItemDetail({ item, slug, isOpen, onClose, onEdit }: ItemDetailPr
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div className="fixed inset-0 bg-black/50 z-[60]" onClick={() => setShowDeleteConfirm(false)} />
-          <div className="relative z-[70] bg-white rounded-lg shadow-xl max-w-sm w-full p-6">
+          <div className="relative z-[70] bg-gray-800 rounded-lg shadow-xl max-w-sm w-full p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-                <AlertTriangle className="w-5 h-5 text-red-600" />
+              <div className="w-10 h-10 rounded-full bg-red-900/30 flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-red-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">Delete Item?</h3>
+              <h3 className="text-lg font-semibold text-gray-100">Delete Item?</h3>
             </div>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-300 mb-6">
               Are you sure you want to delete <strong>{item.name}</strong>? This action cannot be undone.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="flex-1 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                className="flex-1 px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDelete}
                 disabled={deleteItem.isPending}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-800 disabled:opacity-50 transition-colors"
               >
                 {deleteItem.isPending ? 'Deleting...' : 'Delete'}
               </button>

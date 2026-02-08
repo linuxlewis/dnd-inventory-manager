@@ -150,13 +150,13 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
         <div className="fixed inset-0 bg-black/50" onClick={handleClose} />
 
         {/* Modal */}
-        <div className="relative w-full max-w-lg bg-white rounded-lg shadow-xl">
+        <div className="relative w-full max-w-lg bg-gray-800 rounded-lg shadow-xl">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b">
-            <h2 className="text-xl font-semibold text-gray-900">Add Item</h2>
+          <div className="flex items-center justify-between p-4 border-b border-gray-700">
+            <h2 className="text-xl font-semibold text-gray-100">Add Item</h2>
             <button
               onClick={handleClose}
-              className="p-1 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+              className="p-1 text-gray-400 hover:text-gray-200 rounded-lg hover:bg-gray-700"
             >
               <X className="w-6 h-6" />
             </button>
@@ -165,14 +165,14 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
           {/* Body */}
           <form onSubmit={handleSubmit} className="p-4 space-y-4 max-h-[70vh] overflow-y-auto">
             {formError && (
-              <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+              <div className="p-3 bg-red-900/30 border border-red-500 text-red-400 rounded">
                 {formError}
               </div>
             )}
 
             {/* SRD Search */}
             <div ref={dropdownRef} className="relative">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-300 mb-1">
                 Search SRD (optional)
               </label>
               <div className="relative">
@@ -187,7 +187,7 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
                   }}
                   onFocus={() => setShowDropdown(true)}
                   placeholder="Search D&D 5e items..."
-                  className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full pl-10 pr-10 py-2 bg-gray-700 text-gray-100 placeholder-gray-400 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800"
                 />
                 {srdLoading && (
                   <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 animate-spin" />
@@ -196,16 +196,16 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
               
               {/* Dropdown */}
               {showDropdown && srdResults.length > 0 && (
-                <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                <div className="absolute z-10 mt-1 w-full bg-gray-700 border border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                   {srdResults.map((item) => (
                     <button
                       key={item.index}
                       type="button"
                       onClick={() => handleSrdSelect(item)}
-                      className="w-full text-left px-4 py-2 hover:bg-gray-100 border-b last:border-b-0"
+                      className="w-full text-left px-4 py-2 hover:bg-gray-600 border-b border-gray-600 last:border-b-0"
                     >
-                      <div className="font-medium text-gray-900">{item.name}</div>
-                      <div className="text-sm text-gray-500">
+                      <div className="font-medium text-gray-100">{item.name}</div>
+                      <div className="text-sm text-gray-400">
                         {item.equipment_category?.name}
                       </div>
                     </button>
@@ -214,11 +214,11 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
               )}
             </div>
 
-            <hr className="my-4" />
+            <hr className="my-4 border-gray-700" />
 
             {/* Name */}
             <div>
-              <label htmlFor="add-item-name" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="add-item-name" className="block text-sm font-medium text-gray-300 mb-1">
                 Name <span className="text-red-500">*</span>
               </label>
               <input
@@ -227,21 +227,21 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 bg-gray-700 text-gray-100 placeholder-gray-400 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800"
               />
             </div>
 
             {/* Type and Rarity */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="add-item-type" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="add-item-type" className="block text-sm font-medium text-gray-300 mb-1">
                   Type <span className="text-red-500">*</span>
                 </label>
                 <select
                   id="add-item-type"
                   value={type}
                   onChange={(e) => setType(e.target.value as ItemType)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 bg-gray-700 text-gray-100 placeholder-gray-400 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800"
                 >
                   {ITEM_TYPES.map((t) => (
                     <option key={t} value={t}>
@@ -251,14 +251,14 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
                 </select>
               </div>
               <div>
-                <label htmlFor="add-item-rarity" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="add-item-rarity" className="block text-sm font-medium text-gray-300 mb-1">
                   Rarity
                 </label>
                 <select
                   id="add-item-rarity"
                   value={rarity}
                   onChange={(e) => setRarity(e.target.value as ItemRarity)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 bg-gray-700 text-gray-100 placeholder-gray-400 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800"
                 >
                   {ITEM_RARITIES.map((r) => (
                     <option key={r} value={r}>
@@ -271,7 +271,7 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
 
             {/* Category */}
             <div>
-              <label htmlFor="add-item-category" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="add-item-category" className="block text-sm font-medium text-gray-300 mb-1">
                 Category
               </label>
               <input
@@ -280,14 +280,14 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 placeholder="e.g., Weapon, Armor, Adventuring Gear"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 bg-gray-700 text-gray-100 placeholder-gray-400 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800"
               />
             </div>
 
             {/* Quantity and Weight */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="add-item-quantity" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="add-item-quantity" className="block text-sm font-medium text-gray-300 mb-1">
                   Quantity
                 </label>
                 <input
@@ -296,11 +296,11 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
                   min="1"
                   value={quantity}
                   onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 bg-gray-700 text-gray-100 placeholder-gray-400 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800"
                 />
               </div>
               <div>
-                <label htmlFor="add-item-weight" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="add-item-weight" className="block text-sm font-medium text-gray-300 mb-1">
                   Weight (lbs)
                 </label>
                 <input
@@ -310,14 +310,14 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
                   step="0.1"
                   value={weight}
                   onChange={(e) => setWeight(e.target.value ? parseFloat(e.target.value) : '')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 bg-gray-700 text-gray-100 placeholder-gray-400 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800"
                 />
               </div>
             </div>
 
             {/* Estimated Value */}
             <div>
-              <label htmlFor="add-item-value" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="add-item-value" className="block text-sm font-medium text-gray-300 mb-1">
                 Estimated Value (GP)
               </label>
               <input
@@ -327,13 +327,13 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
                 step="0.01"
                 value={estimatedValue}
                 onChange={(e) => setEstimatedValue(e.target.value ? parseFloat(e.target.value) : '')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 bg-gray-700 text-gray-100 placeholder-gray-400 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800"
               />
             </div>
 
             {/* Description */}
             <div>
-              <label htmlFor="add-item-description" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="add-item-description" className="block text-sm font-medium text-gray-300 mb-1">
                 Description
               </label>
               <textarea
@@ -341,13 +341,13 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                className="w-full px-3 py-2 bg-gray-700 text-gray-100 placeholder-gray-400 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800 resize-none"
               />
             </div>
 
             {/* Notes */}
             <div>
-              <label htmlFor="add-item-notes" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="add-item-notes" className="block text-sm font-medium text-gray-300 mb-1">
                 Notes
               </label>
               <textarea
@@ -356,24 +356,24 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
                 onChange={(e) => setNotes(e.target.value)}
                 rows={2}
                 placeholder="Personal notes about this item..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                className="w-full px-3 py-2 bg-gray-700 text-gray-100 placeholder-gray-400 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800 resize-none"
               />
             </div>
           </form>
 
           {/* Footer */}
-          <div className="flex justify-end gap-3 p-4 border-t bg-gray-50 rounded-b-lg">
+          <div className="flex justify-end gap-3 p-4 border-t border-gray-700 bg-gray-900 rounded-b-lg">
             <button
               type="button"
               onClick={handleClose}
-              className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              className="px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleSubmit}
               disabled={createItem.isPending}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:opacity-50 transition-colors"
             >
               {createItem.isPending ? 'Adding...' : 'Add Item'}
             </button>

@@ -39,23 +39,23 @@ export function HistorySidebar({ slug, isOpen, onClose }: HistorySidebarProps) {
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/30 z-40"
+        className="fixed inset-0 bg-black/50 z-40"
         onClick={onClose}
       />
 
       {/* Sidebar */}
-      <div className="fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-xl z-50 flex flex-col">
+      <div className="fixed inset-y-0 right-0 w-full max-w-md bg-gray-800 shadow-xl z-50 flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b">
+        <div className="flex items-center justify-between p-4 border-b border-gray-700">
           <div className="flex items-center gap-2">
-            <History className="w-5 h-5 text-gray-600" />
-            <h2 className="text-lg font-semibold text-gray-900">Activity Log</h2>
+            <History className="w-5 h-5 text-gray-400" />
+            <h2 className="text-lg font-semibold text-gray-100">Activity Log</h2>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 text-gray-400 hover:bg-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-gray-400" />
           </button>
         </div>
 
@@ -65,20 +65,20 @@ export function HistorySidebar({ slug, isOpen, onClose }: HistorySidebarProps) {
             <div className="animate-pulse space-y-3">
               {[1, 2, 3, 4, 5].map((i) => (
                 <div key={i} className="flex items-start gap-2">
-                  <div className="w-6 h-6 bg-gray-200 rounded-full" />
+                  <div className="w-6 h-6 bg-gray-700 rounded-full" />
                   <div className="flex-1 space-y-1">
-                    <div className="h-3 bg-gray-200 rounded w-3/4" />
-                    <div className="h-2 bg-gray-200 rounded w-1/2" />
+                    <div className="h-3 bg-gray-700 rounded w-3/4" />
+                    <div className="h-2 bg-gray-700 rounded w-1/2" />
                   </div>
                 </div>
               ))}
             </div>
           ) : entries.length === 0 ? (
-            <p className="text-gray-500 text-sm text-center py-8">
+            <p className="text-gray-400 text-sm text-center py-8">
               No activity recorded yet
             </p>
           ) : (
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-gray-700">
               {entries.map((entry) => (
                 <HistoryEntry key={entry.id} entry={entry} />
               ))}

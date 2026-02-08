@@ -78,12 +78,12 @@ export function ItemsList({ slug, onItemClick, onAddClick }: ItemsListProps) {
             placeholder="Search items..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full pl-10 pr-4 py-2 bg-gray-700 text-gray-100 placeholder-gray-400 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800"
           />
         </div>
         <button
           onClick={onAddClick}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-colors"
         >
           <Plus className="w-5 h-5" />
           <span className="hidden sm:inline">Add Item</span>
@@ -92,15 +92,15 @@ export function ItemsList({ slug, onItemClick, onAddClick }: ItemsListProps) {
 
       {/* Tabs */}
       <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-        <div className="flex gap-1 min-w-max bg-gray-100 p-1 rounded-lg">
+        <div className="flex gap-1 min-w-max bg-gray-800 p-1 rounded-lg">
           {TABS.map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
               className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                 activeTab === tab.key
-                  ? 'bg-white text-gray-900 shadow'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-gray-700 text-gray-100 shadow'
+                  : 'text-gray-400 hover:text-gray-200'
               }`}
             >
               {tab.label}
@@ -108,8 +108,8 @@ export function ItemsList({ slug, onItemClick, onAddClick }: ItemsListProps) {
                 <span
                   className={`px-2 py-0.5 text-xs rounded-full ${
                     activeTab === tab.key
-                      ? 'bg-indigo-100 text-indigo-700'
-                      : 'bg-gray-200 text-gray-600'
+                      ? 'bg-indigo-900/40 text-indigo-300'
+                      : 'bg-gray-600 text-gray-300'
                   }`}
                 >
                   {typeCounts[tab.key]}
@@ -124,13 +124,13 @@ export function ItemsList({ slug, onItemClick, onAddClick }: ItemsListProps) {
       {isLoading ? (
         <div className="text-center py-12">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-600 border-t-transparent"></div>
-          <p className="mt-4 text-gray-600">Loading items...</p>
+          <p className="mt-4 text-gray-400">Loading items...</p>
         </div>
       ) : items.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+        <div className="text-center py-12 bg-gray-800 rounded-lg border-2 border-dashed border-gray-600">
           <PackageOpen className="mx-auto w-12 h-12 text-gray-400" />
-          <h3 className="mt-4 text-lg font-medium text-gray-900">No items found</h3>
-          <p className="mt-2 text-gray-500">
+          <h3 className="mt-4 text-lg font-medium text-gray-100">No items found</h3>
+          <p className="mt-2 text-gray-400">
             {searchQuery
               ? 'Try a different search term'
               : 'Get started by adding your first item'}
@@ -138,7 +138,7 @@ export function ItemsList({ slug, onItemClick, onAddClick }: ItemsListProps) {
           {!searchQuery && (
             <button
               onClick={onAddClick}
-              className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+              className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-colors"
             >
               <Plus className="w-5 h-5" />
               Add Item

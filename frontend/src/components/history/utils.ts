@@ -1,12 +1,17 @@
 import type { HistoryAction } from '../../api/types'
 
-export function formatRelativeTime(dateString: string): string {
-  // Handle ISO strings - ensure UTC parsing if no timezone specified
-  let date = new Date(dateString)
+export function formatRelativeTime(dateInput: string | number): string {
+  let date: Date
   
-  // If the date string doesn't have timezone info, treat as UTC
-  if (!dateString.includes('Z') && !dateString.includes('+') && !dateString.includes('-', 10)) {
-    date = new Date(dateString + 'Z')
+  if (typeof dateInput === 'number') {
+    // Timestamp (milliseconds)
+    date = new Date(dateInput)
+  } else {
+    // ISO string - ensure UTC parsing if no timezone specified
+    date = new Date(dateInput)
+    if (!dateInput.includes('Z') && !dateInput.includes('+') && !dateInput.includes('-', 10)) {
+      date = new Date(dateInput + 'Z')
+    }
   }
   
   const now = new Date()

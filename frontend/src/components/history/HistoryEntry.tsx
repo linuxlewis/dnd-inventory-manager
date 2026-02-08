@@ -13,10 +13,10 @@ const TYPE_ICONS: Record<ItemType, React.ComponentType<{ className?: string }>> 
 
 // Action-based styling
 const ACTION_STYLES = {
-  item_added: { bg: 'bg-green-100', color: 'text-green-600' },
-  item_updated: { bg: 'bg-blue-100', color: 'text-blue-600' },
-  item_removed: { bg: 'bg-red-100', color: 'text-red-600' },
-  currency_updated: { bg: 'bg-amber-100', color: 'text-amber-600' },
+  item_added: { bg: 'bg-green-900/40', color: 'text-green-400' },
+  item_updated: { bg: 'bg-blue-900/40', color: 'text-blue-400' },
+  item_removed: { bg: 'bg-red-900/40', color: 'text-red-400' },
+  currency_updated: { bg: 'bg-amber-900/40', color: 'text-amber-400' },
 } as const
 
 interface HistoryEntryProps {
@@ -59,7 +59,7 @@ export function HistoryEntry({ entry }: HistoryEntryProps) {
         <Icon className={`w-3 h-3 ${style.color}`} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-xs font-medium text-gray-900">
+        <p className="text-xs font-medium text-gray-100">
           {formatActionDescription(entry.action, entry.entity_name)}
         </p>
         {detailText && (
