@@ -12,3 +12,4 @@ backend/tests
 frontend/node_modules
 frontend/dist
 .env*
+data/
