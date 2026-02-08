@@ -79,6 +79,10 @@ The frontend dev server proxies `/api` requests to `localhost:8000`.
 | SRD Data | GraphQL ([dnd5eapi.co](https://www.dnd5eapi.co/)) |
 | Container | nginx + uvicorn · supervisord |
 
+## Disclaimer
+
+This project is not affiliated with, endorsed by, or associated with Wizards of the Coast, Hasbro, or any of their subsidiaries. Dungeons & Dragons, D&D, and all related trademarks are property of Wizards of the Coast LLC. Game data provided via the [D&D 5e SRD API](https://www.dnd5eapi.co/) under the Open Gaming License (OGL).
+
 ## License
 
 MIT
