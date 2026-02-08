@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
-import { flushSync } from 'react-dom'
+import { useState, useEffect, useRef } from 'react'
 import { X, Search, Loader2 } from 'lucide-react'
 import { useCreateItem } from '../../api/items'
 import { useSrdSearch, type SrdSearchResult } from '../../api/srd/hooks'
@@ -70,7 +69,6 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
 
   const dropdownRef = useRef<HTMLDivElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
-  const formRef = useRef<HTMLDivElement>(null)
 
   // Debounce search using custom hook
   const debouncedQuery = useDebounce(searchQuery, 300)
@@ -133,9 +131,6 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
   }
 
   const handleSrdSelect = (item: SrdSearchResult) => {
-    // flushSync ensures all state updates render synchronously,
-    // preventing a visual glitch where the Name input appears empty
-    flushSync(() => {
     setSrdSelectCount((c) => c + 1)
     setName(item.name)
     setType(srdToType(item))
@@ -194,12 +189,6 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
 
     setSearchQuery('')
     setShowDropdown(false)
-    }) // end flushSync
-
-    // Scroll form to top so the populated name is visible
-    requestAnimationFrame(() => {
-      formRef.current?.scrollTo({ top: 0 })
-    })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -311,7 +300,7 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
           </div>
 
           {/* Body */}
-          <form ref={formRef as React.RefObject<HTMLFormElement>} onSubmit={handleSubmit} className="p-4 space-y-4 max-h-[50vh] overflow-y-auto">
+          <form onSubmit={handleSubmit} className="p-4 space-y-4 max-h-[50vh] overflow-y-auto">
             {formError && (
               <div className="p-3 bg-red-900/30 border border-red-500 text-red-400 rounded">
                 {formError}
