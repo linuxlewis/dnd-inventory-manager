@@ -30,7 +30,7 @@ RUN uv sync --frozen --no-dev
 FROM python:3.12-slim
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends nginx supervisor && \
+    apt-get install -y --no-install-recommends nginx supervisor curl && \
     rm -rf /var/lib/apt/lists/*
 
 # Create app user
@@ -126,6 +126,6 @@ RUN mkdir -p /app/data && chown app:app /app/data
 EXPOSE 80
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost/health')" || exit 1
+    CMD curl -f http://localhost/health || exit 1
 
 CMD ["supervisord", "-c", "/etc/supervisor/supervisord.conf"]
