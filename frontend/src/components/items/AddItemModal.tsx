@@ -186,73 +186,71 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
             </button>
           </div>
 
+          {/* SRD Search - outside scrollable area so dropdown isn't clipped */}
+          <div className="p-4 border-b" ref={dropdownRef}>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Search SRD (optional)
+            </label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value)
+                  setShowDropdown(true)
+                }}
+                onFocus={() => setShowDropdown(true)}
+                placeholder="Search D&D 5e items..."
+                className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+              {srdLoading && (
+                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 animate-spin" />
+              )}
+            </div>
+            
+            {/* Dropdown */}
+            {showDropdown && srdResults.length > 0 && (
+              <div className="mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                {srdResults.map((item) => (
+                  <button
+                    key={`${item.source}-${item.index}`}
+                    type="button"
+                    onClick={() => handleSrdSelect(item)}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-100 border-b last:border-b-0"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-gray-900">{item.name}</span>
+                      {item.source === 'magic-item' && (
+                        <span className="text-xs px-1.5 py-0.5 bg-purple-100 text-purple-700 rounded">Magic</span>
+                      )}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {item.source === 'magic-item'
+                        ? item.equipment_category.name
+                        : ('equipment_category' in item
+                            ? (item as { equipment_category: { name: string } }).equipment_category.name
+                            : item.__typename)}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+            {showDropdown && !srdLoading && debouncedQuery.length >= 2 && srdResults.length === 0 && (
+              <div className="mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg px-4 py-3 text-sm text-gray-500">
+                No items found
+              </div>
+            )}
+          </div>
+
           {/* Body */}
-          <form onSubmit={handleSubmit} className="p-4 space-y-4 max-h-[70vh] overflow-y-auto">
+          <form onSubmit={handleSubmit} className="p-4 space-y-4 max-h-[50vh] overflow-y-auto">
             {formError && (
               <div className="p-3 bg-red-900/30 border border-red-500 text-red-400 rounded">
                 {formError}
               </div>
             )}
-
-            {/* SRD Search */}
-            <div ref={dropdownRef} className="relative">
-              <label className="block text-sm font-medium text-gray-300 mb-1">
-                Search SRD (optional)
-              </label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value)
-                    setShowDropdown(true)
-                  }}
-                  onFocus={() => setShowDropdown(true)}
-                  placeholder="Search D&D 5e items..."
-                  className="w-full pl-10 pr-10 py-2 bg-gray-700 text-gray-100 placeholder-gray-400 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800"
-                />
-                {srdLoading && (
-                  <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 animate-spin" />
-                )}
-              </div>
-              
-              {/* Dropdown */}
-              {showDropdown && srdResults.length > 0 && (
-                <div className="absolute z-10 mt-1 w-full bg-gray-700 border border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                  {srdResults.map((item) => (
-                    <button
-                      key={`${item.source}-${item.index}`}
-                      type="button"
-                      onClick={() => handleSrdSelect(item)}
-                      className="w-full text-left px-4 py-2 hover:bg-gray-600 border-b border-gray-600 last:border-b-0"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-100">{item.name}</span>
-                        {item.source === 'magic-item' && (
-                          <span className="text-xs px-1.5 py-0.5 bg-purple-800 text-purple-200 rounded">Magic</span>
-                        )}
-                      </div>
-                      <div className="text-sm text-gray-400">
-                        {item.source === 'magic-item'
-                          ? item.equipment_category.name
-                          : ('equipment_category' in item
-                              ? (item as { equipment_category: { name: string } }).equipment_category.name
-                              : item.__typename)}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-              {showDropdown && !srdLoading && debouncedQuery.length >= 2 && srdResults.length === 0 && (
-                <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg px-4 py-3 text-sm text-gray-500">
-                  No items found
-                </div>
-              )}
-            </div>
-
-            <hr className="my-4 border-gray-700" />
 
             {/* Name */}
             <div>
