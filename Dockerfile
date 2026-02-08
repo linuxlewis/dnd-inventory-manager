@@ -62,7 +62,7 @@ server {
     gzip_min_length 1000;
 
     location /api/ {
-        proxy_pass http://127.0.0.1:8000/;
+        proxy_pass http://127.0.0.1:8000;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -95,28 +95,26 @@ COPY <<'SUPERVISOR' /etc/supervisor/conf.d/app.conf
 [supervisord]
 nodaemon=true
 user=root
-logfile=/dev/stdout
+logfile=/dev/null
 logfile_maxbytes=0
 
 [program:uvicorn]
-command=/app/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000
+command=/app/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --log-level info --access-log
 directory=/app
 user=app
 autostart=true
 autorestart=true
-stdout_logfile=/dev/stdout
+stdout_logfile=/dev/fd/1
 stdout_logfile_maxbytes=0
-stderr_logfile=/dev/stderr
-stderr_logfile_maxbytes=0
+redirect_stderr=true
 
 [program:nginx]
 command=nginx -g "daemon off;"
 autostart=true
 autorestart=true
-stdout_logfile=/dev/stdout
+stdout_logfile=/dev/fd/1
 stdout_logfile_maxbytes=0
-stderr_logfile=/dev/stderr
-stderr_logfile_maxbytes=0
+redirect_stderr=true
 SUPERVISOR
 
 # Create data directory
