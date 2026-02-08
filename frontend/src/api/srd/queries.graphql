@@ -1,0 +1,162 @@
+query SearchEquipment($name: String!) {
+  equipments(name: $name) {
+    ... on IEquipment {
+      index
+      name
+      cost {
+        quantity
+        unit
+      }
+      weight
+      desc
+    }
+    ... on Weapon {
+      weapon_category
+      category_range
+      damage {
+        damage_dice
+        damage_type {
+          name
+        }
+      }
+      range {
+        normal
+        long
+      }
+      properties {
+        name
+      }
+    }
+    ... on Armor {
+      armor_category
+      armor_class {
+        base
+        dex_bonus
+        max_bonus
+      }
+      stealth_disadvantage
+      str_minimum
+    }
+    ... on Gear {
+      equipment_category {
+        name
+      }
+    }
+  }
+}
+
+query SearchMagicItems($name: String!) {
+  magicItems(name: $name) {
+    index
+    name
+    desc
+    rarity {
+      name
+    }
+    equipment_category {
+      name
+    }
+  }
+}
+
+query GetEquipmentByIndex($index: String!) {
+  equipment(index: $index) {
+    ... on IEquipment {
+      index
+      name
+      cost {
+        quantity
+        unit
+      }
+      weight
+      desc
+    }
+    ... on Weapon {
+      weapon_category
+      category_range
+      damage {
+        damage_dice
+        damage_type {
+          name
+        }
+      }
+      range {
+        normal
+        long
+      }
+      two_handed_damage {
+        damage_dice
+        damage_type {
+          name
+        }
+      }
+      properties {
+        name
+        index
+      }
+    }
+    ... on Armor {
+      armor_category
+      armor_class {
+        base
+        dex_bonus
+        max_bonus
+      }
+      stealth_disadvantage
+      str_minimum
+    }
+    ... on Gear {
+      equipment_category {
+        name
+      }
+      gear_category {
+        name
+      }
+    }
+    ... on Tool {
+      tool_category
+    }
+    ... on Vehicle {
+      vehicle_category
+      speed {
+        quantity
+        unit
+      }
+      capacity
+    }
+    ... on Pack {
+      contents {
+        item {
+          ... on IEquipment {
+            index
+            name
+          }
+        }
+        quantity
+      }
+    }
+    ... on Ammunition {
+      quantity
+    }
+  }
+}
+
+query GetMagicItemByIndex($index: String!) {
+  magicItem(index: $index) {
+    index
+    name
+    desc
+    rarity {
+      name
+    }
+    equipment_category {
+      name
+    }
+    image
+    variant
+    variants {
+      index
+      name
+    }
+  }
+}

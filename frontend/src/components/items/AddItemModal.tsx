@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { X, Search, Loader2 } from 'lucide-react'
 import { useCreateItem } from '../../api/items'
-import { useSrdSearch } from '../../api/srd'
-import type { ItemType, ItemRarity, SrdItem, ItemCreate } from '../../api/types'
+import { useSrdSearch, type SrdSearchResult } from '../../api/srd/hooks'
+import type { ItemType, ItemRarity, ItemCreate } from '../../api/types'
 import { ITEM_TYPES, ITEM_RARITIES, TYPE_LABELS, RARITY_LABELS } from './utils'
 import { useDebounce } from '../../hooks/useDebounce'
 
@@ -30,13 +30,22 @@ function srdToRarity(srdRarity?: { name: string }): ItemRarity {
   return 'common'
 }
 
-function srdToType(srdItem: SrdItem): ItemType {
-  const category = srdItem.equipment_category?.name?.toLowerCase() || ''
-  if (category.includes('weapon') || category.includes('armor') || srdItem.weapon_category || srdItem.armor_category) {
-    return 'equipment'
+function srdToType(item: SrdSearchResult): ItemType {
+  if (item.source === 'magic-item') {
+    const category = item.equipment_category.name.toLowerCase()
+    if (category.includes('potion')) return 'potion'
+    if (category.includes('scroll')) return 'scroll'
+    return 'misc'
   }
-  if (category.includes('potion')) return 'potion'
-  if (category.includes('scroll')) return 'scroll'
+  // Equipment union types
+  const typename = item.__typename
+  if (typename === 'Weapon' || typename === 'Armor') return 'equipment'
+  if ('equipment_category' in item) {
+    const category = (item as { equipment_category: { name: string } }).equipment_category.name.toLowerCase()
+    if (category.includes('weapon') || category.includes('armor')) return 'equipment'
+    if (category.includes('potion')) return 'potion'
+    if (category.includes('scroll')) return 'scroll'
+  }
   return 'misc'
 }
 
@@ -47,6 +56,7 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
   const [showDropdown, setShowDropdown] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   
+  const [srdSelectCount, setSrdSelectCount] = useState(0)
   const [name, setName] = useState('')
   const [type, setType] = useState<ItemType>('equipment')
   const [category, setCategory] = useState('')
@@ -95,19 +105,88 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
     onClose()
   }
 
-  const handleSrdSelect = (srdItem: SrdItem) => {
-    setName(srdItem.name)
-    setType(srdToType(srdItem))
-    setCategory(srdItem.equipment_category?.name || '')
-    setRarity(srdToRarity(srdItem.rarity))
-    setDescription(srdItem.desc?.join('\n') || '')
-    if (srdItem.weight) setWeight(srdItem.weight)
-    if (srdItem.cost) {
-      // Convert to gold pieces using conversion rates
-      const rate = CURRENCY_TO_GP[srdItem.cost.unit] ?? 0
-      const costInGp = srdItem.cost.quantity * rate
-      setEstimatedValue(costInGp)
+  const cleanSrdDescription = (desc?: string[] | null): string => {
+    if (!desc || desc.length === 0) return ''
+    // Filter out lines that are just type/rarity headers (e.g. "Potion, varies", "Weapon, rare")
+    // and markdown table formatting (|---|---|)
+    const cleaned = desc
+      .filter((line) => {
+        const trimmed = line.trim()
+        // Skip "Type, rarity" header lines
+        if (/^(Potion|Weapon|Armor|Wondrous item|Ring|Rod|Staff|Wand|Scroll),\s/i.test(trimmed)) return false
+        // Skip table separator lines
+        if (/^\|[-|:\s]+\|$/.test(trimmed)) return false
+        // Skip table header/title lines like "Potions of Healing (table)"
+        if (/\(table\)\s*$/i.test(trimmed)) return false
+        return true
+      })
+      // Clean markdown table rows into readable text
+      .map((line) => {
+        if (line.startsWith('|') && line.endsWith('|')) {
+          return line.split('|').filter(Boolean).map(s => s.trim()).join(' — ')
+        }
+        return line
+      })
+    return cleaned.join('\n').trim()
+  }
+
+  const handleSrdSelect = (item: SrdSearchResult) => {
+    setSrdSelectCount((c) => c + 1)
+    setName(item.name)
+    setType(srdToType(item))
+    // Build description from structured data + raw desc
+    let desc = cleanSrdDescription(item.desc)
+    if (item.source === 'equipment') {
+      const parts: string[] = []
+      if (item.__typename === 'Weapon') {
+        if (item.weapon_category) parts.push(`${item.weapon_category} Weapon`)
+        if (item.damage) {
+          const dmgStr = item.damage.damage_type
+            ? `${item.damage.damage_dice} ${item.damage.damage_type.name}`
+            : item.damage.damage_dice
+          parts.push(`Damage: ${dmgStr}`)
+        }
+        if (item.properties?.length) {
+          parts.push(`Properties: ${item.properties.map(p => p.name).join(', ')}`)
+        }
+      } else if (item.__typename === 'Armor') {
+        if (item.armor_category) parts.push(`${item.armor_category} Armor`)
+        if (item.armor_class) {
+          const acStr = item.armor_class.dex_bonus
+            ? `AC ${item.armor_class.base} + Dex modifier`
+            : `AC ${item.armor_class.base}`
+          parts.push(acStr)
+        }
+      }
+      if (parts.length) {
+        desc = desc ? `${parts.join(' · ')}\n\n${desc}` : parts.join(' · ')
+      }
     }
+    setDescription(desc)
+
+    if (item.source === 'magic-item') {
+      setCategory(item.equipment_category.name)
+      setRarity(srdToRarity(item.rarity))
+    } else {
+      // Equipment: extract category from __typename or equipment_category
+      if ('equipment_category' in item) {
+        setCategory((item as { equipment_category: { name: string } }).equipment_category.name)
+      } else if (item.__typename === 'Weapon') {
+        setCategory('Weapon')
+      } else if (item.__typename === 'Armor') {
+        setCategory('Armor')
+      } else {
+        setCategory(item.__typename ?? '')
+      }
+      setRarity('common')
+      if (item.weight) setWeight(item.weight)
+      if (item.cost) {
+        const rate = CURRENCY_TO_GP[item.cost.unit] ?? 0
+        const costInGp = item.cost.quantity * rate
+        setEstimatedValue(costInGp)
+      }
+    }
+
     setSearchQuery('')
     setShowDropdown(false)
   }
@@ -162,59 +241,71 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
             </button>
           </div>
 
+          {/* SRD Search - outside scrollable area so dropdown isn't clipped */}
+          <div className="p-4 border-b" ref={dropdownRef}>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Search SRD (optional)
+            </label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value)
+                  setShowDropdown(true)
+                }}
+                onFocus={() => setShowDropdown(true)}
+                placeholder="Search D&D 5e items..."
+                className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+              {srdLoading && (
+                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 animate-spin" />
+              )}
+            </div>
+            
+            {/* Dropdown */}
+            {showDropdown && srdResults.length > 0 && (
+              <div className="mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                {srdResults.map((item) => (
+                  <button
+                    key={`${item.source}-${item.index}`}
+                    type="button"
+                    onClick={() => handleSrdSelect(item)}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-100 border-b last:border-b-0"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-gray-900">{item.name}</span>
+                      {item.source === 'magic-item' && (
+                        <span className="text-xs px-1.5 py-0.5 bg-purple-100 text-purple-700 rounded">Magic</span>
+                      )}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {item.source === 'magic-item'
+                        ? item.equipment_category.name
+                        : ('equipment_category' in item
+                            ? (item as { equipment_category: { name: string } }).equipment_category.name
+                            : item.__typename)}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+            {showDropdown && !srdLoading && debouncedQuery.length >= 2 && srdResults.length === 0 && (
+              <div className="mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg px-4 py-3 text-sm text-gray-500">
+                No items found
+              </div>
+            )}
+          </div>
+
           {/* Body */}
-          <form onSubmit={handleSubmit} className="p-4 space-y-4 max-h-[70vh] overflow-y-auto">
+          <form onSubmit={handleSubmit} className="p-4 space-y-4 max-h-[50vh] overflow-y-auto">
             {formError && (
               <div className="p-3 bg-red-900/30 border border-red-500 text-red-400 rounded">
                 {formError}
               </div>
             )}
-
-            {/* SRD Search */}
-            <div ref={dropdownRef} className="relative">
-              <label className="block text-sm font-medium text-gray-300 mb-1">
-                Search SRD (optional)
-              </label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value)
-                    setShowDropdown(true)
-                  }}
-                  onFocus={() => setShowDropdown(true)}
-                  placeholder="Search D&D 5e items..."
-                  className="w-full pl-10 pr-10 py-2 bg-gray-700 text-gray-100 placeholder-gray-400 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800"
-                />
-                {srdLoading && (
-                  <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 animate-spin" />
-                )}
-              </div>
-              
-              {/* Dropdown */}
-              {showDropdown && srdResults.length > 0 && (
-                <div className="absolute z-10 mt-1 w-full bg-gray-700 border border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                  {srdResults.map((item) => (
-                    <button
-                      key={item.index}
-                      type="button"
-                      onClick={() => handleSrdSelect(item)}
-                      className="w-full text-left px-4 py-2 hover:bg-gray-600 border-b border-gray-600 last:border-b-0"
-                    >
-                      <div className="font-medium text-gray-100">{item.name}</div>
-                      <div className="text-sm text-gray-400">
-                        {item.equipment_category?.name}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <hr className="my-4 border-gray-700" />
 
             {/* Name */}
             <div>
@@ -222,10 +313,12 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
                 Name <span className="text-red-500">*</span>
               </label>
               <input
+                key={`name-${srdSelectCount}`}
                 id="add-item-name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                autoComplete="off"
                 required
                 className="w-full px-3 py-2 bg-gray-700 text-gray-100 placeholder-gray-400 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-gray-800"
               />

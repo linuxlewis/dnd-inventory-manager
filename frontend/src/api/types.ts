@@ -65,21 +65,6 @@ export interface ItemCreate {
 
 export type ItemUpdate = Partial<ItemCreate>
 
-export interface SrdItem {
-  index: string
-  name: string
-  equipment_category?: { name: string }
-  weapon_category?: string
-  armor_category?: string
-  desc?: string[]
-  cost?: { quantity: number; unit: string }
-  weight?: number
-  damage?: { damage_dice: string; damage_type: { name: string } }
-  armor_class?: { base: number; dex_bonus: boolean }
-  properties?: { name: string }[]
-  rarity?: { name: string }
-}
-
 // Currency types
 export type CurrencyDenomination = 'copper' | 'silver' | 'gold' | 'platinum'
 

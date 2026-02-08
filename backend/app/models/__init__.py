@@ -29,7 +29,6 @@ from app.models.item import (
     ItemType,
     ItemUpdate,
 )
-from app.models.srd import SrdItemRead
 
 __all__ = [
     "CurrencyConvert",
@@ -54,5 +53,4 @@ __all__ = [
     "ItemListResponse",
     "ItemType",
     "ItemRarity",
-    "SrdItemRead",
 ]
