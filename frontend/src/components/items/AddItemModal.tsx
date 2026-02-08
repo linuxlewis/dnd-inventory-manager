@@ -68,6 +68,7 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
 
   const dropdownRef = useRef<HTMLDivElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
+  const formRef = useRef<HTMLDivElement>(null)
 
   // Debounce search using custom hook
   const debouncedQuery = useDebounce(searchQuery, 300)
@@ -187,6 +188,11 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
 
     setSearchQuery('')
     setShowDropdown(false)
+
+    // Scroll form to top so the populated name is visible
+    requestAnimationFrame(() => {
+      formRef.current?.scrollTo({ top: 0 })
+    })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -298,7 +304,7 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
           </div>
 
           {/* Body */}
-          <form onSubmit={handleSubmit} className="p-4 space-y-4 max-h-[50vh] overflow-y-auto">
+          <form ref={formRef as React.RefObject<HTMLFormElement>} onSubmit={handleSubmit} className="p-4 space-y-4 max-h-[50vh] overflow-y-auto">
             {formError && (
               <div className="p-3 bg-red-900/30 border border-red-500 text-red-400 rounded">
                 {formError}
