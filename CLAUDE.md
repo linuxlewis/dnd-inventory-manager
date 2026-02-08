@@ -21,7 +21,7 @@ Web app for D&D 5e party inventory management. Slug + passphrase access (no user
 ## Project Structure
 
 ```
-dnd-helper/                    # Main repo (on main branch)
+dnd-inventory-manager/                    # Main repo (on main branch)
 ├── backend/
 │   └── app/
 │       ├── main.py           # FastAPI app
@@ -48,9 +48,9 @@ dnd-helper/                    # Main repo (on main branch)
     └── ralph.sh              # Agent loop script
 
 # Worktrees (sibling directories) - generic workers
-dnd-helper-wt-1/              # Can work on any branch/PRD
-dnd-helper-wt-2/              # Can work on any branch/PRD
-dnd-helper-wt-3/              # Can work on any branch/PRD
+dnd-inventory-manager-wt-1/              # Can work on any branch/PRD
+dnd-inventory-manager-wt-2/              # Can work on any branch/PRD
+dnd-inventory-manager-wt-3/              # Can work on any branch/PRD
 ```
 
 ## SQLModel Patterns
