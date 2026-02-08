@@ -4,7 +4,7 @@ A collaborative web app for managing shared party inventory in D&D 5e campaigns.
 
 **🎮 Try it now at [dndinventorymanager.com](https://dndinventorymanager.com)**
 
-<!-- ![Screenshot](docs/screenshot.png) -->
+![D&D Party Inventory Manager](docs/screenshot.png)
 
 ## Features
 
