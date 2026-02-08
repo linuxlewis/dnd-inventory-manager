@@ -1,33 +1,22 @@
 # D&D Party Inventory Manager - Docker Compose
-# Production deployment with persistent SQLite storage
 #
 # Usage:
-#   docker-compose up --build        # Start services
-#   docker-compose down              # Stop services
-#   docker-compose logs -f           # View logs
+#   docker compose up --build       # Build and start
+#   docker compose up -d            # Start in background
+#   docker compose down             # Stop
 #
-# Access:
-#   Frontend: http://localhost:9080
-#   Backend:  http://localhost:9000
-#   Via Tailscale: http://<tailscale-ip>:9080
+# Access: http://localhost:8080
 
 services:
-  backend:
-    build: ./backend
-    container_name: dnd-backend
+  app:
+    build: .
+    # Or use pre-built image:
+    # image: linuxlewis/dnd-helper:latest
+    container_name: dnd-helper
     ports:
-      - "9000:8000"
+      - "8080:80"
     volumes:
       - ./data:/app/data
-    env_file:
-      - .env.docker
-    restart: unless-stopped
-
-  frontend:
-    build: ./frontend
-    container_name: dnd-frontend
-    ports:
-      - "9080:80"
-    depends_on:
-      - backend
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///./data/dnd_inventory.db
     restart: unless-stopped
