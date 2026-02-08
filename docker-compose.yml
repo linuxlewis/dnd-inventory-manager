@@ -11,8 +11,8 @@ services:
   app:
     build: .
     # Or use pre-built image:
-    # image: linuxlewis/dnd-helper:latest
-    container_name: dnd-helper
+    # image: linuxlewis/dnd-inventory-manager:latest
+    container_name: dnd-inventory-manager
     ports:
       - "8080:80"
     volumes:

@@ -6,9 +6,9 @@
 
 | Worktree | Location | Current Branch | Assigned PRD | Status |
 |----------|----------|----------------|--------------|--------|
-| wt-1 | `../dnd-helper-wt-1` | — | — | 🔲 Available |
-| wt-2 | `../dnd-helper-wt-2` | — | — | 🔲 Available |
-| wt-3 | `../dnd-helper-wt-3` | — | — | 🔲 Available |
+| wt-1 | `../dnd-inventory-manager-wt-1` | — | — | 🔲 Available |
+| wt-2 | `../dnd-inventory-manager-wt-2` | — | — | 🔲 Available |
+| wt-3 | `../dnd-inventory-manager-wt-3` | — | — | 🔲 Available |
 
 ---
 

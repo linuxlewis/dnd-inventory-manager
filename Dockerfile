@@ -2,8 +2,8 @@
 # Builds frontend with Bun, serves via nginx + proxies API to uvicorn
 #
 # Usage:
-#   docker build -t dnd-helper .
-#   docker run -p 8080:80 -v ./data:/app/data dnd-helper
+#   docker build -t dnd-inventory-manager .
+#   docker run -p 8080:80 -v ./data:/app/data dnd-inventory-manager
 #
 # Access at http://localhost:8080
 
