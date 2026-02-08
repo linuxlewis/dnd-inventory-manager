@@ -1,0 +1,15 @@
+.git
+.github
+data
+*.md
+!README.md
+docs
+tasks
+scripts/ralph
+backend/.venv
+backend/__pycache__
+backend/tests
+frontend/node_modules
+frontend/dist
+.env*
+data/
