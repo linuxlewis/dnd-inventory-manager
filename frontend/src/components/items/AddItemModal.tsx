@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { flushSync } from 'react-dom'
 import { X, Search, Loader2 } from 'lucide-react'
 import { useCreateItem } from '../../api/items'
 import { useSrdSearch, type SrdSearchResult } from '../../api/srd/hooks'
@@ -131,6 +132,9 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
   }
 
   const handleSrdSelect = (item: SrdSearchResult) => {
+    // flushSync ensures all state updates render synchronously,
+    // preventing a visual glitch where the Name input appears empty
+    flushSync(() => {
     setName(item.name)
     setType(srdToType(item))
     // Build description from structured data + raw desc
@@ -188,6 +192,7 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
 
     setSearchQuery('')
     setShowDropdown(false)
+    }) // end flushSync
 
     // Scroll form to top so the populated name is visible
     requestAnimationFrame(() => {
