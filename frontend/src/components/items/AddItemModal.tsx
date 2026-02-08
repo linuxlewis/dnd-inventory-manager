@@ -104,10 +104,35 @@ export function AddItemModal({ slug, isOpen, onClose }: AddItemModalProps) {
     onClose()
   }
 
+  const cleanSrdDescription = (desc?: string[] | null): string => {
+    if (!desc || desc.length === 0) return ''
+    // Filter out lines that are just type/rarity headers (e.g. "Potion, varies", "Weapon, rare")
+    // and markdown table formatting (|---|---|)
+    const cleaned = desc
+      .filter((line) => {
+        const trimmed = line.trim()
+        // Skip "Type, rarity" header lines
+        if (/^(Potion|Weapon|Armor|Wondrous item|Ring|Rod|Staff|Wand|Scroll),\s/i.test(trimmed)) return false
+        // Skip table separator lines
+        if (/^\|[-|:\s]+\|$/.test(trimmed)) return false
+        // Skip table header/title lines like "Potions of Healing (table)"
+        if (/\(table\)\s*$/i.test(trimmed)) return false
+        return true
+      })
+      // Clean markdown table rows into readable text
+      .map((line) => {
+        if (line.startsWith('|') && line.endsWith('|')) {
+          return line.split('|').filter(Boolean).map(s => s.trim()).join(' — ')
+        }
+        return line
+      })
+    return cleaned.join('\n').trim()
+  }
+
   const handleSrdSelect = (item: SrdSearchResult) => {
     setName(item.name)
     setType(srdToType(item))
-    setDescription(item.desc?.join('\n') || '')
+    setDescription(cleanSrdDescription(item.desc) || '')
 
     if (item.source === 'magic-item') {
       setCategory(item.equipment_category.name)

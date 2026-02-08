@@ -93,7 +93,30 @@ export function useSrdSearch(query: string) {
         (item) => ({ ...item, source: 'magic-item' as const })
       )
 
-      return [...equipment, ...magicItems]
+      const combined = [...equipment, ...magicItems]
+
+      // Deduplicate: if same name appears with "Varies" rarity and a specific rarity, keep the specific one
+      const byName = new Map<string, SrdSearchResult[]>()
+      for (const item of combined) {
+        const list = byName.get(item.name) || []
+        list.push(item)
+        byName.set(item.name, list)
+      }
+
+      const deduped: SrdSearchResult[] = []
+      for (const [, items] of byName) {
+        if (items.length > 1) {
+          // Prefer items without "Varies" rarity
+          const specific = items.filter(
+            (i) => i.source !== 'magic-item' || (i as SrdMagicItemResult).rarity?.name !== 'Varies'
+          )
+          deduped.push(...(specific.length > 0 ? specific : [items[0]]))
+        } else {
+          deduped.push(items[0])
+        }
+      }
+
+      return deduped
     },
     enabled: query.length >= 2,
     staleTime: 1000 * 60 * 5,
